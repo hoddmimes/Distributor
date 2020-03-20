@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Messages>
+
+	<!-- ========================================================================
+							Distributor Management Messages (used by the Distributor)
+	==========================================================================-->
+	<Message name="DistNetMsg">
+		<Attribute name="requestId" type="long"/>
+		<Attribute name="timestamp" type="long"/>
+		<Attribute name="isRequestMessage" type="boolean"/>
+		<Attribute name="message" type="MessageWrapper"/>
+	</Message>
+	<!--
+	 * Top level query, exploring the domain. What distributors are started 
+	 * and what connetions do they have 
+	 -->
+	<Message name="DistDomainConnectionEntry">
+		<Attribute name="connectionId" type="long"/>
+		<Attribute name="mcaAddress" type="String"/>
+		<Attribute name="mcaPort" type="int"/>
+		<Attribute name="subscriptions" type="int"/>
+		<Attribute name="inRetransmissions" type="int"/>
+		<Attribute name="outRetransmissions" type="int"/>
+	</Message>
+	<Message name="DistDomainDistributorEntry">
+		<Attribute name="distributorId" type="long"/>
+		<Attribute name="hostname" type="String"/>
+		<Attribute name="hostaddress" type="String"/>
+		<Attribute name="applicationName" type="String"/>
+		<Attribute name="startTime" type="String"/>
+		<Attribute name="inRetransmissions" type="int"/>
+		<Attribute name="outRetransmissions" type="int"/>
+		<Attribute name="connections" type="DistDomainConnectionEntry" array="[]"/>
+	</Message>
+	<Message name="DistExploreDomainRqst">
+	</Message>
+	<Message name="DistExploreDomainRsp">
+		<Attribute name="distributor" type="DistDomainDistributorEntry"/>
+	</Message>
+	<!--
+	  * Get detailed information for a distributor
+	  -->
+	<Message name="DistributorEntry">
+		<Attribute name="hostname" type="String"/>
+		<Attribute name="hostaddress" type="String"/>
+		<Attribute name="applicationName" type="String"/>
+		<Attribute name="startTime" type="String"/>
+		<Attribute name="connections" type="int"/>
+		<Attribute name="distributorId" type="long"/>
+		<Attribute name="memMax" type="long"/>
+		<Attribute name="memUsed" type="long"/>
+		<Attribute name="memFree" type="long"/>
+		<Attribute name="inRetransmissions" type="int"/>
+		<Attribute name="outRetransmissions" type="int"/>
+		<Attribute name="subscriptions" type="int"/>
+	</Message>
+	<Message name="DistExploreDistributorRqst">
+		<Attribute name="distributorId" type="long"/>
+	</Message>
+	<Message name="DistExploreDistributorRsp">
+		<Attribute name="distributor" type="DistributorEntry"/>
+	</Message>
+	<!--
+	  * Get detailed information for a connection
+	-->
+	<Message name="DataRateItem">
+		<Attribute name="total" type="long"/>
+		<Attribute name="currValue" type="int"/>
+		<Attribute name="peakValue" type="int"/>
+		<Attribute name="peakTime" type="String"/>
+	</Message>
+	<Message name="QueueSizeItem">
+		<Attribute name="size" type="long"/>
+		<Attribute name="peakSize" type="int"/>
+		<Attribute name="peakTime" type="String"/>
+	</Message>
+	<Message name="ConnectionEntry">
+		<Attribute name="mcaAddress" type="String"/>
+		<Attribute name="mcaPort" type="int"/>
+		<Attribute name="connectionId" type="long"/>
+		<Attribute name="publishers" type="int"/>
+		<Attribute name="subscribers" type="int"/>
+		<Attribute name="subscriptions" type="int"/>
+		<!-- Retransmission info -->
+		<Attribute name="inRetransmissions" type="int"/>
+		<Attribute name="outRetransmissions" type="int"/>
+		<!-- Queue Information -->
+		<Attribute name="deliverUpdateQueue" type="QueueSizeItem"/>
+		<!-- sender info -->
+		<Attribute name="xtaTotalBytes" type="long"/>
+		<Attribute name="xtaTotalSegments" type="long"/>
+		<Attribute name="xtaTotalUpdates" type="long"/>
+		<Attribute name="xtaBytes" type="DataRateItem"/>
+		<Attribute name="xtaSegments" type="DataRateItem"/>
+		<Attribute name="xtaUpdates" type="DataRateItem"/>
+		<Attribute name="xtaBytes1min" type="DataRateItem"/>
+		<Attribute name="xtaSegments1min" type="DataRateItem"/>
+		<Attribute name="xtaUpdates1min" type="DataRateItem"/>
+		<Attribute name="xtaBytes5min" type="DataRateItem"/>
+		<Attribute name="xtaSegments5min" type="DataRateItem"/>
+		<Attribute name="xtaUpdates5min" type="DataRateItem"/>
+		<!-- receiver info -->
+		<Attribute name="rcvTotalBytes" type="long"/>
+		<Attribute name="rcvTotalSegments" type="long"/>
+		<Attribute name="rcvTotalUpdates" type="long"/>
+		<Attribute name="rcvBytes" type="DataRateItem"/>
+		<Attribute name="rcvSegments" type="DataRateItem"/>
+		<Attribute name="rcvUpdates" type="DataRateItem"/>
+		<Attribute name="rcvBytes1min" type="DataRateItem"/>
+		<Attribute name="rcvSegments1min" type="DataRateItem"/>
+		<Attribute name="rcvUpdates1min" type="DataRateItem"/>
+		<Attribute name="rcvBytes5min" type="DataRateItem"/>
+		<Attribute name="rcvSegments5min" type="DataRateItem"/>
+		<Attribute name="rcvUpdates5min" type="DataRateItem"/>
+	</Message>
+	<Message name="DistExploreConnectionRqst">
+		<Attribute name="distributorId" type="long"/>
+		<Attribute name="connectionId" type="long"/>
+	</Message>
+	<Message name="DistExploreConnectionRsp">
+		<Attribute name="connection" type="ConnectionEntry"/>
+	</Message>
+	<!--
+	   * Get detailed information about active subscription for a connection
+	   -->
+	<Message name="DistExploreSubscriptionsRqst">
+		<Attribute name="distributorId" type="long"/>
+		<Attribute name="connectionId" type="long"/>
+	</Message>
+	<Message name="DistExploreSubscriptionsRsp">
+		<Attribute name="mcaAddress" type="String"/>
+		<Attribute name="mcaPort" type="int"/>
+		<Attribute name="subscriptions" type="String" array="[]"/>
+	</Message>
+	<!--
+	   * Get detailed information about retransmission requests
+	   -->
+	<Message name="DistExploreRetransmissionsRqst">
+		<Attribute name="distributorId" type="long"/>
+		<Attribute name="connectionId" type="long"/>
+	</Message>
+	<Message name="DistExploreRetransmissonsRsp">
+		<Attribute name="mcaAddress" type="String"/>
+		<Attribute name="mcaPort" type="int"/>
+		<Attribute name="totalInRqst" type="int"/>
+		<Attribute name="totalOutRqst" type="int"/>
+		<Attribute name="totalSeenRqst" type="int"/>
+		<Attribute name="inHosts" type="String" array="[]"/>
+		<Attribute name="outHosts" type="String" array="[]"/>
+	</Message>
+	<Message name="NameValuePair" dbObject="Embeddable">
+		<Attribute name="name" type="String"/>
+		<Attribute name="value" type="String"/>
+		<Attribute name="code" type="String"/>
+	</Message>
+	<!-- ========================================================================
+							Configuration Load Messages (used in the Configurator)
+	==========================================================================-->
+	<Message name="ConfigurationXmlLoadRqst">
+	</Message>
+	<Message name="ConfigurationXmlLoadRsp">
+		<Attribute name="xmlConfiguration" type="String"/>
+	</Message>
+	
+	<!-- ========================================================================
+							Distributor Broadcast Message
+	==========================================================================-->
+	<!-- Message sent by a subscriber to notify the broadcast gateway what information the
+	      subscriber interested in. The message is  also sent between broadcast gateways
+	      to register interests -->
+	<Message name="DistBdxGwyHello">
+		<Attribute name="bdxGwyName" type="String"/>
+	</Message>
+	<Message name="DistBdxGwySubscrInterestItem">
+		<Attribute name="multicastGroupId" type="long"/>
+		<Attribute name="handler" type="String"/>
+		<Attribute name="subject" type="String"/>
+	</Message>
+	<Message name="DistBdxGwySubscrInterest">
+		<Constants>
+			<Constant name="ADD_INTEREST" type="int" value="1"/>
+			<Constant name="REMOVE_INTEREST" type="int" value="0"/>
+		</Constants>
+		<Attribute name="action" type="int"/>
+		<Attribute name="interests" type="DistBdxGwySubscrInterestItem" array="[]"/>
+	</Message>
+	<!-- Ping request response, keep alive message sent between broadcast gateways -->
+	<Message name="DistBdxGwyPingRqst">
+		<Attribute name="rqstId" type="int"/>
+		<Attribute name="startTime" type="long"/>
+		<Attribute name="bdxGwyName" type="String"/>
+	</Message>
+	<Message name="DistBdxGwyPingRsp">
+		<Attribute name="rqstId" type="int"/>
+		<Attribute name="startTime" type="long"/>
+		<Attribute name="bdxGwyName" type="String"/>
+	</Message>
+	<!-- Update message sent between broadcast gateways -->
+	<Message name="DistBdxGwyUpdateItem">
+		<Attribute name="multicastGroupId" type="long"/>
+		<Attribute name="subject" type="String"/>
+		<Attribute name="message" type="byte[]"/>
+	</Message>
+	<Message name="DistBdxGwyUpdate">
+		<Attribute name="updates" type="DistBdxGwyUpdateItem" array="[]"/>
+	</Message>
+	
+	</Messages>

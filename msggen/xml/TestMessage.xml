@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Messages>
+
+
+	
+	<!-- ========================================================================
+							Test Message Related Stuff
+	==========================================================================-->
+	<Message name="TestMessage">
+		<Attribute name="stringArray" type="String" array="[]"/>
+		<Attribute name="boolValue" type="boolean"/>
+		<Attribute name="byteValue" type="byte"/>
+		<Attribute name="shortValue" type="short"/>
+		<Attribute name="intValue" type="int" mandatory="true"/>
+		<Attribute name="intArray" type="int" array="[]"/>
+		<Attribute name="longValue" type="long"/>
+		<Attribute name="strValue" type="String"/>
+		<Attribute name="bytesValue" type="byte[]"/>
+		<Attribute name="bytesArrayValue" type="byte[]" array="[]"/>
+	</Message>
+	
+	
+	</Messages>
