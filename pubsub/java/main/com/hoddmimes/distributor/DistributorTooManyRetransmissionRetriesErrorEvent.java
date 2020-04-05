@@ -24,7 +24,7 @@ public class DistributorTooManyRetransmissionRetriesErrorEvent extends Distribut
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Constructor for creating a <i>DistributorTooManyRetransmissionRetriesErrorEvent<7i>
+	 * Constructor for creating a <i>DistributorTooManyRetransmissionRetriesErrorEvent</i>
 	 * @param pMcAddress the IP multicast address used by the distributor connection
 	 * @param pMcPort the UDP port used by the distributor connection
 	 */

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <File name="file"  fileName="./logs/distributor.log">
+            <PatternLayout>
+                <Pattern>%d %p %C{1} [%F %t %L] %m %ex%n</Pattern>
+            </PatternLayout>
+        </File>
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout>
+                <Pattern>%d{HH:mm:ss.SSS} %C{1} %-5level  - %msg%n</Pattern>
+            </PatternLayout>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="trace">
+            <AppenderRef level="DEBUG" ref="file"/>
+            <AppenderRef level="TRACE" ref="STDOUT"/>
+        </Root>
+    </Loggers>
+</Configuration>

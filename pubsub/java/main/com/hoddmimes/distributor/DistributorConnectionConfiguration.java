@@ -432,7 +432,7 @@ public class DistributorConnectionConfiguration {
 	/**
 	 * Sets the server retransmission holdback time (in milliseconds). When a
 	 * retransmission request is received the missed message will not be re-sent
-	 * immidetatly in case holdback value is > 0. In case a message is missed
+	 * immidetatly in case holdback value is &gt; 0. In case a message is missed
 	 * it's not unlikely that more an one receiver is missing the message. By
 	 * hold back the re-publishing of the missed message multiple retransmission
 	 * requests can be "servered" if they arrive within the holdback interval,

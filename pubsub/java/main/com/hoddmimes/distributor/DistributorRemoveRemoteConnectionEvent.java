@@ -21,7 +21,7 @@ public class DistributorRemoveRemoteConnectionEvent extends DistributorEvent{
 	 * @param pRemoteAddress IP address of the node on which the distributor connection is created.
 	 * @param pSenderId the sender id used on the remote host 
 	 * @param pMcAddress distributor connection IP multicast InetAddress
-	 * @param pMcPort distributor connection UDP port used.
+	 * @param pMcaPort distributor connection UDP port used.
 	 * @param pApplicationName remote application name.
 	 */
 	public DistributorRemoveRemoteConnectionEvent(InetAddress pRemoteAddress,

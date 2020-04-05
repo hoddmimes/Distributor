@@ -234,7 +234,7 @@ public class DistributorApplicationConfiguration {
 	 * Setting the network interface on which the management control transport
 	 * is to be enabled. By default the transport is enabled on all interfaces.
 	 * 
-	 * @param pCMAInterfaceAddress
+	 * @param pCMAInterfaceAddress, configuration multicast address interface address
 	 */
 	public void setCMAInterface(String pCMAInterfaceAddress) {
 		mCMAInterface = pCMAInterfaceAddress;
@@ -288,7 +288,7 @@ public class DistributorApplicationConfiguration {
 
 	/**
 	 * Returns the number of timer threads that should be started. The
-	 * recommended value is 2. In case of <i><b>many</i></b> connections being created it
+	 * recommended value is 2. In case of <i> <b>many</i> </b> connections being created it
 	 * could be applicable to started 1 or 2 more timer threads.
 	 * 
 	 * @return int, number of timer threads that will be started
@@ -299,11 +299,11 @@ public class DistributorApplicationConfiguration {
 
 	/**
 	 * Sets the number of timer threads that will be started. The recommended
-	 * value is 2. In case of <i><b>many</i></b> connections being created it could be
+	 * value is 2. In case of <i><b>many</b></i> connections being created it could be
 	 * applicable to started 1 or 2 more timer threads. By default two threads are started.
 	 * This should be sufficient.
 	 * 
-	 * @param pValue
+	 * @param pValue, number of timer threads to activate
 	 */
 	public void setTimerThreads(int pValue) {
 		mTimerThreads = pValue;
@@ -344,7 +344,7 @@ public class DistributorApplicationConfiguration {
 	
 	/**
 	 * Set the host address where the broadcast gateway is running
-	 * @param pAddress
+	 * @param pAddress, IP4 address of the host where the broadcast gateway is running.
 	 */
 	public void setBroadcastGatewayAddress(String pAddress) {
 		this.mBdxGwyAddress = pAddress;

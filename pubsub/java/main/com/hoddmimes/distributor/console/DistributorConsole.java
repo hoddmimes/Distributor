@@ -379,7 +379,7 @@ public class DistributorConsole extends JFrame implements
 	}
 
 	/**
-	 * @param args
+	 * @param args, program arguments
 	 */
 	@SuppressWarnings("static-access")
 	public static void main(String[] args) {

@@ -12,9 +12,8 @@ package com.hoddmimes.distributor;
  * and just deliver updates that match the subjects/topics the subscriber has an
  * interest in. The subject string is a hierarchical name string where levels are
  * divided by the character  &quot;/ &quot; for example  &quot;/foo/bar/fie &quot;. The characters
- * (strings)  &quot;* &quot; and  &quot;... &quot; works as wildcards. <i><b>These strings must not be present
- * in a subject when publishing data</i></b> but are applicable when setting up an
- * subscription. The  &quot;* &quot; match any string at a certain level, for example
+ * (strings)  &quot;* &quot; and  &quot;... &quot; works as wildcards. <i><b>These strings must not be present in a subject when publishing data</b></i>
+ * but are applicable when setting up an subscription. The  &quot;* &quot; match any string at a certain level, for example
  *  &quot;/foo/* /fie &quot; will match any string at the second level. The string  &quot;... &quot;
  * matches all strings at the current level and all sublevels, for example
  *  &quot;/foo/... &quot; will match  &quot;/foo/bar/fie &quot; and  &quot;/foo/allan/gazonk/47111 &quot; etc.
@@ -43,18 +42,13 @@ public interface DistributorSubscriberIf {
 	/**
 	 * Removes an active subscription
 	 * 
-	 * @param pHandle handle identifying the subscription. Passing "null" as
-	 *            argument will remove all active subscriptions.
+	 * @param pHandle handle identifying the subscription. Passing "null" as argument will remove all active subscriptions.
 	 * @throws DistributorException, remove exception error.
 	 */
-	public void removeSubscription(Object pHandle)
-			throws DistributorException;
+	public void removeSubscription(Object pHandle) throws DistributorException;
 
 	/**
-	 * Close and removes the subscriber. All active subscriptions are implicitly
-	 * removed.
-	 * 
-	 * @throws DistributorException, close exception error.
+	 * Close and removes the subscriber. All active subscriptions are implicitly removed.
 	 */
 	public void close();
 

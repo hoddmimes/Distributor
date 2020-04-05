@@ -21,7 +21,7 @@ public interface DistributorConnectionIf
 	 * subscribers and publishers being associated to the same UDP multicast
 	 * address / port will receive an event telling that connection for the
 	 * particular application/host has closed down i.e.
-	 * <A HREF="DistributorRemoveRemoteConnectionEvent.html">DistributorRemoveRemoteConnectionEvent.html</>
+	 * <a HREF="DistributorRemoveRemoteConnectionEvent.html">DistributorRemoveRemoteConnectionEvent.html</a>
 	 * event.
 	 * 
 	 */
@@ -53,8 +53,7 @@ public interface DistributorConnectionIf
 	public long getConnectionId();
 
 	/**
-	 * Returns the connection is string which is the multicast (UDP) address <<
-	 * 32 + multicast (UDP) port
+	 * Returns the connection is string which is the multicast (UDP) address &lt;&lt; 32 + multicast (UDP) port
 	 * 
 	 * @return connection id string
 	 */

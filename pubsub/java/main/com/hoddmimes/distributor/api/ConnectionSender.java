@@ -124,7 +124,7 @@ class ConnectionSender {
 			Enumeration<NetworkInterface> tEnumInterface = NetworkInterface.getNetworkInterfaces();
 			while( tEnumInterface.hasMoreElements()) {
 				NetworkInterface tInterface = tEnumInterface.nextElement();
-				if (tInterface.getDisplayName().equals( tEthDevice )) {
+				if (tInterface.getName().equals( tEthDevice )) {
 					Enumeration<InetAddress> tEnumInetAddr = tInterface.getInetAddresses();
 					while(tEnumInetAddr.hasMoreElements()) {
 						InetAddress tAdr = tEnumInetAddr.nextElement();

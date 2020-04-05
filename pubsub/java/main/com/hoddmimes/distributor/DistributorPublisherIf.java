@@ -17,8 +17,8 @@ public interface DistributorPublisherIf {
 	 * updates that match the subjects/topics the subscriber has an interest in.
 	 * The subject string is a Hierarchical   name string where levels are divided
 	 * by the character &quot;/&quot; for example  &quot;/foo/bar/fie &quot;. The characters (strings)
-	 *  &quot;* &quot; and  &quot;... &quot; works as wildcards. <i><b>These wildcard strings must not be present in a
-	 * subject when publishing data</i></b> but are applicable when setting up an
+	 *  &quot;* &quot; and  &quot;... &quot; works as wildcards.
+	 *  <i><b>These wildcard strings must not be present in a subject when publishing data</i></b> but are applicable when setting up an
 	 * subscription. The  &quot;* &quot; match any string at a certain level, for example
 	 *  &quot;/foo/* /fie&quot; will match any string at the second level. The string  &quot;... &quot;
 	 * matches all strings at the current level and all sublevels, for example
@@ -33,7 +33,6 @@ public interface DistributorPublisherIf {
 
 	/**
 	 * Close and removes the publisher
-	 * 
 	 * @throws DistributorException, close exception error.
 	 */
 	public void close() throws DistributorException;

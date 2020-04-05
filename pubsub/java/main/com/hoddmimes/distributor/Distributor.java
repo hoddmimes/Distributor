@@ -28,9 +28,9 @@ public class Distributor {
 	final static SimpleDateFormat cSDF = new SimpleDateFormat("HH:mm:ss.SSS");
 
 	final DistributorApplicationConfiguration mApplicationConfiguration;
-	final Logger 						mLogger = LogManager.getLogger( this.getClass().getSimpleName());
-	final long 							mDistributorId;
-	final String 						mStartTimeString;
+	final Logger 							  mLogger = LogManager.getLogger( this.getClass().getSimpleName());
+	final long 							      mDistributorId;
+	final String 						      mStartTimeString;
 
 	final BdxGwyDistributorClient 			mBdxGwyConnction;
 	final DistributorManagementController 	mMgmtController;
@@ -163,7 +163,16 @@ public class Distributor {
 			}
 		}
 	}
-	
+
+	/**
+	 * Method for updating the events being logged.
+	 * See DistributorApplicationConfiguration.LOG_*
+	 * @param pLogMask, mask with the events being captured and logged
+	 */
+	public void setLogging( int pLogMask ) {
+		this.mApplicationConfiguration.setLogFlags( pLogMask );
+	}
+
 	/**
 	 * Method for receiving the time when the distributor instance was created. 
 	 * @return creation time having the following format "HH:mm:ss.SSS"
