@@ -15,9 +15,9 @@ An application create a Distributor object. The Distributor object is like a han
 Having a Distributor instance the application can create Distributor Connections, Publishers and Subscriber instances.
 
 -   **_[Distributor](https://github.com/hoddmimes/Distributor/blob/master/pubsub/java/main/com/hoddmimes/distributor/Distributor.java)_** object, handle encapsulating the distributor utility.
--   **_[Distributor Connection](https://github.com/hoddmimes/Distributor/blob/master/pubsub/java/main/com/hoddmimes/distributor/DistributorConnectionIf.html)_**  object, is like a transport channel encapsulating the physical transport i.e. the interface to a IP multicast socket.
--   **_[Publisher](https://github.com/hoddmimes/Distributor/blob/master/pubsub/java/main/com/hoddmimes/distributor/DistributorPublisherIf.html)_**  object, an interface allowing applications to publish data.
--   **_[Subscriber](https://github.com/hoddmimes/Distributor/blob/master/pubsub/java/main/com/hoddmimes/distributor/DistributorSubscriberIf.html)_**  object, an interface allowing applications to enable subscriptions and managing data subscription filters.
+-   **_[Distributor Connection](https://github.com/hoddmimes/Distributor/blob/master/pubsub/java/main/com/hoddmimes/distributor/DistributorConnectionIf.java)_**  object, is like a transport channel encapsulating the physical transport i.e. the interface to a IP multicast socket.
+-   **_[Publisher](https://github.com/hoddmimes/Distributor/blob/master/pubsub/java/main/com/hoddmimes/distributor/DistributorPublisherIf.java)_**  object, an interface allowing applications to publish data.
+-   **_[Subscriber](https://github.com/hoddmimes/Distributor/blob/master/pubsub/java/main/com/hoddmimes/distributor/DistributorSubscriberIf.java)_**  object, an interface allowing applications to enable subscriptions and managing data subscription filters.
 
 
 
