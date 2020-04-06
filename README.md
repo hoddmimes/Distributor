@@ -38,7 +38,18 @@ Having a Distributor instance the application can create Distributor Connections
 
 A small publisher sample is found [here](pubsub/java/main/com/hoddmimes/distributor/samples/Publisher.java)
 
+<sup>
+```json
+{
+  "firstName": "John",
+  "lastName": "Smith",
+  "age": 25
+}
 ```
+</sup>
+
+
+
 import com.hoddmimes.distributor.*;
 
 
