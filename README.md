@@ -21,7 +21,7 @@ Having a Distributor instance the application can create Distributor Connections
 
 
 
-##Overall Design
+## Overall Design
 - The focus has been on delivering real time information, high volume and low latency without any loss of data. 
 
 - The Distributor is a true _one-to-many_ mechanism. When publishing updates it sent once and is received by one or more subscribers that have declared an interest in the information.
@@ -48,7 +48,7 @@ When creating a [Distributor](javadoc/com/hoddmimes/boreas/core/distributor/Dist
 Normally the _DistributorApplicationConfiguration_ object are instasiated with default parameters suitable for most application you can however modify the default parameters 
 after you have created the _DistributorApplicationConfiguration_ object and before creating the _Distributor_ instance.
 
-##Distributor Connection Configuration
+## Distributor Connection Configuration
 When application exchange information using the _Distributor_ utility it is done over IP multicast. A single [IP class D](https://www.tutorialspoint.com/ipv4/ipv4_address_classes.htm) address translates to an physical 
 Ethernet multicast group. There is a one-to-one mapping between a [DistributorConnection](javadoc/com/hoddmimes/boreas/core/distributor/DistributorConnectionIf.html) and a IP Multicast address.
 
