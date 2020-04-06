@@ -41,7 +41,7 @@ Having a Distributor instance the application can create Distributor Connections
 - Publishing of messages are _not transactional_. Publishers do not know about receivers. Receivers on the other hand knows about publishers and monitor the sequense of published messages.
 
 
-##Distributor Application Configuration 
+## Distributor Application Configuration 
 When creating a [Distributor](javadoc/com/hoddmimes/boreas/core/distributor/Distributor.html) instance a 
 [DistributorApplicationConfiguration](javadoc/com/hoddmimes/boreas/core/distributor/DistributorApplicationConfiguration.html) instance is passed as parameter.
 
@@ -58,7 +58,7 @@ To a large extent it defines settings for how the _Distributor_ application prot
   
 
 
-##Subject Names
+## Subject Names
 
 All information published by publisher application have an associated subject name. 
 And in order for subscriber application to receive data they must setup subscriptions on subjects that they have and interest in.
@@ -82,7 +82,7 @@ Some typical matching rules.
 “/foo/bar/…” with match anything with three or more levels starting with “/foo” and “/bar” at level  one and two. 
 
 
-##Nagging Distributor Connections
+## Nagging Distributor Connections
 
 The transport protocol when dissaminating information with the Distributor utility is IP Multicast.  IP multicasting cater for layer 1 and 2 in the ISO/OSI model.
 This implicates that there is *_no flow control or error detection_* if messages are lost or duplicated, The Distributor application _protocol_, hidden for publisher and subscriber 
@@ -127,7 +127,7 @@ totRetransmissions = 0;
 
 
 
-##A minimalist Publisher App
+## A minimalist Publisher App
 
 A bit more comprehensive publisher sample is found [here](pubsub/java/main/com/hoddmimes/distributor/samples/Publisher.java)
 
@@ -190,7 +190,7 @@ public class Publisher {
 </sup>
 
 
-##A minimalist Subscriber App
+## A minimalist Subscriber App
 
 A bit more comprehensive subscriber sample is found [here](pubsub/java/main/com/hoddmimes/distributor/samples/Subscriber.java)
 
