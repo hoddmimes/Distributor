@@ -14,10 +14,10 @@ Using the Distributor API is trivial.
 An application create a Distributor object. The Distributor object is like a handle to the Distributor utility.  
 Having a Distributor instance the application can create Distributor Connections, Publishers and Subscriber instances.
 
--   **_[Distributor](https://github.com/hoddmimes/Distributor/blob/master/pubsub/java/main/com/hoddmimes/distributor/Distributor.java)_** object, handle encapsulating the distributor utility.
--   **_[Distributor Connection](https://github.com/hoddmimes/Distributor/blob/master/pubsub/java/main/com/hoddmimes/distributor/DistributorConnectionIf.java)_**  object, is like a transport channel encapsulating the physical transport i.e. the interface to a IP multicast socket.
--   **_[Publisher](https://github.com/hoddmimes/Distributor/blob/master/pubsub/java/main/com/hoddmimes/distributor/DistributorPublisherIf.java)_**  object, an interface allowing applications to publish data.
--   **_[Subscriber](https://github.com/hoddmimes/Distributor/blob/master/pubsub/java/main/com/hoddmimes/distributor/DistributorSubscriberIf.java)_**  object, an interface allowing applications to enable subscriptions and managing data subscription filters.
+-   **_[Distributor](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/blob/master/javadoc/com/hoddmimes/distributor/Distributor.html)_** object, handle encapsulating the distributor utility.
+-   **_[Distributor Connection](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/blob/master/javadoc/com/hoddmimes/distributor/DistributorConnectionIf.html)_**  object, is like a transport channel encapsulating the physical transport i.e. the interface to a IP multicast socket.
+-   **_[Publisher](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/blob/master/javadoc/com/hoddmimes/distributor/DistributorPublisherIf.html)_**  object, an interface allowing applications to publish data.
+-   **_[Subscriber](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/blob/master/javadoc/com/hoddmimes/distributor/DistributorSubscriberIf.html)_**  object, an interface allowing applications to enable subscriptions and managing data subscription filters.
 
 
 
@@ -42,17 +42,17 @@ Having a Distributor instance the application can create Distributor Connections
 
 
 ## Distributor Application Configuration 
-When creating a [Distributor](https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/Distributor.html) instance a 
-[DistributorApplicationConfiguration](https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/DistributorApplicationConfiguration.html) instance is passed as parameter.
+When creating a [Distributor](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/Distributor.html) instance a 
+[DistributorApplicationConfiguration](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/DistributorApplicationConfiguration.html) instance is passed as parameter.
 
 Normally the _DistributorApplicationConfiguration_ object are instasiated with default parameters suitable for most application you can however modify the default parameters 
 after you have created the _DistributorApplicationConfiguration_ object and before creating the _Distributor_ instance.
 
 ## Distributor Connection Configuration
 When application exchange information using the _Distributor_ utility it is done over IP multicast. A single [IP class D](https://www.tutorialspoint.com/ipv4/ipv4_address_classes.htm) address translates to an physical 
-Ethernet multicast group. There is a one-to-one mapping between a [DistributorConnection](https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/DistributorConnectionIf.html) and a IP Multicast address.
+Ethernet multicast group. There is a one-to-one mapping between a [DistributorConnection](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/DistributorConnectionIf.html) and a IP Multicast address.
 
-When instasiating a a _DistributorConnection_ a [DistributorConnectionConfiguration](https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/DistributorConnectionConfiguration.html)
+When instasiating a a _DistributorConnection_ a [DistributorConnectionConfiguration](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/DistributorConnectionConfiguration.html)
 is passed as parameter. The _DistributorConnectionConfiguration_ defines the behaviour of how the distrbutor disaminates and receivs data for that _channel_
 To a large extent it defines settings for how the _Distributor_ application protocol will behave/work.
   
