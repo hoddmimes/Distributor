@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"com.hoddmimes.distributor"},{"l":"com.hoddmimes.distributor.api"},{"l":"com.hoddmimes.distributor.bdxgwy"},{"l":"com.hoddmimes.distributor.generated.messages"},{"l":"com.hoddmimes.distributor.sampels"},{"l":"com.hoddmimes.distributor.sampels.table"}]
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"com.hoddmimes.distributor"},{"l":"com.hoddmimes.distributor.api"},{"l":"com.hoddmimes.distributor.bdxgwy"},{"l":"com.hoddmimes.distributor.generated.messages"}]

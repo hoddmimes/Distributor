@@ -1,9 +1,9 @@
-
+package com.hoddmimes.distributor.samples;
 
 import com.hoddmimes.distributor.*;
 
 
-public class Publisher {
+public class MiniPublisher {
 
 	private static final String EthDevice = "eth0";
 	private static final String IpAddress = "224.10.10.44";

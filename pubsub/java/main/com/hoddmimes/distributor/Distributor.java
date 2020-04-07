@@ -165,9 +165,23 @@ public class Distributor {
 	}
 
 	/**
-	 * Method for updating the events being logged.
+	 * Method for updating the events being logged. Can be set and modified in real time
+	 * The value is a mask i.e. an OR for the event values being of interest
 	 * See DistributorApplicationConfiguration.LOG_*
-	 * @param pLogMask, mask with the events being captured and logged
+	 * <table>
+	 *  <tr><th>Event</th><th>Mask</th><th>Description</th></tr>
+	 * 	<tr><td>LOG_ERROR_EVENTS</td><td>1</td><td>trace when application error events are passed to the publisher / subscriber event callback routines</td></tr>
+	 * 	<tr><td>LOG_CONNECTION_EVENTS</td><td>2</td><td>trace the creation and deletion of distributor connection instances</td></tr>
+	 * 	<tr><td>LOG_RMTDB_EVENTS</td><td>4</td><td>trace the creation and deletion of <i>remote</i> distributor connection</tr>
+	 * 	<tr><td>LOG_RETRANSMISSION_EVENTS</td><td>8</td><td>trace retransmission requests and recovery events</td></tr>
+	 * 	<tr><td>LOG_SUBSCRIPTION_EVENTS</td><td>16</td><td>trace when subscribers add and remove subscriptions</td></tr>
+	 * 	<tr><td>LOG_STATISTIC_EVENTS</td><td>32</td><td>periodically out statistics information to the log file in case statistic tracing is enabled.</td></tr>
+	 * 	<tr><td>LOG_SEGMENTS_EVENTS</td><td>64</td><td>trace when sending and receiving packages (can be extensive).</td></tr>
+	 * 	<tr><td>LOG_DATA_PROTOCOL_RCV</td><td>128</td><td>trace distributor protocol messages received.</td></tr>
+	 * 	<tr><td>LOG_DATA_PROTOCOL_XTA</td><td>256</td><td>trace distributor protocol messages sent.</td></tr>
+	 * 	<tr><td>LOG_RETRANSMISSION_CACHE</td><td>512</td><td>periodically trace the size and time span of the messages in the retransmission cache</td></tr>
+	 * </table>
+	 *
 	 */
 	public void setLogging( int pLogMask ) {
 		this.mApplicationConfiguration.setLogFlags( pLogMask );
