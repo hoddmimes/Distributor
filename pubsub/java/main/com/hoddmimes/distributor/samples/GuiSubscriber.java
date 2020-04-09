@@ -116,6 +116,10 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 
 	private JButton jCancelSendButton = null;
 
+	private JButton jBrowseDeviceButton = null;
+
+	private JButton jLoggingButton = null;
+
 	private JLabel jStateLabel = null;
 
 	
@@ -135,6 +139,9 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 	String												mP2PHost;
 	int													mP2PPort;
 
+	private int mLogFlags = DistributorApplicationConfiguration.LOG_CONNECTION_EVENTS +
+							DistributorApplicationConfiguration.LOG_ERROR_EVENTS;
+
 	private JLabel jBytesReceivedLabel = null;
 
 	private JTextField jBytesReceivedTextField = null;
@@ -146,6 +153,7 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 	private JLabel jCurrentSeqnoSeenLabel;
 	private JTextField jLastSeqnoSeenTextField;
 	private JLabel jEthDeviceLabel;
+	private JLabel jLoggingLabel;
 	private JTextField jEthDeviceTextField;
 	
 
@@ -165,7 +173,7 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 	 * @return void
 	 */
 	private void initialize() {
-		this.setSize(451, 321);
+		this.setSize(530, 321);
 		this.setResizable(false);
 		this.setBackground(new Color(255, 255, 204));
 		this.setContentPane(getJContentPane());
@@ -250,13 +258,12 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 			jIpBufferSizeLabel.setText("IP Buffer size");
 			jIpBufferSizeLabel.setFont(new Font("Arial", Font.PLAIN, 12));
 			jSegmentSizeLabel = new JLabel();
-			jSegmentSizeLabel.setBounds(new Rectangle(10, 40, 100
-					, 16));
+			jSegmentSizeLabel.setBounds(new Rectangle(10, 40, 100, 16));
 			jSegmentSizeLabel.setText("Segment size");
 			jSegmentSizeLabel.setFont(new Font("Arial", Font.PLAIN, 12));
 			jParameterPanel = new JPanel();
 			jParameterPanel.setLayout(null);
-			jParameterPanel.setPreferredSize(new Dimension(200, 1));
+			jParameterPanel.setPreferredSize(new Dimension(260, 1));
 			jParameterPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED), "Parameters", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.TOP, new Font("Dialog", Font.ITALIC, 10), Color.blue));
 			jParameterPanel.add(jSegmentSizeLabel, null);
 			jParameterPanel.add(getJSegmentSizeTextField(), null);
@@ -266,6 +273,9 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 			jParameterPanel.add(getJErrorRateTextField(), null);
 			jParameterPanel.add(getJEthDeviceLabel());
 			jParameterPanel.add(getJEthDeviceTextField());
+			jParameterPanel.add(getBrowseDeviceButtonButton());
+			jParameterPanel.add(getLoggingLabel());
+			jParameterPanel.add(getLoggingButton());
 		}
 		return jParameterPanel;
 	}
@@ -536,6 +546,37 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 		}
 		return jCancelSendButton;
 	}
+
+	private JButton getBrowseDeviceButtonButton() {
+		if (jBrowseDeviceButton == null) {
+			jBrowseDeviceButton = new JButton();
+			jBrowseDeviceButton.setAction(new AbstractAction(){
+				public void actionPerformed(ActionEvent arg0) {
+					listEthDevices();
+				}
+			});
+			jBrowseDeviceButton.setBounds(new Rectangle(192, 80, 32, 16));
+			jBrowseDeviceButton.setEnabled(true);
+			jBrowseDeviceButton.setText("...");
+		}
+		return jBrowseDeviceButton;
+	}
+
+
+	private JButton getLoggingButton() {
+		if (jLoggingButton == null) {
+			jLoggingButton = new JButton();
+			jLoggingButton.setAction(new AbstractAction(){
+				public void actionPerformed(ActionEvent arg0) {
+					setLogLevel();
+				}
+			});
+			jLoggingButton.setBounds(new Rectangle(125, 101, 100, 18));
+			jLoggingButton.setEnabled(true);
+			jLoggingButton.setText("Set Logging");
+		}
+		return jLoggingButton;
+	}
 	
     void startToReceiveAction() {
   
@@ -558,6 +599,28 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
     	}
     	
     }
+
+	public void listEthDevices() {
+		ListNetwrkDialog dialog = new ListNetwrkDialog(this, "Network Devices", true);
+		dialog.pack();
+		dialog.setVisible(true);
+		String tDevice = dialog.getSelectedDevice();
+		if (tDevice != null) {
+			jEthDeviceTextField.setText( tDevice );
+		}
+	}
+
+	public void setLogLevel() {
+		SetLogLevelDialog dialog = new SetLogLevelDialog(this, "Set Log Level", mLogFlags, true);
+		dialog.pack();
+		dialog.setVisible(true);
+
+		mLogFlags = dialog.getSelectedLogLevel();
+		if (mDistributor != null) {
+			mDistributor.setLogging( mLogFlags );
+		}
+
+	}
 	
     void cancelReceiveActions() {
     	mSubscriber.close();
@@ -585,10 +648,10 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 	void connectToDistributorAction() 
 	{
 		
-		connectNative();
-		
-    	getJConnectButton().setEnabled(false);
-    	getJStartReceiveButton().setEnabled(true);
+		if (connectNative()) {
+    		getJConnectButton().setEnabled(false);
+    		getJStartReceiveButton().setEnabled(true);
+		}
 	}
 	
 	
@@ -596,7 +659,7 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 	
 	
 	
-	void connectNative()
+	boolean connectNative()
 	{
 	
 		DistributorApplicationConfiguration tApplConfig = new DistributorApplicationConfiguration("TestSubscriber");
@@ -622,10 +685,12 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 	  
 	    
 	    	mConnection = mDistributor.createConnection(tConfig);
+	    	return true;
 	    	
 	    }
 	    catch( DistributorException e) {
 	    	 new ErrorMessage( mFameInstance, "Failed to connect", e.getMessage());
+	    	 return false;
 	    }
 	}
 	
@@ -999,6 +1064,18 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 		}
 		return jEthDeviceLabel;
 	}
+
+	private JLabel getLoggingLabel() {
+		if (jLoggingLabel == null) {
+			jLoggingLabel = new JLabel();
+			jLoggingLabel.setText("Log Flags");
+			jLoggingLabel.setFont(new Font("Dialog", Font.PLAIN, 12));
+			jLoggingLabel.setBounds(new Rectangle(10, 60, 89, 16));
+			jLoggingLabel.setBounds(10, 101, 107, 16);
+		}
+		return jLoggingLabel;
+	}
+
 	private JTextField getJEthDeviceTextField() {
 		if (jEthDeviceTextField == null) {
 			jEthDeviceTextField = new JTextField();

@@ -240,8 +240,6 @@ class ConnectionSender {
 		
 
 		if (mConnection.mApplicationConfiguration.isBroadcastGateway()) {
-
-
 			pSegmentFlags += Segment.FLAG_M_SEGMENT_BDXGWY;
 		}
 

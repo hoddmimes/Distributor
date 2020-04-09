@@ -107,6 +107,12 @@ project(':pubsub') {
         delete fileTree('java/main/com/hoddmimes/distributor/generated/messages') {
             include '*.java'
         }
+        delete fileTree('../') {
+            include 'distributor-*.jar'
+        }
+        doLast {
+            println('Distributor generated filed successfully deleted!')
+        }
     }
 
     task buildJar( type: Jar ) {
@@ -136,7 +142,7 @@ project(':pubsub') {
         args "-xml","./xml/DistributorMessagesFileSet.xml"
     }
 
-    clean.dependsOn(deleteGeneratedFiles)
+    compileJava.dependsOn(deleteGeneratedFiles)
     compileJava.dependsOn('generateMessageClasses')
     build.finalizedBy(buildJar)
 

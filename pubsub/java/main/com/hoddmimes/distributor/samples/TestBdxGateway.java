@@ -7,11 +7,6 @@ import com.hoddmimes.distributor.bdxgwy.BroadcastGateway;
 
 import java.util.ArrayList;
 
-
-
-
-
-
 public class TestBdxGateway 
 {
 	ArrayList<BdxGwyMulticastGroupParameterEntry> mMultiCastGroups;
@@ -29,7 +24,7 @@ public class TestBdxGateway
 		mMultiCastGroups.add( new BdxGwyMulticastGroupParameterEntry(DistributorConnectionConfiguration.DEFAULT_MCA_ADDRESS, DistributorConnectionConfiguration.DEFAULT_MCA_PORT));
 		mBroadcastGateways.add( new BdxGatewayParameterEntry("BdxGwyHomeA", "192.168.42.10",11888));
 		mBroadcastGateways.add( new BdxGatewayParameterEntry("BdxGwyHomeB", "192.168.42.11",11888));
-		mBdxGwy = new BroadcastGateway( 11900, 11888, "BdxGwyHomeX64", null, mBroadcastGateways, mMultiCastGroups);
+		mBdxGwy = new BroadcastGateway( 11900, 11888, "BdxGwyHomeA", null, mBroadcastGateways, mMultiCastGroups);
 		while( true ) {
 			try{ Thread.currentThread().sleep(10000L); }
 			catch( InterruptedException e) {}
