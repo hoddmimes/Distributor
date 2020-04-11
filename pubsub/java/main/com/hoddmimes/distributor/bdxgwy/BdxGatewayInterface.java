@@ -48,7 +48,8 @@ public interface BdxGatewayInterface {
 	 * Only defined gateways are accepted.
 	 * 
 	 * @param pRemoteBdxGwyName, bdx gateway "name" of the gateway connecting
+	 * @param pInboundIpAddress, ip address of the inbound remote bdx gateway
 	 * @return true if the gateway is allowed to connect otherwise false.
 	 */
-	public boolean validInboundClient( String pRemoteBdxGwyName);
+	public boolean validInboundClient( String pRemoteBdxGwyName, String pInboundIpAddress);
 }

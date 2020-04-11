@@ -28,8 +28,8 @@ public class BroadcastGateway extends Thread implements BdxGatewayInterface {
 	private static final Logger cLogger = LogManager.getLogger( BdxGwySubscriptionFilter.class.getSimpleName());
 	Map<Long, BdxGwyMulticastGroupEntry> mMulticastGroups; 			   // local multicast group entries
 	ArrayList<BdxGwyOutboundGatewayEntry> mBdxGwyOutboundConnections;  // outbound broadcast gateway entries
-	ArrayList<BdxGwyInboundGatewayEntry> mBdxGwyInboundConnections;  // outbound broadcast gateway entries
-	ArrayList<String> mBdxGwyAllowedInboundGateways;				// a list of names of the gateways that are allowed to connect
+	ArrayList<BdxGwyInboundGatewayEntry> mBdxGwyInboundConnections;  // inbound broadcast gateway entries
+	ArrayList<BdxGwyAuthEntry> mBdxGwyAllowedInboundGateways;		// a list of names and optiobal ip-addresses of the gateways that are allowed to connect
 	TcpIpServer mTcpIpDistributorClientServer;					    // TCP/IP server handling distributor client connections
 	TcpIpServer mTcpIpBdxGwyServer;									// TCP/IP server handling connections from remote bdx gateways 
 	Distributor mDistributor;										// Local distributor handle
@@ -41,14 +41,14 @@ public class BroadcastGateway extends Thread implements BdxGatewayInterface {
 	/**
 	 * Constructor for creating and starting a broadcast gateway instance
 	 * 
-	 * @param pConfiguration, the Distributor App configuration to be used when the gateway acts as a local publisher of remote updates.
+	 * @param pApplConfig, the Distributor App configuration to be used when the gateway acts as a local publisher of remote updates.
 	 * @param pDistributorClientAcceptPort, the TCP/IP port on which local distributor application will connect up and advertise
 	 * 							 the subjects that they subscribe for.
 	 *
 	 * @param pBdxGwyAcceptPort, the TCP/IP port on which the the broadcast gateway will accept inbound connections
 	 * 							 on from other broadcast gateways acting as clients
 	 *
-	 * @param pBdxGwyAllowedInboundGateways, a list of remote gateways that are allowed to connect to this gateway 
+	 * @param pBdxGwyAllowedInboundGateways, a list of remote gateways and optional ip-addresses that are allowed to connect to this gateway
 	 * 										 if being null any gateway is allowed to connect
 	 * @param pBdxGwyOutboundEntries, a list of broadcast gateways to which we will try to connect
 	 * @param pMcgEntries, the multicast groups that the gateway will listing to and publish data on.
@@ -57,12 +57,12 @@ public class BroadcastGateway extends Thread implements BdxGatewayInterface {
 	public BroadcastGateway(  DistributorApplicationConfiguration pApplConfig,
 			                  int pDistributorClientAcceptPort,
 							  int pBdxGwyAcceptPort,
-							  List<String> pBdxGwyAllowedInboundGateways,
+							  List<BdxGwyAuthEntry> pBdxGwyAllowedInboundGateways,
 							  List<BdxGatewayParameterEntry> pBdxGwyOutboundEntries,
 							  List<BdxGwyMulticastGroupParameterEntry> pMcgEntries) {
 
 		if (pBdxGwyAllowedInboundGateways != null) {
-			mBdxGwyAllowedInboundGateways = new ArrayList<String>();
+			mBdxGwyAllowedInboundGateways = new ArrayList<>();
 			mBdxGwyAllowedInboundGateways.addAll(pBdxGwyAllowedInboundGateways);
 		}
 		mMulticastGroups = new HashMap<Long, BdxGwyMulticastGroupEntry>(); // Local  multicast groups
@@ -195,13 +195,16 @@ public class BroadcastGateway extends Thread implements BdxGatewayInterface {
 	}
 	
 	@Override
-	public boolean validInboundClient(String pRemoteBdxGwyName) {
+	public boolean validInboundClient(String pRemoteBdxGwyName, String pInboundIpAddress) {
 		if (mBdxGwyAllowedInboundGateways == null) {
 			return true;
 		}
-		
+
+		/**
+		 * Validate inbound connnection from
+		 */
 		for( int i = 0; i < mBdxGwyAllowedInboundGateways.size(); i++) {
-			if (mBdxGwyAllowedInboundGateways.get(i).equalsIgnoreCase(pRemoteBdxGwyName)) {
+			if (mBdxGwyAllowedInboundGateways.get(i).equal(pRemoteBdxGwyName, pInboundIpAddress)) {
 				return true;
 			}
 		}
@@ -240,7 +243,7 @@ public class BroadcastGateway extends Thread implements BdxGatewayInterface {
 		@Override
 		public void tcpipMessageRead(TcpIpConnection pConnection, byte[] pBuffer) {
 			BdxGwyInboundGatewayEntry tEntry = (BdxGwyInboundGatewayEntry) pConnection.getUserCntx();
-			tEntry.connectionDataRead(pBuffer);
+			tEntry.connectionDataRead(pBuffer, pConnection.getRemoteHost());
 		}
 	}
 

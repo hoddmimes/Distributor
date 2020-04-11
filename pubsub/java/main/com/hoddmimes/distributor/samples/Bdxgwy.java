@@ -3,6 +3,7 @@ package com.hoddmimes.distributor.samples;
 import com.hoddmimes.distributor.DistributorApplicationConfiguration;
 import com.hoddmimes.distributor.DistributorConnectionConfiguration;
 import com.hoddmimes.distributor.bdxgwy.BdxGatewayParameterEntry;
+import com.hoddmimes.distributor.bdxgwy.BdxGwyAuthEntry;
 import com.hoddmimes.distributor.bdxgwy.BdxGwyMulticastGroupParameterEntry;
 import com.hoddmimes.distributor.bdxgwy.BroadcastGateway;
 import org.apache.logging.log4j.LogManager;
@@ -20,7 +21,7 @@ public class Bdxgwy
 
 	private ArrayList<BdxGwyMulticastGroupParameterEntry> mMultiCastGroups;
 	private ArrayList<BdxGatewayParameterEntry> mOutboundBroadcastGateways;
-	private ArrayList<String> mInboundBroadcastGateways;
+	private ArrayList<BdxGwyAuthEntry> mInboundBroadcastGateways;
 
 	private String mBdxGwyName;
 	private String mEthDevice;
@@ -91,7 +92,8 @@ public class Bdxgwy
 					for(  i = 0; i < tNodeList.getLength(); i++ ) {
 						if (tNodeList.item(i).getNodeType() == Node.ELEMENT_NODE) {
 							Element tGwy = (Element) tNodeList.item(i);
-							mInboundBroadcastGateways.add(AuxXml.getStringAttribute(tGwy, "name", null));
+							mInboundBroadcastGateways.add( new BdxGwyAuthEntry( AuxXml.getStringAttribute(tGwy, "name", null),
+																			    AuxXml.getStringAttribute(tGwy, "host", null)));
 						}
 					}
 				}
