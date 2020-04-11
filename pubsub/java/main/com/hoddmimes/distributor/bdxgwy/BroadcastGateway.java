@@ -286,7 +286,7 @@ public class BroadcastGateway extends Thread implements BdxGatewayInterface {
 				 * should be removed. The notification is sent to all remote broadcast gateways.
 				 */
 				for (int i = 0; i < mBdxGwyOutboundConnections.size(); i++) {
-					mBdxGwyOutboundConnections.get(i).localClientSubscriptionIterest(tMsg);
+					mBdxGwyOutboundConnections.get(i).localClientSubscriptionInterest(tMsg);
 				}
 			}
 		}
@@ -326,7 +326,7 @@ public class BroadcastGateway extends Thread implements BdxGatewayInterface {
 		private void processDistBdxGwySubscrInterest( TcpIpConnection pConnection, DistBdxGwySubscrInterest tMessage) {
 			updateLocalSubscription(pConnection, tMessage);
 			for (int i = 0; i < mBdxGwyOutboundConnections.size(); i++) {
-				mBdxGwyOutboundConnections.get(i).localClientSubscriptionIterest( tMessage);
+				mBdxGwyOutboundConnections.get(i).localClientSubscriptionInterest( tMessage);
 			}
 		}
 
