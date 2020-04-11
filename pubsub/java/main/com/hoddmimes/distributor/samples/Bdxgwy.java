@@ -5,6 +5,8 @@ import com.hoddmimes.distributor.DistributorConnectionConfiguration;
 import com.hoddmimes.distributor.bdxgwy.BdxGatewayParameterEntry;
 import com.hoddmimes.distributor.bdxgwy.BdxGwyMulticastGroupParameterEntry;
 import com.hoddmimes.distributor.bdxgwy.BroadcastGateway;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -14,6 +16,8 @@ import java.util.ArrayList;
 
 public class Bdxgwy
 {
+	final Logger mLogger = LogManager.getLogger( this.getClass().getSimpleName());
+
 	private ArrayList<BdxGwyMulticastGroupParameterEntry> mMultiCastGroups;
 	private ArrayList<BdxGatewayParameterEntry> mOutboundBroadcastGateways;
 	private ArrayList<String> mInboundBroadcastGateways;
@@ -53,7 +57,7 @@ public class Bdxgwy
 
 			// Parse Multicast Groups
 			mMultiCastGroups = new ArrayList<>();
-			Element tMcaGroups = AuxXml.getElement(tRoot,"Multicastgroups");
+			Element tMcaGroups = AuxXml.getElement(tRoot,"MulticastGroups");
 			NodeList tNodeList = tMcaGroups.getElementsByTagName("MulticastGroup");
 			for(  i = 0; i < tNodeList.getLength(); i++ ) {
 				if (tNodeList.item(i).getNodeType() == Node.ELEMENT_NODE) {
@@ -112,6 +116,8 @@ public class Bdxgwy
 				                        mInboundBroadcastGateways,
 				                        mOutboundBroadcastGateways,
 				                        mMultiCastGroups);
+		mLogger.info("Successfully started broadcast gateway");
+		
 		while( true ) {
 			try{ Thread.currentThread().sleep(10000L); }
 			catch( InterruptedException e) {}
