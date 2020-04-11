@@ -49,7 +49,6 @@ import com.hoddmimes.distributor.DistributorPublisherIf;
 import com.hoddmimes.distributor.DistributorSubscriberIf;
 import com.hoddmimes.distributor.DistributorUpdateCallbackIf;
 import com.hoddmimes.distributor.auxillaries.UUIDFactory;
-import com.hoddmimes.distributor.bdxgwy.BdxGwySubscriptionFilter;
 import com.hoddmimes.distributor.generated.messages.*;
 import com.hoddmimes.distributor.messaging.MessageBinDecoder;
 import com.hoddmimes.distributor.messaging.MessageBinEncoder;

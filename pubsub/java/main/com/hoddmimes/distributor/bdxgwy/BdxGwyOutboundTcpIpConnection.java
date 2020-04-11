@@ -58,7 +58,9 @@ public  class BdxGwyOutboundTcpIpConnection extends Thread implements TcpIpConne
    }
   
    public void send( MessageInterface pMessage ) {
-	   mOutQueue.add(pMessage);
+	   if (pMessage != null) {
+		   mOutQueue.add(pMessage);
+	   }
    }
    
    private void startConnectionThread() {

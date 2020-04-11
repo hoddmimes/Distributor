@@ -69,7 +69,7 @@ public class BroadcastGateway extends Thread implements BdxGatewayInterface {
 		mBdxGwyOutboundConnections = new ArrayList<BdxGwyOutboundGatewayEntry>(); // List with connections to remote bdx gateways
 		mBdxGwyInboundConnections = new ArrayList<BdxGwyInboundGatewayEntry>();
 		mLocalLanSubscriptions = new HashMap<TcpIpConnection, ArrayList<DistBdxGwySubscrInterestItem>>(); // Local subscription map.
-																																							 // Contains what local dist appl subscribes to
+		mBroadcastGatewayName = pApplConfig.getApplicationName();																																					 // Contains what local dist appl subscribes to
 		/**
 		 * Connect all to local multicast groups being defined
 		 */
