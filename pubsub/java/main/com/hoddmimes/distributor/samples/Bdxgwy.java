@@ -117,7 +117,7 @@ public class Bdxgwy
 				                        mOutboundBroadcastGateways,
 				                        mMultiCastGroups);
 		mLogger.info("Successfully started broadcast gateway");
-		
+
 		while( true ) {
 			try{ Thread.currentThread().sleep(10000L); }
 			catch( InterruptedException e) {}
