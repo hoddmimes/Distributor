@@ -55,9 +55,9 @@ public class BdxGwyInboundGatewayEntry
 	}
 	
 	
-	private void processDistBdxGwyHello( DistBdxGwyHello pMessage ) 
+	private void processDistBdxGwyHello( DistBdxGwyHello pMessage, String pIpAddress )
 	{
-		if (!mBdxGwyInterface.validInboundClient(pMessage.getBdxGwyName())) {
+		if (!mBdxGwyInterface.validInboundClient(pMessage.getBdxGwyName(), pIpAddress)) {
 			mConnection.close(new Exception("connections from broadcast gateway \"" + pMessage.getBdxGwyName() + "\" are not allowed" ));
 		}
 	}
@@ -86,13 +86,13 @@ public class BdxGwyInboundGatewayEntry
 	}
 	
 
-	public void connectionDataRead(byte[] pData) 
+	public void connectionDataRead(byte[] pData, String pRemoteHost)
 	{
 		MessageInterface tMessage = mMessageFactory.createMessage(pData);
 
 		if (tMessage != null) {
 			if (tMessage instanceof DistBdxGwyHello) {
-				processDistBdxGwyHello( (DistBdxGwyHello) tMessage ); 
+				processDistBdxGwyHello( (DistBdxGwyHello) tMessage, pRemoteHost );
 			}
 
 			if (tMessage instanceof DistBdxGwySubscrInterest) {
