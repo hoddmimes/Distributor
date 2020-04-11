@@ -41,26 +41,25 @@ public class BroadcastGateway extends Thread implements BdxGatewayInterface {
 	/**
 	 * Constructor for creating and starting a broadcast gateway instance
 	 * 
+	 * @param pConfiguration, the Distributor App configuration to be used when the gateway acts as a local publisher of remote updates.
 	 * @param pDistributorClientAcceptPort, the TCP/IP port on which local distributor application will connect up and advertise
 	 * 							 the subjects that they subscribe for.
 	 *
 	 * @param pBdxGwyAcceptPort, the TCP/IP port on which the the broadcast gateway will accept inbound connections
 	 * 							 on from other broadcast gateways acting as clients
-	 *    
-	 * @param pBdxGwyName, 	the application name used when acting as a distributor
+	 *
 	 * @param pBdxGwyAllowedInboundGateways, a list of remote gateways that are allowed to connect to this gateway 
 	 * 										 if being null any gateway is allowed to connect
 	 * @param pBdxGwyOutboundEntries, a list of broadcast gateways to which we will try to connect
 	 * @param pMcgEntries, the multicast groups that the gateway will listing to and publish data on.
-	 * @param pDistributorLogFlags, distributor log flags
+	 *
 	 */
-	public BroadcastGateway(  int pDistributorClientAcceptPort, 
+	public BroadcastGateway(  DistributorApplicationConfiguration pApplConfig,
+			                  int pDistributorClientAcceptPort,
 							  int pBdxGwyAcceptPort,
-							  String pBdxGwyName, 
 							  List<String> pBdxGwyAllowedInboundGateways,
 							  List<BdxGatewayParameterEntry> pBdxGwyOutboundEntries,
-							  List<BdxGwyMulticastGroupParameterEntry> pMcgEntries,
-							  int pDistributorLogFlags) {
+							  List<BdxGwyMulticastGroupParameterEntry> pMcgEntries) {
 
 		if (pBdxGwyAllowedInboundGateways != null) {
 			mBdxGwyAllowedInboundGateways = new ArrayList<String>();
@@ -71,16 +70,13 @@ public class BroadcastGateway extends Thread implements BdxGatewayInterface {
 		mBdxGwyInboundConnections = new ArrayList<BdxGwyInboundGatewayEntry>();
 		mLocalLanSubscriptions = new HashMap<TcpIpConnection, ArrayList<DistBdxGwySubscrInterestItem>>(); // Local subscription map.
 																																							 // Contains what local dist appl subscribes to
-		mBroadcastGatewayName = pBdxGwyName;
 		/**
 		 * Connect all to local multicast groups being defined
 		 */
 
 		try {
-			DistributorApplicationConfiguration tApplConfig = new DistributorApplicationConfiguration( mBroadcastGatewayName );
-			tApplConfig.setIsBroadcastGateway(true);
-			tApplConfig.setLogFlags(pDistributorLogFlags);
-			mDistributor = new Distributor(tApplConfig);
+			pApplConfig.setIsBroadcastGateway(true);
+			mDistributor = new Distributor(pApplConfig);
 
 			for (int i = 0; i < pMcgEntries.size(); i++) {
 				BdxGwyMulticastGroupEntry tEntry = new BdxGwyMulticastGroupEntry( pMcgEntries.get(i), this);
@@ -130,29 +126,6 @@ public class BroadcastGateway extends Thread implements BdxGatewayInterface {
 			System.exit(0);
 		}
 
-	}
-	
-	/**
-	 * Constructor for creating and starting a broadcast gateway instance
-	 * 
-	 * @param pClientAcceptPort, the TCP/IP port on which local distributor application will connect up and advertise
-	 * 							 the subjects that they subscribe for.
-	 *
-	 * @param pBdxGwyAcceptPort, the TCP/IP port on which the the broadcast gateway will accept inbound connections
-	 * 							 on from other broadcast gateways acting as clients
-	 *    
-	 * @param pBdxGwyName, 	the application name used when acting as a local distributor 
-	 * @param pBdxGwyAllowedInboundGateways, a list of remote gateways that are allowed to connect to this gateway 
-	 * 										 if being null any gateway is allowed to connect
-	 * @param pBdxGwyOutboundEntries, a list of broadcast gateways to which the gateway will try to connect to and act as an client.
-	 * @param pMcgEntries, the multicast groups that the gateway will listing to and publish data on.
-	 */
-	public BroadcastGateway(int pClientAcceptPort, int pBdxGwyAcceptPort,
-			String pBdxGwyName, 
-			List<String> pBdxGwyAllowedInboundGateways,
-			List<BdxGatewayParameterEntry> pBdxGwyOutboundEntries,
-			List<BdxGwyMulticastGroupParameterEntry> pMcgEntries ) {
-		this( pClientAcceptPort,pBdxGwyAcceptPort, pBdxGwyName, pBdxGwyAllowedInboundGateways, pBdxGwyOutboundEntries, pMcgEntries, 0);
 	}
 
 	@Override

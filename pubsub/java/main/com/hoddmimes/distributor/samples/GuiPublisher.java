@@ -159,6 +159,8 @@ public class GuiPublisher extends JFrame implements DistributorEventCallbackIf {
 	private JButton jEthDeviceButton;
 	private Distributor mDistributor = null;
 
+	private int mBdxGwyPort = 0;
+	private String mBdxGwyHost = null;
 	/**
 	 * This is the default constructor
 	 */
@@ -757,32 +759,24 @@ public class GuiPublisher extends JFrame implements DistributorEventCallbackIf {
 	{
 		int i = 0;
 		while( i < args.length) {
-			if (args[i].compareToIgnoreCase("-ip_buffer_size") == 0) {
-				mIpBufferSizeString = args[i+1];
+			if (args[i].compareToIgnoreCase("-device") == 0) {
+				this.jEthDeviceTextField.setText(args[i+1]);
 				i++;
 			}
-			if (args[i].compareToIgnoreCase("-segment_size") == 0) {
-				mSegmentSizeString = args[i+1];
+			if (args[i].compareToIgnoreCase("-rate") == 0) {
+				this.jSentUpdateRateTextField.setText(args[i+1]);
+
 				i++;
 			}
-			if (args[i].compareToIgnoreCase("-udp_address") == 0) {
-				mAddressString = args[i+1];
+			if (args[i].compareToIgnoreCase("-gatewayHost") == 0) {
+				mBdxGwyHost = args[i+1];
 				i++;
 			}
-			if (args[i].compareToIgnoreCase("-holdback_delay") == 0) {
-				this.mHoldbackDelayString = args[i+1];
+
+			if (args[i].compareToIgnoreCase("-gatewayPort") == 0) {
+				mBdxGwyPort = Integer.parseInt(args[i+1]);
 				i++;
 			}
-			if (args[i].compareToIgnoreCase("-holdback_threashold") == 0) {
-				mHoldbackThreasholdString = args[i+1];
-				i++;
-			}
-			
-			if (args[i].compareToIgnoreCase("-udp_port") == 0) {
-				mPortString = args[i+1];
-				i++;
-			}
-		
 			
 			i++;
 		}
@@ -1148,8 +1142,10 @@ public class GuiPublisher extends JFrame implements DistributorEventCallbackIf {
 		DistributorConnectionIf tConnection;
 			
 		tApplConfig = new DistributorApplicationConfiguration("TestPublisher");
-//		tApplConfig.setBroadcastGatewayAddress("127.0.0.1");
-//		tApplConfig.setBroadcastGatewayPort(11900);
+		if ((mBdxGwyHost != null) && (mBdxGwyPort != 0)) {
+			tApplConfig.setBroadcastGatewayAddress( mBdxGwyHost);
+			tApplConfig.setBroadcastGatewayPort( mBdxGwyPort );
+		}
 		tApplConfig.setEthDevice(this.jEthDeviceTextField.getText());
 		tApplConfig.setLogFlags( mLogFlags );
 

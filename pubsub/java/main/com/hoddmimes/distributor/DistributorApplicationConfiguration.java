@@ -102,7 +102,8 @@ public class DistributorApplicationConfiguration {
 		}
 		return false;
 	}
-	
+
+
 	/**
 	 * By default a specific distributor log file is created in the working directory. The 
 	 * distributor will write its event to the log file. It is possible to disable creation and logging 

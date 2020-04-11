@@ -155,8 +155,9 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 	private JLabel jEthDeviceLabel;
 	private JLabel jLoggingLabel;
 	private JTextField jEthDeviceTextField;
-	
 
+	private int mBdxGwyPort = 0;
+	private String mBdxGwyHost = null;
 
   //  @jve:decl-index=0:
 	/**
@@ -673,6 +674,12 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 //	    							 DistributorApplicationConfiguration.LOG_RMTDB_EVENTS + 
 //	    							 DistributorApplicationConfiguration.LOG_RETRANSMISSION_EVENTS + 
 //	    							 DistributorApplicationConfiguration.LOG_SEGMENTS_EVENTS );
+
+			if ((mBdxGwyHost != null) && (mBdxGwyPort != 0)) {
+				tApplConfig.setBroadcastGatewayAddress( mBdxGwyHost);
+				tApplConfig.setBroadcastGatewayPort( mBdxGwyPort );
+			}
+
 	    	mDistributor = new Distributor( tApplConfig );
 	    	DistributorConnectionConfiguration tConfig = new DistributorConnectionConfiguration( mAddressString, Integer.parseInt( mPortString ));
 	    	if (tErrorRate > 0)
@@ -680,8 +687,8 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 
 	    	tConfig.setIpBufferSize(Integer.parseInt(mIpBufferSizeString));
 	    	tConfig.setSegmentSize(Integer.parseInt(this.getJSegmentSizeTextField().getText()));
-	    	
-	    	
+
+
 	  
 	    
 	    	mConnection = mDistributor.createConnection(tConfig);
@@ -698,39 +705,16 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 	{
 		int i = 0;
 		while( i < args.length) {
-			if (args[i].compareToIgnoreCase("-ip_buffer_size") == 0) {
-				mIpBufferSizeString = args[i+1];
+			if (args[i].compareToIgnoreCase("-device") == 0) {
+				jEthDeviceTextField.setText(args[i+1]);
 				i++;
 			}
-			if (args[i].compareToIgnoreCase("-segment_size") == 0) {
-				mSegmentSizeString = args[i+1];
+			if (args[i].compareToIgnoreCase("-gatewayHost") == 0) {
+				mBdxGwyHost = args[i+1];
 				i++;
 			}
-			if (args[i].compareToIgnoreCase("-udp_address") == 0) {
-				mAddressString = args[i+1];
-				i++;
-			}
-			if (args[i].compareToIgnoreCase("-udp_port") == 0) {
-				mPortString = args[i+1];
-				i++;
-			}
-			if (args[i].compareToIgnoreCase("-p2p_port") == 0) {
-				mP2PPort = Integer.parseInt(args[i+1]);
-				i++;
-			}
-			if (args[i].compareToIgnoreCase("-p2p_host") == 0) {
-				mP2PHost= args[i+1];
-				i++;
-			}
-			
-			if (args[i].equalsIgnoreCase("-connection_type")) {
-				String tType = args[i+1];
-				if (tType.equalsIgnoreCase("NATIVE"))
-				  mConnectType = ConnectType.NATIVE;
-				else if (tType.equalsIgnoreCase("TCPIP"))
-					  mConnectType = ConnectType.TCPIP;
-				else if (tType.equalsIgnoreCase("HTTP"))
-					  mConnectType = ConnectType.HTTP;
+			if (args[i].compareToIgnoreCase("-gatewayPort") == 0) {
+				mBdxGwyPort = Integer.parseInt(args[i+1]);
 				i++;
 			}
 			i++;
