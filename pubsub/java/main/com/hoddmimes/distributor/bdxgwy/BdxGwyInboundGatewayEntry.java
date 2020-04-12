@@ -32,10 +32,11 @@ public class BdxGwyInboundGatewayEntry
 	private MessageFactoryInterface mMessageFactory;
 	
 	
-	BdxGwyInboundGatewayEntry(TcpIpConnection pTcpIpConnection, BdxGatewayInterface mBdxGwyInterface) {
+	BdxGwyInboundGatewayEntry(TcpIpConnection pTcpIpConnection, BdxGatewayInterface pBdxGwyInterface) {
 		mSubscriptionFilter = new BdxGwySubscriptionFilter();
 		mConnection = new BdxGwyInboundTcpIpConnection( pTcpIpConnection );
 		mMessageFactory = new DistributorMessagesFactory();
+		mBdxGwyInterface = pBdxGwyInterface;
 	}
 	
 	public void updateToRemoteBroadcastGateway(String pSubject, byte[] pMessageBytes, long pMulticastGroupId) {

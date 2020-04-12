@@ -11,7 +11,7 @@ public class BdxGwyAuthEntry
     }
 
     public boolean equal( String pInboundGwyName, String pInboundIpAddress ) {
-        if (mGwyName.equals(pInboundGwyName) && ((mIpAddress == null) || (mIpAddress.equals( pInboundGwyName)))) {
+        if (mGwyName.equals(pInboundGwyName) && ((mIpAddress == null) || (mIpAddress.equals( pInboundIpAddress)))) {
             return true;
         }
         return false;

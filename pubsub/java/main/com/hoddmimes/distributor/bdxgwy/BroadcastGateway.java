@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 import com.hoddmimes.distributor.Distributor;
@@ -25,6 +27,8 @@ import org.apache.logging.log4j.Logger;
 
 
 public class BroadcastGateway extends Thread implements BdxGatewayInterface {
+
+	private static Pattern IP_Connection_Pattern = Pattern.compile("^/(\\d+\\.\\d+\\.\\d+\\.\\d+):(\\d+)");
 	private static final Logger cLogger = LogManager.getLogger( BdxGwySubscriptionFilter.class.getSimpleName());
 	Map<Long, BdxGwyMulticastGroupEntry> mMulticastGroups; 			   // local multicast group entries
 	ArrayList<BdxGwyOutboundGatewayEntry> mBdxGwyOutboundConnections;  // outbound broadcast gateway entries
@@ -203,11 +207,22 @@ public class BroadcastGateway extends Thread implements BdxGatewayInterface {
 		/**
 		 * Validate inbound connnection from
 		 */
+		Matcher m = IP_Connection_Pattern.matcher( pInboundIpAddress );
+		if (!m.matches()) {
+			cLogger.warn("unable to extract IP address from connect info (" + pInboundIpAddress + ")");
+			return false;
+		}
+
+		String tIpAddr = m.group(1);
+
 		for( int i = 0; i < mBdxGwyAllowedInboundGateways.size(); i++) {
-			if (mBdxGwyAllowedInboundGateways.get(i).equal(pRemoteBdxGwyName, pInboundIpAddress)) {
+			if (mBdxGwyAllowedInboundGateways.get(i).equal(pRemoteBdxGwyName, tIpAddr)) {
+				cLogger.info("Successfull authorization of bdxgwy: " + pRemoteBdxGwyName + " ip-address: " + tIpAddr );
 				return true;
 			}
 		}
+
+		cLogger.warn("Unauthorized access from bdxgwy: " + pRemoteBdxGwyName + " ip-address: " + tIpAddr );
 		return false;
 	}
 

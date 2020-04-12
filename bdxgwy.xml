@@ -1,10 +1,12 @@
-<BroadcastGateway name="HomeB" clientAccessPort="11900" gatewayAcceptPort="11888" ethDevice="eno1">
+<BroadcastGateway name="FOO" clientAcceptPort="11900" gatewayAcceptPort="11888" ethDevice="eth10">
     <MulticastGroups>
-        <MulticastGroup address="224.42.42.1" port ="4201"/>
+            <MulticastGroup address="224.42.42.1" port="4201"/>
     </MulticastGroups>
     <OutboundGateways>
-        <Gateway name="HomeA" host="192.168.42.100" port="11888"/>
+            <!--Gateway name="HOMEB" host="192.168.1.100" port="11888"/-->
+            <!--Gateway name="HOMEA" host="192.168.42.100" port="11888"/-->
     </OutboundGateways>
     <InboundGateways>
+        <Gateway name="BAR" host="192.168.42.101"/>
     </InboundGateways>
 </BroadcastGateway>
