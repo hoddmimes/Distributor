@@ -1,20 +1,27 @@
 package com.hoddmimes.distributor.tcpip;
 
+
+
+import com.jcraft.jzlib.Deflater;
+import com.jcraft.jzlib.DeflaterOutputStream;
+
+
 import java.io.IOException;
 import java.io.OutputStream;
 
-import com.jcraft.jzlib.JZlib;
-import com.jcraft.jzlib.ZOutputStream;
 
-public class CompressionOutputStream extends ZOutputStream {
 
-	public CompressionOutputStream(OutputStream pOutputStream) throws IOException {
-		this(pOutputStream, JZlib.Z_DEFAULT_COMPRESSION);
+public class CompressionOutputStream extends DeflaterOutputStream {
+
+	public CompressionOutputStream(OutputStream pOut, int pLevel) throws IOException {
+		super( pOut,  new Deflater(pLevel));
+		this.setSyncFlush( true );
 	}
 
-	public CompressionOutputStream(OutputStream pOutputStream, int pCompressionLevel) throws IOException {
-		super(pOutputStream, pCompressionLevel);
-		this.setFlushMode(JZlib.Z_SYNC_FLUSH);
+	public CompressionOutputStream(OutputStream pOut) throws IOException {
+		super( pOut );
+		this.setSyncFlush( true );
 	}
+
 
 }

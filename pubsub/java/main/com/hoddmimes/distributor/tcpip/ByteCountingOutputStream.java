@@ -32,6 +32,11 @@ public class ByteCountingOutputStream extends FilterOutputStream {
 		mBytesWritten++;
 	}
 
+	@Override
+	public void flush() throws IOException {
+		out.flush();
+	}
+
 	public long getBytesWritten() {
 		return mBytesWritten;
 	}

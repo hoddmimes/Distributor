@@ -78,7 +78,6 @@ public class TcpIpConnection extends Thread implements TcpIpCountingInterface {
 			OutputStream tSocketOutputStream = mSocket.getOutputStream();
 
 			if (mConnectionType == TcpIpConnectionTypes.Compression)  {
-
 				mCompStatInputStream = new ByteCountingInputStream( new BufferedInputStream(tSocketInputStream));
 				mCompStatOutputStream = new ByteCountingOutputStream( new BufferedOutputStream(tSocketOutputStream));
 
@@ -87,6 +86,7 @@ public class TcpIpConnection extends Thread implements TcpIpCountingInterface {
 
 				mIn = new DataInputStream(mUnCompStatInputStream);
 				mOut = new DataOutputStream(mUnCompStatOutputStream);
+
 			} else {
 				mUnCompStatOutputStream = new ByteCountingOutputStream( new BufferedOutputStream(tSocketOutputStream));
 				mUnCompStatInputStream = new ByteCountingInputStream( new BufferedInputStream(tSocketInputStream));
@@ -184,7 +184,8 @@ public class TcpIpConnection extends Thread implements TcpIpCountingInterface {
 				if (tMagicalSign != cMagicBinarySign) 
 				{
 					if (!mClosedCalled) {
-						mCallback.tcpipClientError(this, new IOException("Read message with invalid magic sign"));
+						mCallback.tcpipClientError(this,
+								new IOException("Read message with invalid magic sign (" + Integer.toHexString( tMagicalSign ) + ")"));
 					}
 					return;
 				} 
