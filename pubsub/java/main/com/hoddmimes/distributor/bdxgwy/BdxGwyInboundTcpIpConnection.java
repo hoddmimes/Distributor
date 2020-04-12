@@ -30,9 +30,10 @@ public  class BdxGwyInboundTcpIpConnection extends Thread
   
    
    public void send( MessageInterface pMessage ) {
-	   if (!mTimeToDie)
-	   {
-		   mOutQueue.add(pMessage);
+	   if (!mTimeToDie) {
+		   if (pMessage != null) {
+			   mOutQueue.add(pMessage);
+		   }
 	   }
    }
    

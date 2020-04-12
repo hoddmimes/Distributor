@@ -46,7 +46,7 @@ public class BdxGwyOutboundGatewayEntry extends Thread implements BdxGwyOutbound
 	 * Notify remote gateway about the local subscription interest 
 	 * @param tInterest, BdxGwy interest message
 	 */
-	public void localClientSubscriptionIterest( DistBdxGwySubscrInterest tInterest) {
+	public void localClientSubscriptionInterest(DistBdxGwySubscrInterest tInterest) {
 		mConnection.send(tInterest);
 	}
 
