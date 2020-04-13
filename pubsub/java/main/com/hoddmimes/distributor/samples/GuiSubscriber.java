@@ -556,7 +556,7 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 					listEthDevices();
 				}
 			});
-			jBrowseDeviceButton.setBounds(new Rectangle(192, 80, 32, 16));
+			jBrowseDeviceButton.setBounds(new Rectangle(192, 80, 37, 16));
 			jBrowseDeviceButton.setEnabled(true);
 			jBrowseDeviceButton.setText("...");
 		}
@@ -572,9 +572,9 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 					setLogLevel();
 				}
 			});
-			jLoggingButton.setBounds(new Rectangle(125, 101, 120, 18));
+			jLoggingButton.setBounds(new Rectangle(125, 101, 105, 18));
 			jLoggingButton.setEnabled(true);
-			jLoggingButton.setFont( new Font("Arrial", Font.PLAIN,11);
+			jLoggingButton.setFont( new Font("Arrial", Font.PLAIN,10));
 			jLoggingButton.setText("Set Log Level");
 		}
 		return jLoggingButton;

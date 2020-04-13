@@ -122,7 +122,7 @@ public class BroadcastGateway extends Thread implements BdxGatewayInterface {
 		 */
 		try {
 			mTcpIpBdxGwyServer = new TcpIpServer( TcpIpConnectionTypes.Compression,
-												  pBdxGwyAcceptPort, 
+												  pBdxGwyAcceptPort,
 												  new RemoteBroadcastGatewayController());
 		} catch (IOException e) {
 			cLogger.fatal( "Failed to declare broadcast gateway server on port: " + pBdxGwyAcceptPort);
@@ -205,7 +205,7 @@ public class BroadcastGateway extends Thread implements BdxGatewayInterface {
 		}
 
 		/**
-		 * Validate inbound connnection from
+		 * Validate inbound connection from
 		 */
 		Matcher m = IP_Connection_Pattern.matcher( pInboundIpAddress );
 		if (!m.matches()) {

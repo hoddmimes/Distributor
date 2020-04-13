@@ -48,7 +48,7 @@ public class BdxGwyDistributorClient implements TcpIpConnectionCallbackInterface
 			mConnectionThread = new AtomicReference<ConnectionThread>(null);
 			mConnection = TcpIpClient.connect(TcpIpConnectionTypes.Plain, pHostAddress,pHostPort, this);
 		} catch (IOException e) {
-			cLogger.warn("BdxGwyClientConnector, failed to connet to broadcast gateway " + "host: " + pHostAddress + " port: " + pHostPort);
+			cLogger.warn("BdxGwyClientConnector, failed to connect to broadcast gateway " + "host: " + pHostAddress + " port: " + pHostPort);
 			mConnection = null;
 			mConnectionThread.set(new ConnectionThread());
 			mConnectionThread.get().start();
