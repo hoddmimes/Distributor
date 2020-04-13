@@ -1,6 +1,7 @@
 package com.hoddmimes.distributor.bdxgwy;
 
 import com.hoddmimes.distributor.Distributor;
+import com.hoddmimes.distributor.DistributorApplicationConfiguration;
 import com.hoddmimes.distributor.generated.messages.DistBdxGwySubscrInterest;
 
 
@@ -52,4 +53,10 @@ public interface BdxGatewayInterface {
 	 * @return true if the gateway is allowed to connect otherwise false.
 	 */
 	public boolean validInboundClient( String pRemoteBdxGwyName, String pInboundIpAddress);
+
+	/**
+	 * Return the Distribution Gateway application configuration when acting as a local distributor
+	 * @return the app configuration when acting local publisher.
+	 */
+	public DistributorApplicationConfiguration getApplicationConfiguration();
 }

@@ -29,7 +29,7 @@ import org.apache.logging.log4j.Logger;
 public class BroadcastGateway extends Thread implements BdxGatewayInterface {
 
 	private static Pattern IP_Connection_Pattern = Pattern.compile("^/(\\d+\\.\\d+\\.\\d+\\.\\d+):(\\d+)");
-	private static final Logger cLogger = LogManager.getLogger( BdxGwySubscriptionFilter.class.getSimpleName());
+	private static final Logger cLogger = LogManager.getLogger( BroadcastGateway.class.getSimpleName());
 	Map<Long, BdxGwyMulticastGroupEntry> mMulticastGroups; 			   // local multicast group entries
 	ArrayList<BdxGwyOutboundGatewayEntry> mBdxGwyOutboundConnections;  // outbound broadcast gateway entries
 	ArrayList<BdxGwyInboundGatewayEntry> mBdxGwyInboundConnections;  // inbound broadcast gateway entries
@@ -38,7 +38,8 @@ public class BroadcastGateway extends Thread implements BdxGatewayInterface {
 	TcpIpServer mTcpIpBdxGwyServer;									// TCP/IP server handling connections from remote bdx gateways 
 	Distributor mDistributor;										// Local distributor handle
 	String mBroadcastGatewayName;									// Broadcast gateway name of this instance
-	
+
+	DistributorApplicationConfiguration mAppConfiguration; 			// Broadcast Gateway configuration
 	Map<TcpIpConnection, ArrayList<DistBdxGwySubscrInterestItem>> mLocalLanSubscriptions; // All active distributor client subscription being
 																						  // connected to this broadcast gateway 
 
@@ -73,7 +74,8 @@ public class BroadcastGateway extends Thread implements BdxGatewayInterface {
 		mBdxGwyOutboundConnections = new ArrayList<BdxGwyOutboundGatewayEntry>(); // List with connections to remote bdx gateways
 		mBdxGwyInboundConnections = new ArrayList<BdxGwyInboundGatewayEntry>();
 		mLocalLanSubscriptions = new HashMap<TcpIpConnection, ArrayList<DistBdxGwySubscrInterestItem>>(); // Local subscription map.
-		mBroadcastGatewayName = pApplConfig.getApplicationName();																																					 // Contains what local dist appl subscribes to
+		mBroadcastGatewayName = pApplConfig.getApplicationName(); // Contains what local dist appl subscribes to
+		mAppConfiguration = pApplConfig;
 		/**
 		 * Connect all to local multicast groups being defined
 		 */
@@ -226,6 +228,11 @@ public class BroadcastGateway extends Thread implements BdxGatewayInterface {
 		return false;
 	}
 
+	@Override
+	public DistributorApplicationConfiguration getApplicationConfiguration() {
+		return mAppConfiguration;
+	}
+
 	/**
 	 * ===========================================================
 	 * 
@@ -317,6 +324,7 @@ public class BroadcastGateway extends Thread implements BdxGatewayInterface {
 				List<DistBdxGwySubscrInterestItem> tList = tMessage.getInterests();
 				if (tList != null) {
 					for (int i = 0; i < tList.size(); i++) {
+
 						tCltSubscrList.add(tList.get(i));
 					}
 				}

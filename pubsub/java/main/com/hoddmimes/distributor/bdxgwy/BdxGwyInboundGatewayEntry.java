@@ -1,9 +1,12 @@
 package com.hoddmimes.distributor.bdxgwy;
 
+import com.hoddmimes.distributor.DistributorApplicationConfiguration;
 import com.hoddmimes.distributor.generated.messages.*;
 import com.hoddmimes.distributor.messaging.MessageFactoryInterface;
 import com.hoddmimes.distributor.messaging.MessageInterface;
 import com.hoddmimes.distributor.tcpip.TcpIpConnection;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
@@ -26,6 +29,7 @@ import java.util.List;
 
 public class BdxGwyInboundGatewayEntry 
 {
+	private static final Logger cLogger = LogManager.getLogger( BdxGwyInboundGatewayEntry.class.getSimpleName());
 	private BdxGatewayInterface mBdxGwyInterface;
 	private BdxGwyInboundTcpIpConnection mConnection;
 	private BdxGwySubscriptionFilter mSubscriptionFilter;
@@ -70,8 +74,14 @@ public class BdxGwyInboundGatewayEntry
 			for (int i = 0; i < tIterests.size(); i++) {
 				DistBdxGwySubscrInterestItem tIterest = tIterests.get(i);
 				if (pMessage.getAction() == DistBdxGwySubscrInterest.ADD_INTEREST) {
+					if (mBdxGwyInterface.getApplicationConfiguration().isLogFlagEnabled(DistributorApplicationConfiguration.LOG_SUBSCRIPTION_EVENTS)) {
+						cLogger.info( mConnection.getName() + " added subscription " + tIterest.getSubject() );
+					}
 					mSubscriptionFilter.addSubscription(tIterest);
 				} else {
+					if (mBdxGwyInterface.getApplicationConfiguration().isLogFlagEnabled(DistributorApplicationConfiguration.LOG_SUBSCRIPTION_EVENTS)) {
+						cLogger.info( mConnection.getName() + " remove subscription " + tIterest.getSubject() );
+					}
 					mSubscriptionFilter.removeSubscription(tIterest);
 				}
 			}
