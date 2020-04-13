@@ -572,9 +572,10 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 					setLogLevel();
 				}
 			});
-			jLoggingButton.setBounds(new Rectangle(125, 101, 100, 18));
+			jLoggingButton.setBounds(new Rectangle(125, 101, 120, 18));
 			jLoggingButton.setEnabled(true);
-			jLoggingButton.setText("Set Logging");
+			jLoggingButton.setFont( new Font("Arrial", Font.PLAIN,11);
+			jLoggingButton.setText("Set Log Level");
 		}
 		return jLoggingButton;
 	}
