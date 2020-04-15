@@ -150,7 +150,7 @@ public class Publisher {
 				tConnConfig.setSegmentSize(mSegmentSize);
 
 				DistributorConnectionIf tDistributorConnection = mDistributor.createConnection(tConnConfig);
-				DistributorPublisherIf tPublisher = mDistributor.createPublisher(tDistributorConnection, new DistributorEventCallbackHandler("PUBLISHER"));
+				DistributorPublisherIf tPublisher = mDistributor.createPublisher(tDistributorConnection, new DistributorEventCallbackHandler("PUBLISHER-" + tMcaEntry.getMca()));
 				mPublishers.put(tMcaEntry.getId(), tPublisher);
 			}
 

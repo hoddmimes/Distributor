@@ -26,6 +26,7 @@ public class Subscriber {
 	private String			mLocalBdxGwyHost;
 	private int				mLocalBdxGwyPort;
 	private String			mApplicationName;
+	private boolean 		mTrace = false;
 
 
 
@@ -78,6 +79,7 @@ public class Subscriber {
 			mEthDevice = AuxXml.getStringAttribute( tRoot, "device", "eth0");
 			mLocalBdxGwyHost = AuxXml.getStringAttribute( tRoot, "bdxgwyHost", "127.0.0.1");
 			mLocalBdxGwyPort = AuxXml.getIntAttribute( tRoot, "bdxgwyPort", 11900);
+			mTrace = AuxXml.getBooleanAttribute( tRoot, "trace", false);
 
 			// Parse Multicast Groups
 			mMulicastGroups = new ArrayList<>();
@@ -151,7 +153,7 @@ public class Subscriber {
 
 				// Setup subscriptions
 				for( SubjectEntry tSubj : mSubjects ) {
-					tSubscriberIf.addSubscription(tSubj.getSubject(), null);
+					tSubscriberIf.addSubscription(tSubj.getSubject(), tMcaEntry);
 				}
 			}
 		}
@@ -183,7 +185,9 @@ public class Subscriber {
 			if (mStartTime == 0) {
 				mStartTime = System.currentTimeMillis();
 			}
-			
+
+			McaEntry tMcaEntry = (McaEntry) pCallbackParameter;
+
 			mTotalUpdates++;
 			mTotalBytes += pData.length;
 			
@@ -197,7 +201,10 @@ public class Subscriber {
 				}
 				mLastSequenceNumber = tSeqno;
 			}
-			
+
+			if (mTrace) {
+				cLogger.info(" Subject: " + pSubjectName + " seqno: " + tSeqno + "  ( " + tMcaEntry + " )"
+			}
 			
 			if ((mTotalUpdates % mUpdateDisplayFactor) == 0) {
 				
@@ -296,6 +303,11 @@ public class Subscriber {
 
 		public int getPort() {
 			return mPort;
+		}
+
+		@Override
+		public String toString() {
+			return "Mca: " + mMca + " Port: " + mPort;
 		}
 	}
 
