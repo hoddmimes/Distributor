@@ -1,6 +1,8 @@
 package com.hoddmimes.distributor.samples;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -39,6 +41,24 @@ public class AuxXml
     }
 
 
+    public static List<Element> getChildrenElement( Element pElement, String pParentElementname ) {
+        NodeList tNodeList = pElement.getElementsByTagName(pParentElementname);
+        if ((tNodeList == null) || (tNodeList.getLength() != 1)) {
+            return null;
+        }
+        Element tParent = (Element) tNodeList.item(0);
+        tNodeList = tParent.getChildNodes();
+        if (tNodeList == null) {
+           return null;
+        }
+        List<Element> tResult = new ArrayList<>();
+        for( int i = 0; i < tNodeList.getLength(); i++) {
+            if (tNodeList.item(i).getNodeType() == Node.ELEMENT_NODE) {
+                tResult.add( (Element) tNodeList.item(i));
+            }
+        }
+        return tResult;
+    }
 
     public static String getElementValue( Element pElement ) {
         Node tNode = pElement.getFirstChild();

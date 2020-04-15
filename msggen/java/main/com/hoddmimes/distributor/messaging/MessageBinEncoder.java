@@ -112,13 +112,17 @@ public class MessageBinEncoder {
 	}
 
 	public void add(byte[] pBuffer) {
+		add( pBuffer, pBuffer.length);
+	}
+
+	public void add(byte[] pBuffer, int pLength) {
 		if (pBuffer == null) {
 			add(false);
 		} else {
-			ensureCapacity(pBuffer.length + 8);
+			ensureCapacity(pLength + 8);
 			add(true);
-			add(pBuffer.length);
-			mBuffer.put(pBuffer);
+			add(pLength);
+			mBuffer.put(pBuffer, 0, pLength );
 		}
 	}
 

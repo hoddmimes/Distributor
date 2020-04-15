@@ -3,13 +3,15 @@ package com.hoddmimes.distributor.api;
 public class XtaUpdate 
 {
 	 final byte[]  mData;
+	 final int 	   mLength;
 	 final boolean mCommesFromBdxGwy;
 	 final String  mSubjectName;
 	
-	XtaUpdate( String pSubjectname, byte[] pData, boolean pCommesFromBdxGwy ) 
+	XtaUpdate( String pSubjectname, byte[] pData, int pLength, boolean pCommesFromBdxGwy )
 	{
 		mSubjectName = pSubjectname;
 		mData = pData;
+		mLength = pLength;
 		mCommesFromBdxGwy = pCommesFromBdxGwy;
 	}
 	
@@ -21,11 +23,11 @@ public class XtaUpdate
 	// 4 bytes, update data length
 	// 'n' bytes, updata data payload
 	int getSize() {
-		int tSize = mSubjectName.length() + (1+4+1+4) + mData.length;
+		int tSize = mSubjectName.length() + (1+4+1+4) + mLength;
 		return tSize;
 	}
 	
 	int getDataLength() {
-		return mData.length;
+		return mLength;
 	}
 }

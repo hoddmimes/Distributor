@@ -27,9 +27,19 @@ public interface DistributorPublisherIf {
 	 * @param pSubjectname subject name
 	 * @param pData data to be published
 	 * @return the time in usec the IP transmission took i.e. the time spent in the <i>sendto</i>
-	 * @throws DistributorException, send error exception 
+	 * @throws DistributorException, send error exception in case of error
 	 */
 	public int publish(String pSubjectname, byte[] pData) throws DistributorException;
+
+	/**
+	 * String pSubjectname, byte[] pData) throws DistributorException, as above.
+	 * @param pSubjectname subject name
+	 * @param pData data to be publish
+	 * @param pDataLength, length of the data to be published (must be gt 0 lte pData.length)
+	 * @return the time in usec the IP transmission took i.e. the time spent in the <i>sendto</i>
+	 * @throws DistributorException send error exception in case of error
+	 */
+	public int publish( String pSubjectname, byte[] pData, int pDataLength ) throws DistributorException;
 
 	/**
 	 * Close and removes the publisher

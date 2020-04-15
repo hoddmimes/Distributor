@@ -109,6 +109,7 @@ public class Bdxgwy
 		tAppConfig.setEthDevice( mEthDevice );
 		tAppConfig.setLogFlags( DistributorApplicationConfiguration.LOG_CONNECTION_EVENTS +
 						        DistributorApplicationConfiguration.LOG_RMTDB_EVENTS +
+								DistributorApplicationConfiguration.LOG_SUBSCRIPTION_EVENTS +
 				                DistributorApplicationConfiguration.LOG_ERROR_EVENTS);
 
 

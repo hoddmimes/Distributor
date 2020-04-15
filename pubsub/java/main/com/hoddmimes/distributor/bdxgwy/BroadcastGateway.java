@@ -250,7 +250,9 @@ public class BroadcastGateway extends Thread implements BdxGatewayInterface {
 				mBdxGwyInboundConnections.add(tEntry);
 				pConnection.setUserCntx(tEntry);
 			}
-			cLogger.info( "Inbound connection from remote broadcast gateway\n     " + pConnection.getConnectionInfo());
+			if (mAppConfiguration.isLogFlagEnabled( DistributorApplicationConfiguration.LOG_RMTDB_EVENTS)) {
+				cLogger.info( "Inbound connection from remote broadcast gateway\n     " + pConnection.getConnectionInfo());
+			}
 		}
 
 		@Override
@@ -258,6 +260,9 @@ public class BroadcastGateway extends Thread implements BdxGatewayInterface {
 			BdxGwyInboundGatewayEntry tEntry = (BdxGwyInboundGatewayEntry) pConnection.getUserCntx();
 			synchronized( mBdxGwyInboundConnections ) {
 				tEntry.close(pException);
+				if (mAppConfiguration.isLogFlagEnabled( DistributorApplicationConfiguration.LOG_RMTDB_EVENTS)) {
+					cLogger.info("Remote broadcast gateway: " + tEntry.toString() + " disconnected, reason: " + pException.getMessage());
+				}
 				mBdxGwyInboundConnections.remove(tEntry);
 			}
 		}
