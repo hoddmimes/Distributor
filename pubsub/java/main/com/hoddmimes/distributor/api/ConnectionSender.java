@@ -16,9 +16,12 @@ import com.hoddmimes.distributor.DistributorApplicationConfiguration;
 import com.hoddmimes.distributor.DistributorCommunicationErrorEvent;
 import com.hoddmimes.distributor.DistributorConnectionConfiguration;
 import com.hoddmimes.distributor.DistributorException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 class ConnectionSender {
+	static final Logger cLogger = LogManager.getLogger( ConnectionSender.class.getSimpleName() );
 
 	DistributorConnection 		mConnection; 			// Parent connection
 	InetAddress				    mLocalAddress; 			// Local host address
@@ -98,7 +101,7 @@ class ConnectionSender {
 	}
 	
 	
-	InetAddress getLocalAddress() throws DistributorException 
+	InetAddress getLocalAddress() throws DistributorException
 	{
 		// Check if local host address is configured, if so just use it as being defined.
 		InetAddress tLocalHostAddress = null;
@@ -338,7 +341,7 @@ class ConnectionSender {
 			{
 				NetMsgConfiguration tMsg = new NetMsgConfiguration( tSegment );
 				tMsg.decode();
-				mConnection.log( "PROTOCOL [XTA] " + tMsg.toString());
+				cLogger.info( "PROTOCOL [XTA] " + tMsg.toString());
 			}
 			break;
 			
@@ -346,7 +349,7 @@ class ConnectionSender {
 			{
 				NetMsgHeartbeat tMsg = new NetMsgHeartbeat( tSegment );
 				tMsg.decode();
-				mConnection.log( "PROTOCOL [XTA] " + tMsg.toString());
+				cLogger.info( "PROTOCOL [XTA] " + tMsg.toString());
 			}
 			break;
 			
@@ -354,7 +357,7 @@ class ConnectionSender {
 			{
 				NetMsgUpdate tMsg = new NetMsgUpdate(  tSegment );
 				tMsg.decode();
-				mConnection.log( "PROTOCOL [XTA] <retrans>" + tMsg.toString());
+				cLogger.info( "PROTOCOL [XTA] <retrans>" + tMsg.toString());
 			}
 			break;
 			
@@ -362,7 +365,7 @@ class ConnectionSender {
 			{
 				NetMsgRetransmissionNAK tMsg = new NetMsgRetransmissionNAK( tSegment );
 				tMsg.decode();
-				mConnection.log( "PROTOCOL [XTA] " + tMsg.toString());
+				cLogger.info( "PROTOCOL [XTA] " + tMsg.toString());
 			}
 			break;
 			
@@ -370,7 +373,7 @@ class ConnectionSender {
 			{
 				NetMsgRetransmissionRqst tMsg = new NetMsgRetransmissionRqst(  tSegment );
 				tMsg.decode();
-				mConnection.log( "PROTOCOL [XTA] " + tMsg.toString());
+				cLogger.info( "PROTOCOL [XTA] " + tMsg.toString());
 			}
 			break;
 			
@@ -378,13 +381,13 @@ class ConnectionSender {
 			{
 				NetMsgUpdate tMsg = new NetMsgUpdate(  tSegment );
 				tMsg.decode();
-				mConnection.log( "PROTOCOL [XTA] " + tMsg.toString());
+				cLogger.info( "PROTOCOL [XTA] " + tMsg.toString());
 			}
 			break;
 			
 			default:
 			{
-				mConnection.log( "PROTOCOL [XTA] unknown message: " + tMsgType  );
+				cLogger.info( "PROTOCOL [XTA] unknown message: " + tMsgType  );
 				break;
 			}
 		}
@@ -410,7 +413,7 @@ class ConnectionSender {
 			}
 
 			if (isLoggingEnabled( DistributorApplicationConfiguration.LOG_SEGMENTS_EVENTS )) {
-				mConnection.log("XTA Segment: " + pSegment.toString());
+				cLogger.info("XTA Segment: " + pSegment.toString());
 			}
 
 			if (isLoggingEnabled( DistributorApplicationConfiguration.LOG_DATA_PROTOCOL_XTA )) {
@@ -422,14 +425,14 @@ class ConnectionSender {
 			if ((mConfiguration.getFakeXtaErrorRate() > 0) 
 					&& (randomError(mConfiguration.getFakeXtaErrorRate()))
 					&& (pSegment.getHeaderMessageType() == Segment.MSG_TYPE_UPDATE)) {
-				mConnection.log("SIMULATED XTA Error Segment [" + pSegment.getSeqno() + "] dropped");
+				cLogger.info("SIMULATED XTA Error Segment [" + pSegment.getSeqno() + "] dropped");
 			} else {
 				try {
 					tSendTime = mMca.send(pSegment.getEncoder().getByteBuffer());
 					mConnection.mTrafficStatisticsTask.updateXtaStatistics(pSegment);
 				} catch (Exception e) {
 					mErrorSignaled = true;
-					mConnection.log("Failed to send segment, reason: " + e.getMessage());
+					cLogger.info("Failed to send segment, reason: " + e.getMessage());
 					mConnection.logThrowable( e);
 					
 					DistributorCommunicationErrorEvent tEvent = new DistributorCommunicationErrorEvent("[SEND]", mMca.mInetAddress, mMca.mPort, e.getMessage());

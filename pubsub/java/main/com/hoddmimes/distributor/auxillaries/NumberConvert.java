@@ -2,23 +2,35 @@ package com.hoddmimes.distributor.auxillaries;
 
 
 
+import com.hoddmimes.distributor.messaging.MessageBinDecoder;
+import com.hoddmimes.distributor.messaging.MessageBinEncoder;
+
 import java.nio.ByteBuffer;
 
 public class NumberConvert
 {
     public static byte[] short2Bytes(short value) {
         return new byte[] {
-                (byte)(value >> 8),
-                (byte)value};
+                (byte)(value),
+                (byte) (value >> 8)};
     }
 
     public static byte[] int2Bytes(int value) {
         return new byte[] {
-                (byte)(value >> 24),
-                (byte)(value >> 16),
-                (byte)(value >> 8),
-                (byte)value};
+                (byte) (value >> 24),
+                (byte) (value >> 16),
+                (byte) (value >>  8),
+                (byte) (value >>  0) };
     }
+
+    public static byte[] int2BytesSwap(int value) {
+        return new byte[] {
+                (byte) (value >> 0),
+                (byte) (value >> 8),
+                (byte) (value >> 16),
+                (byte) (value >> 24) };
+    }
+
 
     public static byte[] long2Bytes(long value) {
         return new byte[] {
@@ -49,19 +61,19 @@ public class NumberConvert
         return value;
     }
 
-    public static long bytes2Int( byte[] bytes ) {
-        long value = 0;
-        value += (bytes[0] & 0x000000FF) << 24;
+    public static int bytes2Int( byte[] bytes ) {
+        int value = 0;
+        value += (bytes[0] & 0x000000FF) << 24 ;
         value += (bytes[1] & 0x000000FF) << 16;
         value += (bytes[2] & 0x000000FF) << 8;
-        value += (bytes[3] & 0x000000FF);
+        value += (bytes[3] & 0x000000FF) << 0;
         return value;
     }
 
-    public static long bytes2Short( byte[] bytes ) {
-        long value = 0;
-        value += (bytes[0] & 0x000000FF) << 8;
-        value += (bytes[1] & 0x000000FF);
+    public static short bytes2Short( byte[] bytes ) {
+        short value = 0;
+        value += (bytes[0] & 0x000000FF);
+        value += (bytes[1] & 0x000000FF) << 8;
         return value;
     }
 
@@ -76,6 +88,15 @@ public class NumberConvert
 
     public static void main( String[] args ) {
         byte[] b;
+       MessageBinEncoder e = new MessageBinEncoder(12);
+       e.add( 11223344 );
+       b = e.getBytes();
+       MessageBinDecoder d = new MessageBinDecoder( e.getBytes());
+       int x = d.readInt();
+
+       b = int2Bytes( 11223344);
+       x = bytes2Int(b);
+
 
         b = short2Bytes( (short) 27271);
         if (bytes2Short(b) != 27271) {
@@ -96,6 +117,7 @@ public class NumberConvert
         if (bytes2Double(b) != 4711.4711d) {
             System.out.println("Double failed");
         }
+        System.out.println("[All done]");
     }
 }
 

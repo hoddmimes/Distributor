@@ -1,4 +1,4 @@
-<BdxGwyPublisher application="BdxGwySubscriber" device="eth10" bdxgwyHost="127.0.0.1" bdxgwyPort="11900" trace="true">
+<BdxGwyPublisher application="BdxGwySubscriber" device="eno1" bdxgwyHost="127.0.0.1" bdxgwyPort="11900" trace="true">
     <OutboundBroadcastGateways>
         <Gateway name="BAR" ipAddress="192.168.42.101" ipPort="11888" />
     </OutboundBroadcastGateways>

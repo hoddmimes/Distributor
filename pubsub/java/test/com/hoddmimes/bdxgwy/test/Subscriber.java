@@ -32,7 +32,7 @@ public class Subscriber {
 
 
 
-	private String mEthDevice = "eth0";
+	private String mEthDevice;
 
 
 
@@ -44,6 +44,8 @@ public class Subscriber {
 	
 	private int mLogFlags =  DistributorApplicationConfiguration.LOG_CONNECTION_EVENTS +
 	                         DistributorApplicationConfiguration.LOG_RMTDB_EVENTS +
+							 //DistributorApplicationConfiguration.LOG_DATA_PROTOCOL_XTA +
+							 //DistributorApplicationConfiguration.LOG_DATA_PROTOCOL_RCV +
 					         DistributorApplicationConfiguration.LOG_RETRANSMISSION_EVENTS;
 	
 	
@@ -203,7 +205,7 @@ public class Subscriber {
 			}
 
 			if (mTrace) {
-				cLogger.info(" Subject: " + pSubjectName + " seqno: " + tSeqno + "  ( " + tMcaEntry + " )"
+				cLogger.info(" Subject: " + pSubjectName + " seqno: " + tSeqno + "  ( " + tMcaEntry + " )");
 			}
 			
 			if ((mTotalUpdates % mUpdateDisplayFactor) == 0) {

@@ -449,7 +449,7 @@ public class DistributorConnection extends Thread implements DistributorConnecti
 			}
 
 			try {
-				tSB.append("Traffic Statististics MCA " + tConnection.mIpmg.toString() + "\n");
+				tSB.append("Traffic Statistics MCA " + tConnection.mIpmg.toString() + "\n");
 				tSB.append("\t XTA Byte Rate          " + tConnection.mTrafficStatisticsTask.mXtaBytes.mValueSec + "\n");
 				tSB.append("\t XTA Segment Rate       " + tConnection.mTrafficStatisticsTask.mXtaMsgs.mValueSec + "\n");
 				tSB.append("\t XTA Update Rate        " + tConnection.mTrafficStatisticsTask.mXtaUpdates.mValueSec + "\n");

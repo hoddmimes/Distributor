@@ -27,7 +27,7 @@ class NetMsgUpdate extends NetMsg {
 	@Override 
 	void setHeader( byte pMessageType, 
 					byte pSegmentFlags,
-					InetAddress  pLocalAddress, 
+					InetAddress  pLocalAddress,
 					int  pSenderId, 
 					int  pSenderStartTime)
 	{

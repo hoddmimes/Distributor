@@ -13,18 +13,15 @@ import java.nio.ByteBuffer;
 
 import com.hoddmimes.distributor.DistributorException;
 
-class Ipmg 
+public class Ipmg
 {
 	InetSocketAddress mDestinationSocketAddress;
 	MulticastSocket mSocket;
-	MulticastSocket mRcvSocket;
 	InetAddress mInetAddress;
-	int mSenderId;
 	int mPort;
-	int mTTL;
 	NetworkInterface mNetworkInterface;
 
-	Ipmg(InetAddress pAddress, String pNetworkInterface, int pPort,int pBufferSize, int pTTL) throws DistributorException {
+	public Ipmg(InetAddress pAddress, String pNetworkInterface, int pPort,int pBufferSize, int pTTL) throws DistributorException {
 		mInetAddress = pAddress;
 		mPort = pPort;
 
@@ -90,7 +87,7 @@ class Ipmg
 
 	}
 
-	void close() {
+	public void close() {
 		try {
 			mSocket.leaveGroup(mInetAddress);
 			mSocket.close();
@@ -99,10 +96,9 @@ class Ipmg
 		}
 	}
 
-	int send(ByteBuffer pBuffer) throws Exception {
-		DatagramPacket tPacket;
+	public int send(ByteBuffer pBuffer) throws Exception {
 		long tSendTime = 0, tSendStartTime = 0;
-		tPacket = new DatagramPacket(pBuffer.array(), pBuffer.position(), mDestinationSocketAddress);
+		DatagramPacket tPacket = new DatagramPacket(pBuffer.array(), pBuffer.position(), mDestinationSocketAddress);
 		tSendStartTime = System.nanoTime();
 		mSocket.send(tPacket);
 		tSendTime = ((System.nanoTime() - tSendStartTime) / 1000L);
@@ -116,10 +112,11 @@ class Ipmg
 		return (int) tSendTime;
 	}
 
-	SocketAddress receive(ByteBuffer pBuffer) throws IOException {
+	public SocketAddress receive(ByteBuffer pBuffer) throws IOException {
 		pBuffer.clear();
 		DatagramPacket tPacket = new DatagramPacket(pBuffer.array(), pBuffer.capacity());
 		mSocket.receive(tPacket);
+
 		pBuffer.position(tPacket.getLength());
 		return tPacket.getSocketAddress();
 	}
@@ -137,7 +134,5 @@ class Ipmg
 	public String toString() {
 		return mInetAddress.getHostAddress() + ":" + mPort;
 	}
-
-
 
 }

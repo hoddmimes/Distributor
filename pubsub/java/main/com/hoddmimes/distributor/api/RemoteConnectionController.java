@@ -55,6 +55,9 @@ class RemoteConnectionController {
 				mRemoteConnections.put(pSegment, tRemoteConnection);
 
 				if (mConnection.isLogFlagSet(DistributorApplicationConfiguration.LOG_RMTDB_EVENTS)) {
+					if (tRemoteConnection.mRemoteHostInetAddress.getAddress().toString().contains("38.0.167.192")) {
+						System.out.println("debug");
+					}
 					mConnection.log("Remote Connection [CREATED] ("
 							+ Integer.toHexString(pSegment.hashCode()) + ")\n"
 							+ tRemoteConnection.toString());

@@ -1,15 +1,14 @@
 package com.hoddmimes.distributor.api;
 
+import com.hoddmimes.distributor.auxillaries.NumberConvert;
+import com.hoddmimes.distributor.messaging.MessageBinDecoder;
+import com.hoddmimes.distributor.messaging.MessageBinEncoder;
+
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.Comparator;
-
-
-
-import com.hoddmimes.distributor.messaging.MessageBinDecoder;
-import com.hoddmimes.distributor.messaging.MessageBinEncoder;
 
 abstract class Segment implements Comparable<Segment>, Comparator<Segment> 
 {
@@ -122,7 +121,7 @@ abstract class Segment implements Comparable<Segment>, Comparator<Segment>
 		mEncoder.add(mHdrSenderId);
 		mEncoder.add(mHdrSenderStartTime);
 	}
-	
+
 	void decode() {
 		mDecoder.reset();
 		mHdrVersion = mDecoder.readShort();
@@ -131,6 +130,7 @@ abstract class Segment implements Comparable<Segment>, Comparator<Segment>
 		mHdrLocalHostAddr = intToInetAddress(mDecoder.readInt());
 		mHdrSenderId = mDecoder.readInt();
 		mHdrSenderStartTime = mDecoder.readInt();
+
 	}
 	
 	
@@ -318,24 +318,18 @@ abstract class Segment implements Comparable<Segment>, Comparator<Segment>
 	}
 	
 
-   static int inetAddressToInt(InetAddress pInetAddress ) 
+   public static int inetAddressToInt(InetAddress pInetAddress )
 	{
-		byte[] pByteAddr = pInetAddress.getAddress();
-		int tIntAddress = 0;
-		for( int i = 0; i < 4; i++)  {
-			tIntAddress += ((int) pByteAddr[i] << (i*8));
-		}
+
+		int tIntAddress = NumberConvert.bytes2Int(pInetAddress.getAddress());
 		return tIntAddress;
 	}
    
    
-   static InetAddress intToInetAddress(int intAddress ) 
+   public static InetAddress intToInetAddress(int intAddress )
 	{
 	   InetAddress tInetAddress = null;
-	   byte[] tByteAddress = new byte[4];
-	   for( int i = 0; i < 4; i++)  {
-		  tByteAddress[i] = (byte) ((intAddress >> (i*8)) & 0xff);
-	   }
+	   byte[] tByteAddress = NumberConvert.int2Bytes( intAddress );
 	   try {
 		   tInetAddress = Inet4Address.getByAddress(tByteAddress);
 		   return tInetAddress;
@@ -347,10 +341,7 @@ abstract class Segment implements Comparable<Segment>, Comparator<Segment>
 	}
 	
    static public String netAddressAsString( int pIpAddress ) {
-		byte[] tArr = new byte[4];
-		for( int i = 0; i < 4; i++)  {
-			tArr[i] = (byte) ((pIpAddress >> (i*8)) & 0xff);
-		}
+		byte[] tArr = NumberConvert.int2Bytes( pIpAddress );
 		try {
 			return Inet4Address.getByAddress(tArr).toString();
 		}

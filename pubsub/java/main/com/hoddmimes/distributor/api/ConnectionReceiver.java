@@ -23,7 +23,6 @@ class ConnectionReceiver {
 
 	ReceiverThread[] mReceiverThreads = null;
 	Random mRand = null;
-	Logger mLogger;
 
 	ConnectionReceiver(DistributorConnection pConnection) {
 		mRand = new Random(System.currentTimeMillis());
@@ -57,8 +56,7 @@ class ConnectionReceiver {
 		int tMinorMsgVersion = (pSegment.getHeaderVersion() & 0xff);
 
 		if (tMajorVersion != tMajorMsgVersion) {
-			mConnection
-					.log("Received a segment with incompatible version Segment: "
+			cLogger.warn("Received a segment with incompatible version Segment: "
 							+ tMajorMsgVersion
 							+ "."
 							+ tMinorMsgVersion
@@ -93,7 +91,7 @@ class ConnectionReceiver {
 		if (isLogFlagSet( DistributorApplicationConfiguration.LOG_DATA_PROTOCOL_RCV)) {
 			NetMsgConfiguration tMsg = new NetMsgConfiguration( pSegment );
 			tMsg.decode();
-			mLogger.info( "PROTOCOL [RCV] " + tMsg.toString());
+			cLogger.info( "PROTOCOL [RCV] " + tMsg.toString());
 		}
 	}
 
@@ -102,7 +100,7 @@ class ConnectionReceiver {
 		if (isLogFlagSet( DistributorApplicationConfiguration.LOG_DATA_PROTOCOL_RCV)) {
 			NetMsgHeartbeat tMsg = new NetMsgHeartbeat( pSegment );
 			tMsg.decode();
-			mLogger.info( "PROTOCOL [RCV] " + tMsg.toString());
+			cLogger.info( "PROTOCOL [RCV] " + tMsg.toString());
 		}
 	}
 
@@ -119,9 +117,9 @@ class ConnectionReceiver {
 				NetMsgUpdate tMsg = new NetMsgUpdate( pSegment );
 				tMsg.decode();
 				if (pSegment.getHeaderMessageType() == Segment.MSG_TYPE_UPDATE) {
-					mLogger.info( "PROTOCOL [RCV] <UPDATE>" + tMsg.toString());
+					cLogger.info( "PROTOCOL [RCV] <UPDATE>" + tMsg.toString());
 				} else {
-					mLogger.info( "PROTOCOL [RCV] <RETRANSMISSION>" + tMsg.toString());
+					cLogger.info( "PROTOCOL [RCV] <RETRANSMISSION>" + tMsg.toString());
 				}
 			}
 		}
@@ -132,7 +130,7 @@ class ConnectionReceiver {
 		if (isLogFlagSet( DistributorApplicationConfiguration.LOG_DATA_PROTOCOL_RCV)) {
 			NetMsgRetransmissionNAK tMsg = new NetMsgRetransmissionNAK( pSegment );
 			tMsg.decode();
-			mLogger.info( "PROTOCOL [RCV] " + tMsg.toString());
+			cLogger.info( "PROTOCOL [RCV] " + tMsg.toString());
 		}
 	}
 
@@ -142,7 +140,7 @@ class ConnectionReceiver {
 		mConnection.mConnectionSender.retransmit(tMsg);
 		if (isLogFlagSet( DistributorApplicationConfiguration.LOG_DATA_PROTOCOL_RCV)) {
 			tMsg.decode();
-			mLogger.info( "PROTOCOL [RCV] " + tMsg.toString());
+			cLogger.info( "PROTOCOL [RCV] " + tMsg.toString());
 		}
 	}
 
@@ -156,7 +154,7 @@ class ConnectionReceiver {
 		if (isLogFlagSet(DistributorApplicationConfiguration.LOG_SEGMENTS_EVENTS)) {
 			NetMsg tNetMsg = new NetMsg(pSegment);
 			tNetMsg.decode();
-			mConnection.log("RCV Segment: " + tNetMsg.toString() );
+			cLogger.info("RCV Segment: " + tNetMsg.toString() );
 		}
 
 		switch (pSegment.getHeaderMessageType()) {

@@ -74,7 +74,6 @@ class NetMsg {
 		return false;
 	}
 
-
 	public String toString() {
 		return mSegment.toString();
 	}

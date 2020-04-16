@@ -1,5 +1,7 @@
 package com.hoddmimes.distributor;
 
+import com.hoddmimes.distributor.auxillaries.NumberConvert;
+
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -58,10 +60,7 @@ abstract public class DistributorEvent
 	 * @return INetAddress object 
 	 */
 	InetAddress netAddressToInet4Address( int pIpAddress ) {
-		byte[] tArr = new byte[4];
-		for( int i = 0; i < 4; i++)  {
-			tArr[i] = (byte) ((pIpAddress >> (i*8)) & 0xff);
-		}
+		byte[] tArr = NumberConvert.int2BytesSwap( pIpAddress);
 		try {
 			return Inet4Address.getByAddress(tArr);
 		}
