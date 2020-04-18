@@ -32,7 +32,7 @@ public class Distributor {
 	final long 							      mDistributorId;
 	final String 						      mStartTimeString;
 
-	final BdxGwyDistributorClient 			mBdxGwyConnction;
+	final BdxGwyDistributorClient           mBdxGwyConnection;
 	final DistributorManagementController 	mMgmtController;
 
 
@@ -66,11 +66,11 @@ public class Distributor {
 		}
 
 		if (mApplicationConfiguration.isBroadcastGateayUseEnabled()) {
-			mBdxGwyConnction = new BdxGwyDistributorClient(
+			mBdxGwyConnection = new BdxGwyDistributorClient(
 					mApplicationConfiguration.getBroadcastGatewayAddress(),
 					mApplicationConfiguration.getBroadcastGatewayPort());
 		} else {
-			mBdxGwyConnction = null;
+			mBdxGwyConnection = null;
 		}
 	}
 
@@ -155,7 +155,7 @@ public class Distributor {
 				throw new DistributorException("Distributor connects is closed or no longer valid");
 			}
 			tConnection.checkStatus();
-			return tConnection.createSubscriber(pEventCallback, pUpdateCallback, this.mBdxGwyConnction );
+			return tConnection.createSubscriber(pEventCallback, pUpdateCallback, this.mBdxGwyConnection);
 		}
 		finally {
 			if (tConnection != null) {

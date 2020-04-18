@@ -134,6 +134,8 @@ public class Subscriber {
 		 DistributorApplicationConfiguration tApplConfig = new DistributorApplicationConfiguration( mApplicationName );
 		 tApplConfig.setEthDevice( mEthDevice );
 		 tApplConfig.setLogFlags( mLogFlags );
+		 tApplConfig.setBroadcastGatewayAddress( mLocalBdxGwyHost );
+		 tApplConfig.setBroadcastGatewayPort( mLocalBdxGwyPort );
     	
 		 mDistributor = new Distributor(tApplConfig);
 
@@ -173,7 +175,7 @@ public class Subscriber {
 		long mStartTime = 0;
 		long mTotalUpdates = 0;
 		long mTotalBytes = 0;
-		long mLastSequenceNumber = 0;
+		volatile long mLastSequenceNumber = 0;
 		
 		DistributorUpdateCallbackHandler() {
 			
@@ -182,6 +184,8 @@ public class Subscriber {
 		@Override
 		public void distributorUpdate(String pSubjectName, byte[] pData,
 				Object pCallbackParameter, int pDeliveryQueueLength) {
+
+
 			long tSeqno = buffer2Long(pData, 0);
 			
 			if (mStartTime == 0) {
@@ -196,12 +200,12 @@ public class Subscriber {
 			if (mLastSequenceNumber == 0) {
 				mLastSequenceNumber = tSeqno;
 			} else {
-				if ((mLastSequenceNumber +1) != tSeqno) {
-					Exception tException = new Exception("Out of sequence expected: " + (mLastSequenceNumber +1) +
-														 " got: " + tSeqno );
-					cLogger.warn("Message out of sequence", tException);
+				if ((mLastSequenceNumber + 1) != tSeqno) {
+					cLogger.info(" Out of sequence expected: " + (mLastSequenceNumber + 1) + " got: " + tSeqno );
+					//Exception tException = new Exception("Out of sequence expected: " + (mLastSequenceNumber +1) + " got: " + tSeqno );
+					//cLogger.warn("Message out of sequence", tException);
 				}
-				mLastSequenceNumber = tSeqno;
+				mLastSequenceNumber = tSeqno ;
 			}
 
 			if (mTrace) {
