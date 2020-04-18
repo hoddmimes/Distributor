@@ -177,6 +177,7 @@ public class Publisher {
 		try {
 			while( true ) {
 				for( int i = 0; i < mSendBatchFactor; i++) {
+					mLoopCount++;
 					SubjectEntry tSubj = mSubjects.get( tRandom.nextInt(mSubjects.size()));
 
 					tBuffer.putLong(0, tSubj.getSeqNo());

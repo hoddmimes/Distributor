@@ -9,7 +9,7 @@ import com.hoddmimes.distributor.tcpip.TcpIpConnectionCallbackInterface;
 import com.hoddmimes.distributor.tcpip.TcpIpConnectionTypes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import sun.awt.X11.XSystemTrayPeer;
+
 
 import java.io.IOException;
 import java.util.LinkedList;
