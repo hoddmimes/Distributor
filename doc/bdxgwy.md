@@ -42,4 +42,7 @@ and [setBroadcastGatewayPort](https://htmlpreview.github.io/?https://github.com/
 The communication between a a subscriber app and a _bdxgwy_ is p-2-p tcp/ip. 
 A _bdxgwy_ serving multiple subscription apps will import the union of all subscription app interests. 
 
-There is some code examplifies a gateways setup in the directory 
+There is some code examplifies a gateways setup / funcionality in the directory [pubsub/java/main/com/hoddmimes/distributor/samples/bdxgwy](https://github.com/hoddmimes/Distributor/tree/master/pubsub/java/main/com/hoddmimes/distributor/samples/bdxgwy)
+The configuration files to these sample programs are found the [pubsub](https://github.com/hoddmimes/Distributor/tree/master/pubsub) directory. The assumption is that the two LANs 192.168.42.0/24 
+and 192.168.1.0/24 are connected via a routed network. One _bdxgwy_ and a _pusblisher_ application is running on the host 192.168.42.100 and one _bdxgwy_ and publisher is running on the host 192.168.1.100
+ 

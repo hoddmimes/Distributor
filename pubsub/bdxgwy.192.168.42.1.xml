@@ -1,0 +1,11 @@
+<BroadcastGateway name="BAR" clientAcceptPort="11900" gatewayAcceptPort="11888" ethDevice="eno1">
+    <MulticastGroups>
+            <MulticastGroup address="224.42.42.1" port="4201"/>
+            <MulticastGroup address="224.66.66.1" port="4201"/>
+    </MulticastGroups>
+    <OutboundGateways>
+            <Gateway name="FOO" host="192.168.42.100" port="11888"/>
+    </OutboundGateways>
+    <InboundGateways>
+    </InboundGateways>
+</BroadcastGateway>
