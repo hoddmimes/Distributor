@@ -37,7 +37,7 @@
 
 
     <PublisherParameters
-        sendRate="10.0"
+        sendRate="0.5"
         sendFakeError="0"
         ipBufferSize="128000"
         holdback="10"
