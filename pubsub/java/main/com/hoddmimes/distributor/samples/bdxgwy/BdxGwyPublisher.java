@@ -1,4 +1,4 @@
-package com.hoddmimes.bdxgwy.test;
+package com.hoddmimes.distributor.samples.bdxgwy;
 
 import com.hoddmimes.distributor.*;
 import com.hoddmimes.distributor.samples.AuxXml;
@@ -10,7 +10,7 @@ import java.nio.ByteBuffer;
 import java.util.*;
 
 
-public class Publisher {
+public class BdxGwyPublisher {
 	Logger cLogger = LogManager.getLogger("BdxGwyPublisher");
 
 	private Distributor					mDistributor;
@@ -20,7 +20,7 @@ public class Publisher {
 	private Map<Integer,DistributorPublisherIf> mPublishers;
 
 
-	private String mConfigurationFile = "./pubsub/java/test/BdxGwyPublisher.xml";
+	private String mConfigurationFile = "./pubsub/BdxGwyPublisher.xml";
 	private String mEthDevice = "eth0";
 	private String mApplicationName;
 
@@ -50,7 +50,7 @@ public class Publisher {
 	
 	
 	public static void main(String[] pArgs) {
-		Publisher publisher = new Publisher();
+		BdxGwyPublisher publisher = new BdxGwyPublisher();
 		publisher.parseArguments( pArgs );
 		publisher.loadAndParseConfiguration();
 		publisher.setup();

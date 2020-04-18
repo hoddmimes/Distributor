@@ -1,4 +1,4 @@
-package com.hoddmimes.bdxgwy.test;
+package com.hoddmimes.distributor.samples.bdxgwy;
 
 import com.hoddmimes.distributor.*;
 import com.hoddmimes.distributor.samples.AuxXml;
@@ -6,7 +6,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Element;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,10 +13,10 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 
-public class Subscriber {
+public class BdxGwySubscriber {
 	Logger cLogger = LogManager.getLogger("BdxGwySubscriber");
 
-	private String mConfigurationFile = "./pubsub/java/test/BdxGwySubscriber.xml";
+	private String mConfigurationFile = "./pubsub/BdxGwySubscriber.xml";
 
 	private Distributor							mDistributor;
 	private List<BdxGwyOutboundEntry> 			mOutGateways;
@@ -53,7 +52,7 @@ public class Subscriber {
 	
 	public static void main(String[] pArgs) {
 		
-		Subscriber subscriber = new Subscriber();
+		BdxGwySubscriber subscriber = new BdxGwySubscriber();
 		subscriber.parseArguments( pArgs );
 		subscriber.loadAndParseConfiguration();
 		subscriber.setup();

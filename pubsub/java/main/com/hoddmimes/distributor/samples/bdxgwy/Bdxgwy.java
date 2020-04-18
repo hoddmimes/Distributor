@@ -1,11 +1,11 @@
-package com.hoddmimes.distributor.samples;
+package com.hoddmimes.distributor.samples.bdxgwy;
 
 import com.hoddmimes.distributor.DistributorApplicationConfiguration;
-import com.hoddmimes.distributor.DistributorConnectionConfiguration;
 import com.hoddmimes.distributor.bdxgwy.BdxGatewayParameterEntry;
 import com.hoddmimes.distributor.bdxgwy.BdxGwyAuthEntry;
 import com.hoddmimes.distributor.bdxgwy.BdxGwyMulticastGroupParameterEntry;
 import com.hoddmimes.distributor.bdxgwy.BroadcastGateway;
+import com.hoddmimes.distributor.samples.AuxXml;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
@@ -29,7 +29,7 @@ public class Bdxgwy
 	int		mBdxGwyGatewayAcceptPort;
 
 	private BroadcastGateway mBdxGwy;
-	private String mConfigurationFile = "bdxgwy.xml";
+	private String mConfigurationFile = "./pubsub/bdxgwy.xml";
 	
 	public Bdxgwy()
 	{
