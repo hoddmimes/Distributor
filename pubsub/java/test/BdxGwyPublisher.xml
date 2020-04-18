@@ -1,11 +1,5 @@
 <BdxGwyPublisher application="BdxGwyPublisher" device="eth10" bdxgwyHost="127.0.0.1" bdxgwyPort="11900">
-    <OutboundBroadcastGateways>
-
-    </OutboundBroadcastGateways>
-
-    <InboundBroadcastGateways>
-        <Gateway name="BAR" ipAddress="192.168.42.101"/>
-    </InboundBroadcastGateways>
+>
 
     <MulticastGroups>
         <Mca address="224.42.42.1" port="4201" mcaId="1"/>

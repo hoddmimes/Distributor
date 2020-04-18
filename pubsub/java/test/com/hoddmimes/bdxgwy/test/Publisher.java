@@ -170,7 +170,7 @@ public class Publisher {
 
 		// Initialize the send buffer
 		for( int i = Long.BYTES; i < mMaxSize; i++) {
-			tBuffer.put(i, (byte) (tRandom.nextInt(10 ) & 0xff));
+			tBuffer.put(i, (byte) ( 65 + tRandom.nextInt(12 ) & 0xff));
 		}
 		tBuffer.position( mMaxSize );
 

@@ -9,6 +9,7 @@ import com.hoddmimes.distributor.tcpip.TcpIpConnectionCallbackInterface;
 import com.hoddmimes.distributor.tcpip.TcpIpConnectionTypes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import sun.awt.X11.XSystemTrayPeer;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -35,7 +36,7 @@ public class BdxGwyDistributorClient implements TcpIpConnectionCallbackInterface
 	private static final Logger cLogger = LogManager.getLogger( BdxGwyDistributorClient.class.getSimpleName());
 	private String mHostAddress;
 	private int mHostPort;
-	private volatile TcpIpConnection mConnection;
+	private volatile TcpIpConnection mConnection; // If null no connection to bdxgwy
 	private AtomicReference<ConnectionThread> mConnectionThread;
 	private LinkedList<SubjectItem> mSubjectItems;
 
@@ -49,7 +50,7 @@ public class BdxGwyDistributorClient implements TcpIpConnectionCallbackInterface
 			mConnection = TcpIpClient.connect(TcpIpConnectionTypes.Plain, pHostAddress,pHostPort, this);
 		} catch (IOException e) {
 			cLogger.warn("BdxGwyClientConnector, failed to connect to broadcast gateway " + "host: " + pHostAddress + " port: " + pHostPort);
-			mConnection = null;
+			mConnection = null; // No connection yet
 			mConnectionThread.set(new ConnectionThread());
 			mConnectionThread.get().start();
 		}
@@ -140,9 +141,11 @@ public class BdxGwyDistributorClient implements TcpIpConnectionCallbackInterface
 						+ "host: " + mHostAddress + " port: " + mHostPort + "\n reason: " + pE.getMessage());
 		pConnection.close();
 		synchronized (mConnectionThread) {
-			if (mConnectionThread.get() == null) {
+			if (mConnectionThread.get() == null) { // Is zero out by the the ClientConnection after successfull connection
+				cLogger.info( "BdxGwyClientConnector, trying to re-connect to broadcast gateway "
+						+ "host: " + mHostAddress + " port: " + mHostPort );
 				synchronized (this) {
-					mConnection = null;
+					mConnection = null; // Connection lost make sure that it will not be used
 				}
 				mConnectionThread.set(new ConnectionThread());
 				mConnectionThread.get().start();
@@ -178,27 +181,61 @@ public class BdxGwyDistributorClient implements TcpIpConnectionCallbackInterface
 	}
 
 	class ConnectionThread extends Thread {
+		long mStartTimeMs = System.currentTimeMillis();
+		long mLogMsgTimeMs = System.currentTimeMillis();
+
+		public String formatTime(long secs) {
+			return String.format("%02d:%02d:%02d", secs / 3600, (secs % 3600) / 60, secs % 60);
+		}
+
+		public void logConnectionFailure() {
+			long tSecSinceStart = ((System.currentTimeMillis() - mStartTimeMs) / 1000L);
+			long tSecSinceLastLog = ((System.currentTimeMillis() - mLogMsgTimeMs) / 1000L);
+			boolean tLog = false;
+
+			if (tSecSinceStart <= 300L) // 5 min
+			{
+				if (tSecSinceLastLog >= 60) { tLog = true; }
+			}
+			else if (tSecSinceStart <= 900L) // 15 min
+			{
+				if (tSecSinceLastLog >= 120) { tLog = true; }
+			}
+			 else if (tSecSinceStart <= 900L) // 15 min
+			{
+				if (tSecSinceLastLog >= 180) { tLog = true; }
+			} else {
+				if (tSecSinceLastLog >= 300) { tLog = true; }
+			}
+
+			if (tLog) {
+				cLogger.info("BdxGwyClientConnector, failed to re-connect (since: " + formatTime( tSecSinceStart ) + ") to " + "host: " + mHostAddress + " port: " + mHostPort);
+				mLogMsgTimeMs = System.currentTimeMillis();
+			}
+		}
+
 		@Override
 		public void run() {
-			try {
-				TcpIpConnection tConn = TcpIpClient.connect(TcpIpConnectionTypes.Compression, mHostAddress, mHostPort, BdxGwyDistributorClient.this);
-				synchronized (mConnectionThread) {
-					mConnectionThread.set(null);
-					synchronized (BdxGwyDistributorClient.this) {
-						mConnection = tConn;
-						resendSubjectNames();
+
+
+			while( true ) {
+				try {
+					TcpIpConnection tConn = TcpIpClient.connect(TcpIpConnectionTypes.Plain, mHostAddress, mHostPort, BdxGwyDistributorClient.this);
+					synchronized (mConnectionThread) {
+						mConnectionThread.set(null);
+						synchronized (BdxGwyDistributorClient.this) {
+							mConnection = tConn;
+							resendSubjectNames();
+						}
+						cLogger.info("BdxGwyClientConnector, successfully connected to broadcast gateway " + "host: " + mHostAddress + " port: " + mHostPort);
+						return;
 					}
-					cLogger.warn("BdxGwyClientConnector, successfully connected to broadcast gateway " + "host: " + mHostAddress + " port: " + mHostPort);
-					return;
+				} catch (IOException e) {cLogger.info("BdxGwyClientConnector, successfully connected to broadcast gateway " + "host: " + mHostAddress + " port: " + mHostPort);
+					logConnectionFailure();
 				}
-			} catch (IOException e) {
-				// CoreLogger.getInstance().log(CoreLogger.WARNING,
-				// "BdxGwyClientConnector, failed to connect to broadcast gateway "
-				//  "host: " + mHostAddress + " port: " + mHostPort );
-			}
-			try {
-				Thread.sleep(10000);
-			} catch (InterruptedException e) {
+				try { Thread.sleep(10000); }
+				catch (InterruptedException e) {
+				}
 			}
 		}
 	}

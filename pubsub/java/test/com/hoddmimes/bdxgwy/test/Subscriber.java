@@ -57,6 +57,12 @@ public class Subscriber {
 		subscriber.parseArguments( pArgs );
 		subscriber.loadAndParseConfiguration();
 		subscriber.setup();
+		subscriber.cLogger.info("BdxGwySubscriber successfully started");
+		while( true ) {
+			subscriber.cLogger.info("BdxGwySubscriber main loop");
+			try {  Thread.sleep( 15000L ); }
+			catch( InterruptedException e) {}
+		}
 	}
 	
 	
@@ -199,8 +205,8 @@ public class Subscriber {
 			SubjectEntry tSubjEntry = mSubjectMap.get( pSubjectName );
 			if ( tSubjEntry != null) {
 				if (!tSubjEntry.checkSequenceNo( tSeqno )) {
-					Exception tException = new Exception( "Out of sequence expected: " + ( tSubjEntry.expected() ) + " got: " + tSeqno );
-					cLogger.warn("Message out of sequence", tException);
+					Exception tException = new Exception( " Out of sequence expected: " + ( tSubjEntry.expected() ) + " got: " + tSeqno );
+					cLogger.warn("Message out of sequence [" + pSubjectName + "]", tException);
 				}
 
 			}

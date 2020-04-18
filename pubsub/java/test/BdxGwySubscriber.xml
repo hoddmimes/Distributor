@@ -1,7 +1,4 @@
-<BdxGwyPublisher application="BdxGwySubscriber" device="eth10" bdxgwyHost="127.0.0.1" bdxgwyPort="11900" trace="true">
-    <OutboundBroadcastGateways>
-        <Gateway name="BAR" ipAddress="192.168.42.222" ipPort="11888" />
-    </OutboundBroadcastGateways>
+<BdxGwySubscriber application="BdxGwySubscriber" device="eno1" bdxgwyHost="127.0.0.1" bdxgwyPort="11900" trace="true">
 
     <MulticastGroups>
         <Mca address="224.42.42.1" port="4201" mcaId="1"/>
@@ -33,13 +30,8 @@
 
 
     <SubscriberParameters
-        sendRate="10.0"
         sendFakeError="0"
         ipBufferSize="128000"
-        holdback="10"
-        holdbackTreshold="300"
         segmentSize="8192"
-        updateDisplayFactor="10"
-        minMsgSize="1024"
-        maxMsgSize="1024"/>
-</BdxGwyPublisher>
+        updateDisplayFactor="10"/>
+</BdxGwySubscriber>

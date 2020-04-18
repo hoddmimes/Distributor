@@ -122,7 +122,8 @@ public class Bdxgwy
 		mLogger.info("Successfully started broadcast gateway");
 
 		while( true ) {
-			try{ Thread.currentThread().sleep(10000L); }
+			mLogger.info("BDXGWY main loop");
+			try{ Thread.currentThread().sleep(20000L); }
 			catch( InterruptedException e) {}
 		}
 	}
