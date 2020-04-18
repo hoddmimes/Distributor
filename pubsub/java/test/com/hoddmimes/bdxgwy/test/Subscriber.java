@@ -8,8 +8,10 @@ import org.w3c.dom.Element;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 public class Subscriber {
@@ -20,7 +22,7 @@ public class Subscriber {
 	private Distributor							mDistributor;
 	private List<BdxGwyOutboundEntry> 			mOutGateways;
 	private List<McaEntry>						mMulicastGroups;
-	private List<SubjectEntry>					mSubjects;
+	private Map<String, SubjectEntry>			mSubjectMap;
 	private List<DistributorSubscriberIf>		mSubscribers;
 
 	private String			mLocalBdxGwyHost;
@@ -28,9 +30,8 @@ public class Subscriber {
 	private String			mApplicationName;
 	private boolean 		mTrace = false;
 
-
-
-
+	AtomicLong mTotalUpdates = new AtomicLong(0);
+	AtomicLong mTotalBytes = new AtomicLong(0);
 
 	private String mEthDevice;
 
@@ -93,11 +94,12 @@ public class Subscriber {
 			}
 
 			// Parse Subjects
-			mSubjects = new ArrayList<>();
+			mSubjectMap = new HashMap<>();
 			tElements = AuxXml.getChildrenElement( tRoot, "Subjects" );
 			for( int i = 0; i < tElements.size(); i++ ) {
 				Element tSubj = (Element) tElements.get(i);
-				mSubjects.add( new SubjectEntry( AuxXml.getStringAttribute( tSubj,"name", null)));
+				String tSubjectId = AuxXml.getStringAttribute( tSubj,"name", null);
+				mSubjectMap.put( tSubjectId, new SubjectEntry( tSubjectId ));
 			}
 
 			// Parse Outbound Gateways
@@ -154,7 +156,7 @@ public class Subscriber {
 				mSubscribers.add( tSubscriberIf );
 
 				// Setup subscriptions
-				for( SubjectEntry tSubj : mSubjects ) {
+				for( SubjectEntry tSubj : mSubjectMap.values() ) {
 					tSubscriberIf.addSubscription(tSubj.getSubject(), tMcaEntry);
 				}
 			}
@@ -171,9 +173,6 @@ public class Subscriber {
 	class DistributorUpdateCallbackHandler implements DistributorUpdateCallbackIf
 	{
 		long mStartTime = 0;
-		long mTotalUpdates = 0;
-		long mTotalBytes = 0;
-		long mLastSequenceNumber = 0;
 		
 		DistributorUpdateCallbackHandler() {
 			
@@ -190,25 +189,22 @@ public class Subscriber {
 
 			McaEntry tMcaEntry = (McaEntry) pCallbackParameter;
 
-			mTotalUpdates++;
-			mTotalBytes += pData.length;
-			
-			if (mLastSequenceNumber == 0) {
-				mLastSequenceNumber = tSeqno;
-			} else {
-				if ((mLastSequenceNumber +1) != tSeqno) {
-					Exception tException = new Exception("Out of sequence expected: " + (mLastSequenceNumber +1) +
-														 " got: " + tSeqno );
+			long tTotUpds = mTotalUpdates.incrementAndGet();
+			long tTotBytes = mTotalBytes.getAndAdd( pData.length);
+
+			SubjectEntry tSubjEntry = mSubjectMap.get( pSubjectName );
+			if ( tSubjEntry != null) {
+				if (!tSubjEntry.checkSequenceNo( tSeqno )) {
+					Exception tException = new Exception( "Out of sequence expected: " + ( tSubjEntry.expected() ) + " got: " + tSeqno );
 					cLogger.warn("Message out of sequence", tException);
 				}
-				mLastSequenceNumber = tSeqno;
 			}
 
 			if (mTrace) {
 				cLogger.info(" Subject: " + pSubjectName + " seqno: " + tSeqno + "  ( " + tMcaEntry + " )");
 			}
 			
-			if ((mTotalUpdates % mUpdateDisplayFactor) == 0) {
+			if ((tTotUpds % mUpdateDisplayFactor) == 0) {
 				
 				System.gc();
 
@@ -219,8 +215,8 @@ public class Subscriber {
 				
 				
 				long tTimeDiff = System.currentTimeMillis() - mStartTime;
-				long tUpdateRate =  (mTotalUpdates * 1000L) / tTimeDiff;
-				long tByteRate = (mTotalBytes * 1000L) / tTimeDiff;
+				long tUpdateRate =  (tTotUpds * 1000L) / tTimeDiff;
+				long tByteRate = (tTotBytes * 1000L) / tTimeDiff;
 				cLogger.info( "  UPDATE-STAT TotUpds: " + mTotalUpdates + " delivery-queue: " + pDeliveryQueueLength + " UpdRate: " + tUpdateRate +
 						      " (upds/s) ByteRate: " + tByteRate + " (B/s) memory used: " + (mUsedMem/1024) + " (KB)" );
 			}
@@ -274,12 +270,29 @@ public class Subscriber {
 
 	class SubjectEntry
 	{
-
 		private String  mSubject;
+		private long	mLastSeqNoSeen;
+		private long 	isExpected;
 
 		public SubjectEntry( String pSubject) {
-
+			mLastSeqNoSeen = 0L;
 			mSubject = pSubject;
+		}
+
+		long expected() {
+			return isExpected;
+		}
+
+		boolean checkSequenceNo( long pSeqNo ) {
+			boolean ok = true;
+			if (mLastSeqNoSeen == 0) {
+				mLastSeqNoSeen = pSeqNo;
+			} else {
+				isExpected = (mLastSeqNoSeen + 1);
+				ok = (isExpected == pSeqNo) ? true : false;
+				mLastSeqNoSeen = pSeqNo;
+			}
+			return ok;
 		}
 
 

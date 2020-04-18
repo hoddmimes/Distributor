@@ -111,6 +111,7 @@ public class Publisher {
 
 			// Parse Publisher Parameters
 			Element tPubParams = AuxXml.getElement( tRoot,"PublisherParameters");
+			mRate = AuxXml.getDoubleAttribute( tPubParams,"sendRate", 10.0d);
 			mMinSize = AuxXml.getIntAttribute( tPubParams,"minMsgSize", 1024);
 			mMaxSize = AuxXml.getIntAttribute( tPubParams,"maxMsgSize", 1024);
 			mIpBufferSize = AuxXml.getIntAttribute( tPubParams,"ipBufferSize", 128000);
@@ -164,31 +165,34 @@ public class Publisher {
 
 		ByteBuffer tBuffer = ByteBuffer.allocate( mMaxSize );
 		Random tRandom = new Random();
-		long mSequenceNumber = 0l, mMcaSendTime = 0l;
+		long mLoopCount = 0l, mMcaSendTime = 0l;
 		parseSenderRate();
 
 		// Initialize the send buffer
 		for( int i = Long.BYTES; i < mMaxSize; i++) {
 			tBuffer.put(i, (byte) (tRandom.nextInt(10 ) & 0xff));
 		}
+		tBuffer.position( mMaxSize );
 
 		try {
 			while( true ) {
 				for( int i = 0; i < mSendBatchFactor; i++) {
-					tBuffer.putLong(0, ++mSequenceNumber);
+					SubjectEntry tSubj = mSubjects.get( tRandom.nextInt(mSubjects.size()));
+
+					tBuffer.putLong(0, tSubj.getSeqNo());
 					int tMsgSize = (mMaxSize == mMinSize) ? tBuffer.position() : (mMinSize + Math.abs(tRandom.nextInt() % (mMaxSize - mMinSize)));
-					SubjectEntry tSubj = mSubjects.get( (int) mSequenceNumber % mSubjects.size());
+
 					DistributorPublisherIf tPublisher = mPublishers.get( tSubj.getMcaId());
 					mMcaSendTime += tPublisher.publish( tSubj.getSubject(), tBuffer.array(), tMsgSize);
 
 
-					if ((mSequenceNumber % mUpdateDisplayFactor) == 0) {
+					if ((mLoopCount % mUpdateDisplayFactor) == 0) {
 						long mFreeMem = Runtime.getRuntime().freeMemory();
 						long mTotalMem = Runtime.getRuntime().totalMemory();
 						long mUsedMem = (mTotalMem - mFreeMem) / 1024L;
-						long tAvgSendTime = mMcaSendTime / mSequenceNumber;
+						long tAvgSendTime = mMcaSendTime / mLoopCount;
 
-						cLogger.info( " updates sent: " + mSequenceNumber + " avg xta time: " + tAvgSendTime + " memory used: " + mUsedMem + " (KB)");
+						cLogger.info( " updates sent: " + mLoopCount + " avg xta time: " + tAvgSendTime + " memory used: " + mUsedMem + " (KB)");
 					}
 				}
 				try  { Thread.currentThread().sleep(mSendWait); }
@@ -213,7 +217,7 @@ public class Publisher {
 			
 		if (mRate < 1.0) {
 			mSendBatchFactor = 1;
-			mSendWait = (long) (1 / mRate);
+			mSendWait = (long) (1000 / mRate);
 		}
 		else if (mRate  <= 100 ) {
 			mSendBatchFactor = 1;
@@ -297,13 +301,20 @@ public class Publisher {
 	class SubjectEntry
 	{
 
-		private String mSubject;
+		private String  mSubject;
 		private int	    mMcaId;
+		private long mSeqNo;
 
 		public SubjectEntry( String pSubject, int pMcaId ) {
 			mMcaId = pMcaId;
 			mSubject = pSubject;
+			mSeqNo = 0l;
 		}
+
+		public long getSeqNo() {
+			return (++mSeqNo);
+		}
+
 
 
 		public String getSubject() {
