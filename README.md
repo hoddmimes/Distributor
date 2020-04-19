@@ -141,6 +141,10 @@ That will cause the kernel receiver buffer to be filled up an over written. To m
 kernal bufferes used for receiving multicast can be enlarged. By the default they may be on the lowerside since normally there is not a large demand for 
 handling larger volumes of multicast traffic
 
+
+
+
+
 You have to have administrator privileges to change the kernal buffer configuration.
 
 **_On Linux_**  
@@ -174,6 +178,22 @@ Better and more comprehensive documentation on subject UDP buffering could be fo
 - [UDP Buffering Background](https://www.informatica.com/downloads/1568_high_perf_messaging_wp/Topics-in-High-Performance-Messaging.htm#UDP-BUFFERING-BACKGROUND)
 - [UDP Buffer Sizing](https://www.informatica.com/downloads/1568_high_perf_messaging_wp/Topics-in-High-Performance-Messaging.htm#UDP-BUFFER-SIZING) 
 
+
+#### Limiting the Transmission Rate 
+Normally there is no restriction on how fast and how much data a _publisher_ can publish data. The limitation is normally on the controller side i.e. how 
+much data the ethernet controller can handle. In some situations is could be necessary to pace the transmission in order not to flood
+the network. Especially at startup when an application might want to publish all its data. 
+
+The _Distributor_ API has a primitive mechanism for controlling  how much data that could be published on a connection (i.e multicastgroup) per second. This is configured when a distributor connection is created.
+
+When declaring a distributor connection [createConnection](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/Distributor.html#createConnection(com.hoddmimes.distributor.DistributorConnectionConfiguration))
+a [connection configuration object](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/DistributorConnectionConfiguration.html) is passed as argument.
+
+The max bandwith can be configured via the method [setMaxBandwith( int pMaxBandwidth )](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/DistributorConnectionConfiguration.html#setMaxBandwidth(double))
+The value express is Mbit per second. _Note_ that the lowest value will always be 0.25 Mbit /sec.
+
+It also possible to configure how frequently the bandwith utilization should be monitored using the method 
+[setFlowRateRecalculateInterval​(long pInterval)](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/DistributorConnectionConfiguration.html#setFlowRateRecalculateInterval(long))
 
 
 

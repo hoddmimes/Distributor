@@ -37,7 +37,7 @@ public class DistributorConnectionConfiguration {
 	public static final long DEFUALT_HEARTBEAT_INTERVAL = 3000;
 	public static final int DEFUALT_HEARTBEAT_MAX_LOST = 10;
 	public static final long DEFUALT_FLOW_RECALCULATE_INTERVAL = 100;
-	public static final double DEFAULT_MAX_BANDWIDTH = 0;
+	public static final double DEFAULT_MAX_BANDWIDTH = 0; // Mbit /sec
 	public static final int DEFAULT_FAKE_XTA_ERROR_RATE = 0;
 	public static final int DEFAULT_FAKE_RCV_ERROR_RATE = 0;
 
@@ -398,10 +398,10 @@ public class DistributorConnectionConfiguration {
 	}
 
 	/**
-	 * Returns the maximum bandwith (bytes/sec) that could be sent on the
+	 * Returns the maximum bandwidth (bytes/sec) that could be sent on the
 	 * connection
 	 * 
-	 * @return int, max bandwidth bytes/sec
+	 * @return int, max bandwidth bytes/sec (Mbit/sec)
 	 */
 	public double getMaxBandwidth() {
 		return mMaxBandwidth;
@@ -411,13 +411,13 @@ public class DistributorConnectionConfiguration {
 	/**
 	 * Sets the maximum number of bytes that the connection can push out per
 	 * second. By the default the bandwidth is set to zero implicating that the
-	 * bandwidth allowed is infinite.
+	 * bandwidth allowed is infinite. The minimum bandwith will never be less than
+	 * 0.25 Mbit/sec
 	 * 
-	 * @param pValue
-	 *            max bandwidth (bytes/sec)
+	 * @param pMbitPerSec max bandwidth (bytes/sec). Expressed as Mbit/sec
 	 */
-	public void setMaxBandwidth(double pValue) {
-		mMaxBandwidth = pValue;
+	public void setMaxBandwidth(double pMbitPerSec) {
+		mMaxBandwidth = pMbitPerSec;
 	}
 
 	/**
