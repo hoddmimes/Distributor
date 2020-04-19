@@ -32,6 +32,8 @@ Having a Distributor instance the application can create Distributor Connections
 
 - Publishers keep sent messages in a retransmission cache and could serve retransmission requests from receivers as long messages are in the retransmission cache. The retransmission cache is a FIFO cache with a limited size (configurable). 
 
+- If a retransmission request can not be serverved the received is notified via the distributor application callback interface. 
+
 - An application may connect up to one or more physical IP multicast groups.  Publishers and subscribers that would like to share information must be connected to the same IP multicast groups i.e. IP Class D address and IP port. 
 
 - The size of a message is not bound to the size of the UDP buffer size. Larger messages are broken up in segments and sent in multiple UDP packaes and re-assembled by receiving  distribuors and delivered as large messages to the receiver applications.
@@ -124,6 +126,64 @@ totRetransmissions = 0;
 ```
 
 </sup>
+
+
+## Retransmission 
+
+The _Distributor_ transmission protocol has  guarateed delivery, to some extent. The ptotocoll has mechanisms for detect duplicates and lost messages and take proper action to recover.
+However is messages can not be delivered in order the receiver application is notified about the exception via a callback.
+Since the _Distributor_ application does not have a sophisticated flow control the most likely cause for losing messages is data overrun. This typically is caused by the receiver application 
+not processing data fast enough and internal kernal buffers are filled up and eventually overwritten. Could happen due insufficient process capacity i.e. lack CPU cycles. 
+The only solution for these scenarios are; process data faster. Could be done by using a more powerfull machine or optimizing the subscriber app. And possibly subscribe to less data. 
+
+But it can also happen due to broadcast spikes i.e. the publisher sending a large amount of data in a short time.
+That will cause the kernel receiver buffer to be filled up an over written. To make receiver applications more ressilient 
+kernal bufferes used for receiving multicast can be enlarged. By the default they may be on the lowerside since normally there is not a large demand for 
+handling larger volumes of multicast traffic
+
+You have to have administrator privileges to change the kernal buffer configuration.
+
+**_On Linux_**  
+
+// to read current value 
+```    
+$ sysctl net.core.rmem_max     // display max size for kernel read buffers (default 131071)
+$ sysctl net.core.wmem_max     // display max size for kernel send  buffers (default 131071)
+```
+
+// to modify the buffer sizes
+```    
+$ sysctl  –w net.core.rmem_max = 16777216
+$ sysctl  –w net.core.wmem_max  = 16777216
+```  
+The values could be changed dynamically but will not be persisted. In case you reboot your system the setting will go back to the default values. By adding the values to the file /etc/sysctl.conf values can be set at boot time.
+If you would like to get information about if you have any data overruns on the eth interface you can use the ifconfig command.
+```   
+$ ifconfig <eth-device> 	! Typically eth0, eth1 etc
+eth1      Link encap:Ethernet  HWaddr 00:50:04:2F:1E:4
+               inet6 addr: fe80::250:4ff:fe2f:1e42/64 Scope:Link
+               UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+               RX packets:23099429 errors:0 dropped:0 overruns:0 frame:0
+               TX packets:927844 errors:0 dropped:0 overruns:0 carrier:0
+               collisions:0 txqueuelen:1000
+               RX bytes:2638670187 (2.4 GiB)  TX bytes:108286946 (103.2 MiB)
+               Interrupt:18 Base address:0xef80
+```  
+
+Better and more comprehensive documentation on subject UDP buffering could be found on informatica web site.
+- [UDP Buffering Background](https://www.informatica.com/downloads/1568_high_perf_messaging_wp/Topics-in-High-Performance-Messaging.htm#UDP-BUFFERING-BACKGROUND)
+- [UDP Buffer Sizing](https://www.informatica.com/downloads/1568_high_perf_messaging_wp/Topics-in-High-Performance-Messaging.htm#UDP-BUFFER-SIZING) 
+
+
+
+
+## Broadcast Gateways
+The multicast distribution is possible on LAN and is normally not working in a routed network. However multicast traffic can be _routed_ 
+using a Muticast Routing protocol (PIM, MOSPF etc.) These protocols are normally not enable and require some configuration in routers, if being supported.
+
+The _Distrbutor_ library includes some code allowing multicast to be _routed_ between two LAN using a P-2-P connection.
+For more information about the _Distributor_ broadcast gateway see [Distributor Broadcast Gateway] (https://github.com/hoddmimes/Distributor/blob/master/doc/bdxgwy.md) 
+
 
 
 
