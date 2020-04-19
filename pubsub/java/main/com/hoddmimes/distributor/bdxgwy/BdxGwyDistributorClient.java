@@ -48,6 +48,7 @@ public class BdxGwyDistributorClient implements TcpIpConnectionCallbackInterface
 		try {
 			mConnectionThread = new AtomicReference<ConnectionThread>(null);
 			mConnection = TcpIpClient.connect(TcpIpConnectionTypes.Plain, pHostAddress,pHostPort, this);
+			cLogger.info("BdxGwyClientConnector successfully connected to  host: " + pHostAddress + " port " + pHostPort );
 		} catch (IOException e) {
 			cLogger.warn("BdxGwyClientConnector, failed to connect to broadcast gateway " + "host: " + pHostAddress + " port: " + pHostPort);
 			mConnection = null; // No connection yet
@@ -188,7 +189,7 @@ public class BdxGwyDistributorClient implements TcpIpConnectionCallbackInterface
 			return String.format("%02d:%02d:%02d", secs / 3600, (secs % 3600) / 60, secs % 60);
 		}
 
-		public void logConnectionFailure() {
+		public void logConnectionFailure( Exception pException ) {
 			long tSecSinceStart = ((System.currentTimeMillis() - mStartTimeMs) / 1000L);
 			long tSecSinceLastLog = ((System.currentTimeMillis() - mLogMsgTimeMs) / 1000L);
 			boolean tLog = false;
@@ -209,7 +210,9 @@ public class BdxGwyDistributorClient implements TcpIpConnectionCallbackInterface
 			}
 
 			if (tLog) {
-				cLogger.info("BdxGwyClientConnector, failed to re-connect (since: " + formatTime( tSecSinceStart ) + ") to " + "host: " + mHostAddress + " port: " + mHostPort);
+				cLogger.info("BdxGwyClientConnector, failed to re-connect (since: " + formatTime( tSecSinceStart ) + ") to " + "host: " + mHostAddress + " port: " + mHostPort +
+						"\n reason: " + pException.getMessage());
+
 				mLogMsgTimeMs = System.currentTimeMillis();
 			}
 		}
@@ -230,8 +233,8 @@ public class BdxGwyDistributorClient implements TcpIpConnectionCallbackInterface
 						cLogger.info("BdxGwyClientConnector, successfully connected to broadcast gateway " + "host: " + mHostAddress + " port: " + mHostPort);
 						return;
 					}
-				} catch (IOException e) {cLogger.info("BdxGwyClientConnector, successfully connected to broadcast gateway " + "host: " + mHostAddress + " port: " + mHostPort);
-					logConnectionFailure();
+				} catch (IOException e) {
+					logConnectionFailure( e );
 				}
 				try { Thread.sleep(10000); }
 				catch (InterruptedException e) {

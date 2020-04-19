@@ -1,4 +1,4 @@
-<BdxGwySubscriber application="BdxGwySubscriber" device="eno1" bdxgwyHost="127.0.0.1" bdxgwyPort="11900" trace="true">
+<BdxGwySubscriber application="BdxGwySubscriber" device="eno1" bdxgwyHost="127.0.0.1" bdxgwyPort="11900" trace="false">
 
     <MulticastGroups>
         <Mca address="224.42.42.1" port="4201" mcaId="1"/>
