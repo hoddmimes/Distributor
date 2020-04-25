@@ -1,6 +1,6 @@
 # Java Multicast Distributor
 
-The *Distributor* utility is a **pub/sub** messaging component. The utility provides an API allowing application to publish real time data received by one or many aplications on a [LAN](https://www.cisco.com/c/en/us/products/switches/what-is-a-lan-local-area-network.html#~types).
+The *Distributor* utility is a **publish/subscribe** messaging component. The utility provides an API allowing application to publish real time data received by one or many applications on a [LAN](https://www.cisco.com/c/en/us/products/switches/what-is-a-lan-local-area-network.html#~types).
 The utility is a true _one-to-many_ transport using IP multicast as transport.
 
 
@@ -12,7 +12,7 @@ Snipplets for minimalist [_Publisher_](#A-minimalist-Publisher-App) and [_Subscr
 Using the Distributor API is trivial.  
   
 An application create a Distributor object. The Distributor object is like a handle to the Distributor utility.  
-Having a Distributor instance the application can create Distributor Connections, Publishers and Subscriber instances.
+Having a Distributor instance the application can create Distributor Connections (i.e. communication channels) , Publishers and Subscriber instances.
 
 -   **_[Distributor](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/blob/master/javadoc/com/hoddmimes/distributor/Distributor.html)_** object, handle encapsulating the distributor utility.
 -   **_[Distributor Connection](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/blob/master/javadoc/com/hoddmimes/distributor/DistributorConnectionIf.html)_**  object, is like a transport channel encapsulating the physical transport i.e. the interface to a IP multicast socket.
@@ -26,9 +26,11 @@ Having a Distributor instance the application can create Distributor Connections
 
 - The Distributor is a true _one-to-many_ mechanism. When publishing updates it sent once and is received by one or more subscribers that have declared an interest in the information.
 
-- The distributor uses IP [multicast](http://en.wikipedia.org/wiki/Multicast) ([RFC 1112](http://www.ietf.org/rfc/rfc1112.txt)) when publishing update messages. The IP multicast transport is not a guarantee transport, messages can get lost or be delivered out of order. The distributor implements a recovery schema guarantying published messages not being lost or duplicated. 
+- The distributor uses IP [multicast](http://en.wikipedia.org/wiki/Multicast) ([RFC 1112](http://www.ietf.org/rfc/rfc1112.txt)) when publishing update messages. The IP multicast transport is an OSI layer 2 transpor
+which do not guarantee delivery. Messages can get lost or be delivered out of order. The distributor implements a recovery schema guarantying published messages not being lost or duplicated. 
 
-- Negative acknowledgment is used to signal detection of lost messages. Receivers do not acknowledge received messages as long as messages being received in sequence. In case a receiver discovers a loss of messages a retransmission request is published to the publisher requesting retransmission of missed messages. Retransmission and recover takes place over the IP multicast channel used for publishing. All recovery logic is internal to the distributor package and hidden for the applications using the distributor utility.
+- Negative acknowledgment is used to signal detection of lost messages. Receivers do not acknowledge received messages as long as messages being received in sequence. 
+In case a receiver discovers a loss of messages a retransmission request is published to the publisher requesting retransmission of missed messages. Retransmission and recover takes place over the IP multicast channel used for publishing. All recovery logic is internal to the distributor package and hidden for the applications using the distributor utility.
 
 - Publishers keep sent messages in a retransmission cache and could serve retransmission requests from receivers as long messages are in the retransmission cache. The retransmission cache is a FIFO cache with a limited size (configurable). 
 
@@ -36,7 +38,7 @@ Having a Distributor instance the application can create Distributor Connections
 
 - An application may connect up to one or more physical IP multicast groups.  Publishers and subscribers that would like to share information must be connected to the same IP multicast groups i.e. IP Class D address and IP port. 
 
-- The size of a message is not bound to the size of the UDP buffer size. Larger messages are broken up in segments and sent in multiple UDP packaes and re-assembled by receiving  distribuors and delivered as large messages to the receiver applications.
+- The size of a message is not bound to the size of the UDP buffer size. Larger messages are broken up in segments and sent in multiple UDP packages. Distributors API re-assemble segments and delivere the data as large messages to the receiver applications.
 
 - The distrbutor does not persist messages and do not provide a store-and-forward pattern. Information published is volatile. 
 
@@ -54,8 +56,8 @@ after you have created the _DistributorApplicationConfiguration_ object and befo
 When application exchange information using the _Distributor_ utility it is done over IP multicast. A single [IP class D](https://www.tutorialspoint.com/ipv4/ipv4_address_classes.htm) address translates to an physical 
 Ethernet multicast group. There is a one-to-one mapping between a [DistributorConnection](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/DistributorConnectionIf.html) and a IP Multicast address.
 
-When instasiating a a _DistributorConnection_ a [DistributorConnectionConfiguration](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/DistributorConnectionConfiguration.html)
-is passed as parameter. The _DistributorConnectionConfiguration_ defines the behaviour of how the distrbutor disaminates and receivs data for that _channel_
+When instantiating a _DistributorConnection_ a [DistributorConnectionConfiguration](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/DistributorConnectionConfiguration.html)
+is passed as parameter. The _DistributorConnectionConfiguration_ defines the behaviour for how the distributor disseminates and receives data over that _channel_
 To a large extent it defines settings for how the _Distributor_ application protocol will behave/work.
   
 
@@ -86,12 +88,12 @@ Some typical matching rules.
 
 ## Nagging Distributor Connections
 
-The transport protocol when dissaminating information with the Distributor utility is IP Multicast.  IP multicasting cater for layer 1 and 2 in the ISO/OSI model.
+The transport protocol when disseminating information with the Distributor utility is IP Multicast.  IP multicasting cater for layer 1 and 2 in the ISO/OSI model.
 This implicates that there is *_no flow control or error detection_* if messages are lost or duplicated, The Distributor application _protocol_, hidden for publisher and subscriber 
 application implement error detection, retransmissions and and a sort of flow control. Since the mechanism is a true one-to-many there is not a one-to-one relation betweeen a 
 publisher and subscriber.   
 
-Each distributor connection having subscriber monitors itself to examine that it does not generate too many retransmission constantly. This could typically happen 
+Each distributor connection having subscribers monitors itself to examine that it does not generate too many retransmissions, constantly. This could typically happen 
 if the distributor get overloaded (i.e. running out of CPU). Receiver buffers will then be filled up and overwritten    
 
 Three configurable parameters are used to control the nagging monitor behavior:
@@ -130,15 +132,15 @@ totRetransmissions = 0;
 
 ## Retransmission 
 
-The _Distributor_ transmission protocol has  guarateed delivery, to some extent. The ptotocoll has mechanisms for detect duplicates and lost messages and take proper action to recover.
+The _Distributor_ transmission protocol has  guaranteed delivery, to some extent. The protocoll has mechanisms for detect duplicates and lost messages and take proper action to recover.
 However is messages can not be delivered in order the receiver application is notified about the exception via a callback.
 Since the _Distributor_ application does not have a sophisticated flow control the most likely cause for losing messages is data overrun. This typically is caused by the receiver application 
 not processing data fast enough and internal kernal buffers are filled up and eventually overwritten. Could happen due insufficient process capacity i.e. lack CPU cycles. 
-The only solution for these scenarios are; process data faster. Could be done by using a more powerfull machine or optimizing the subscriber app. And possibly subscribe to less data. 
+The only solution for these scenarios are; process data faster. Could be done by using a more powerfull machine or optimizing the subscriber app. And / or possibly subscribe to less data. 
 
 But it can also happen due to broadcast spikes i.e. the publisher sending a large amount of data in a short time.
 That will cause the kernel receiver buffer to be filled up an over written. To make receiver applications more ressilient 
-kernal bufferes used for receiving multicast can be enlarged. By the default they may be on the lowerside since normally there is not a large demand for 
+kernal bufferes used for receiving multicast can be enlarged. By the default they may be on the lower side since normally there is not a large demand for 
 handling larger volumes of multicast traffic
 
 
@@ -182,7 +184,7 @@ Better and more comprehensive documentation on subject UDP buffering could be fo
 #### Limiting the Transmission Rate 
 Normally there is no restriction on how fast and how much data a _publisher_ can publish data. The limitation is normally on the controller side i.e. how 
 much data the ethernet controller can handle. In some situations is could be necessary to pace the transmission in order not to flood
-the network. Especially at startup when an application might want to publish all its data. 
+the network. Especially at startup when an application might want to publish a snapshot of its data.
 
 The _Distributor_ API has a primitive mechanism for controlling  how much data that could be published on a connection (i.e multicastgroup) per second. This is configured when a distributor connection is created.
 
@@ -194,6 +196,7 @@ The value express is Mbit per second. _Note_ that the lowest value will always b
 
 It also possible to configure how frequently the bandwith utilization should be monitored using the method 
 [setFlowRateRecalculateInterval​(long pInterval)](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/DistributorConnectionConfiguration.html#setFlowRateRecalculateInterval(long))
+The default interval for checking the publishing  rate is 250 ms.
 
 
 

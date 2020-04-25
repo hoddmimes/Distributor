@@ -14,6 +14,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Color;
 import java.awt.Toolkit;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JLabel;
 import java.awt.Rectangle;
@@ -56,7 +58,8 @@ import javax.swing.SwingConstants;
 */
 public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf, DistributorUpdateCallbackIf {
 	
-	static final String cTestSubject ="/test-subject-name";
+	private static final String TEST_SUBJECT = "/test-subject-name";
+
 	private enum ConnectType {NATIVE,HTTP,TCPIP};
 	
 
@@ -122,7 +125,8 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 
 	private JLabel jStateLabel = null;
 
-	
+
+	List<String> 									mSubjects = null;
 	int 											mSeqNo;
 	Component 										mFameInstance;
 	Distributor 									mDistributor;
@@ -174,6 +178,8 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 	 * @return void
 	 */
 	private void initialize() {
+		this.mSubjects = new ArrayList<>();
+		this.mSubjects.add( TEST_SUBJECT );
 		this.setSize(530, 321);
 		this.setResizable(false);
 		this.setBackground(new Color(255, 255, 204));
@@ -594,7 +600,9 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
     	
     	try {
     		mSubscriber = mDistributor.createSubscriber(mConnection, this, this);
-    		mSubscriber.addSubscription( cTestSubject , null );
+    		for( String tSubject : mSubjects ) {
+    			mSubscriber.addSubscription(tSubject, null );
+			}
     	}
     	catch( DistributorException e) {
     		e.printStackTrace();
@@ -708,6 +716,17 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 		while( i < args.length) {
 			if (args[i].compareToIgnoreCase("-device") == 0) {
 				jEthDeviceTextField.setText(args[i+1]);
+				i++;
+			}
+			if (args[i].compareToIgnoreCase("-subjects") == 0) {
+				String[] arr =  args[i+1].split(",");
+				if (arr.length > 0) {
+					mSubjects = new ArrayList<>();
+					for( int j = 0; j < arr.length; j++)
+					{
+						mSubjects.add( arr[j].trim() );
+					}
+				}
 				i++;
 			}
 			if (args[i].compareToIgnoreCase("-gatewayHost") == 0) {
