@@ -52,7 +52,7 @@ public class Bdxgwy
 			Element tRoot = tRootDocument.getDocumentElement();
 
 			mBdxGwyName = AuxXml.getStringAttribute( tRoot, "name", null);
-			mBdxGwyClientAcceptPort = AuxXml.getIntAttribute( tRoot, "clientAccessPort", 0);
+			mBdxGwyClientAcceptPort = AuxXml.getIntAttribute( tRoot, "clientAcceptPort", 0);
 			mBdxGwyGatewayAcceptPort = AuxXml.getIntAttribute( tRoot, "gatewayAcceptPort", 0);
 			mEthDevice = AuxXml.getStringAttribute( tRoot, "ethDevice", "eth0");
 
