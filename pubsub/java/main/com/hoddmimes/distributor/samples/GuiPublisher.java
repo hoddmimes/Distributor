@@ -35,6 +35,8 @@ import java.awt.image.BufferedImage;
 * LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
 */
 public class GuiPublisher extends JFrame implements DistributorEventCallbackIf {
+	static final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss.SSS");
+
 	static final String cTestSubject ="/test-subject-name";
 	private int mLogFlags = DistributorApplicationConfiguration.LOG_CONNECTION_EVENTS +
 			                DistributorApplicationConfiguration.LOG_ERROR_EVENTS;
@@ -147,7 +149,7 @@ public class GuiPublisher extends JFrame implements DistributorEventCallbackIf {
 	SenderThread										mSenderThread = null;
 	long												mSendSequenceNumber = 0;
 
-
+	boolean 											mUseSimpleAsiiData = false;
 
 	private JLabel jWarmupLabel = null;
 	private JLabel jLoggingLabel = null;
@@ -777,7 +779,12 @@ public class GuiPublisher extends JFrame implements DistributorEventCallbackIf {
 				mBdxGwyPort = Integer.parseInt(args[i+1]);
 				i++;
 			}
-			
+
+			if (args[i].compareToIgnoreCase("-ascciData") == 0) {
+				mUseSimpleAsiiData = Boolean.parseBoolean(args[i+1]);
+				i++;
+			}
+
 			i++;
 		}
 		
@@ -932,6 +939,11 @@ public class GuiPublisher extends JFrame implements DistributorEventCallbackIf {
 				catch( InterruptedException e) {}
 			}
 		}
+
+		byte[] getSimpleAsiiData() {
+			String tMsgStr = "[ subject: " + cTestSubject + " time: " + SDF.format(System.currentTimeMillis()) + " SenderSeqNo: " + String.valueOf((mSendSequenceNumber++));
+			return tMsgStr.getBytes();
+		}
 		
 		byte[] getSendData() {
 			return getSendData(0);
@@ -982,10 +994,14 @@ public class GuiPublisher extends JFrame implements DistributorEventCallbackIf {
 					if ((mMessagesSent % 1000) == 0) {
 						System.out.println("[SENT] " + mSDF.format( System.currentTimeMillis()) + " sent: " + mMessagesSent);
 					}
-					try { 
-						tSendBuffer = getSendData();
-						tSendBuffer[8] = 1;
-						
+					try {
+						if (mUseSimpleAsiiData) {
+							tSendBuffer = getSimpleAsiiData();
+						} else {
+							tSendBuffer = getSendData();
+							tSendBuffer[8] = 1;
+						}
+
 						tSendTime = mFrame.mPublisher.publish(mFrame.cTestSubject, tSendBuffer); 
 						mFrame.mStatisticsThread.update(tSendBuffer.length, tSendTime);
 					}
