@@ -192,6 +192,11 @@ public class DistributorConnection extends Thread implements DistributorConnecti
 		return mConnectionSender.getStatUpdatesPerPackage();
 	}
 
+	@Override
+	public long getAvgXtaTime() {
+		return mTrafficStatisticsTask.getAvgXtaTime();
+	}
+
 	synchronized public void close() {
 		try {
 			lock();
@@ -465,6 +470,7 @@ public class DistributorConnection extends Thread implements DistributorConnecti
 				tSB.append("\t XTA Update Rate        " + tConnection.mTrafficStatisticsTask.mXtaUpdates.mValueSec + "\n");
 				tSB.append("\t XTA Total Segments     " + tConnection.mTrafficStatisticsTask.getTotalXtaSegments() + "\n");
 				tSB.append("\t XTA Total Updates      " + tConnection.mTrafficStatisticsTask.getTotalXtaUpdates() + "\n");
+				tSB.append("\t XTA Avg snd time (usec)" + tConnection.mTrafficStatisticsTask.getAvgXtaTime() + "\n");
 				tSB.append("\t RCV Byte Rate          " + tConnection.mTrafficStatisticsTask.mRcvBytes.mValueSec + "\n");
 				tSB.append("\t RCV Segment Rate       " + tConnection.mTrafficStatisticsTask.mRcvMsgs.mValueSec + "\n");
 				tSB.append("\t RCV Update Rate        " + tConnection.mTrafficStatisticsTask.mRcvUpdates.mValueSec + "\n");

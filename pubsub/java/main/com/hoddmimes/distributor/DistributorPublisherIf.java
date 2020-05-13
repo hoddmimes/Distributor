@@ -67,4 +67,10 @@ public interface DistributorPublisherIf {
 	 * @return avg buffer fill rate.
 	 */
 	public double getBufferFillRate();
+
+	/**
+	 * Returns statistics for the average transmission time in usec for writing physical UDP packages.
+	 * @return avg xta time in usec
+	 */
+	public int getAvgXtaTime();
 }

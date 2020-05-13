@@ -122,4 +122,16 @@ public class DistributorPublisher implements DistributorPublisherIf {
 				DistributorConnectionController.unlockDistributor(tConnection);
 		}
 	}
+
+	@Override
+	public int getAvgXtaTime() {
+		DistributorConnection tConnection = null;
+		try {
+			tConnection = DistributorConnectionController.getAndLockDistributor(mDistributorConnectionId);
+			return  (tConnection != null) ? (int) tConnection.getAvgXtaTime(): 0;
+		}
+		finally {
+			DistributorConnectionController.unlockDistributor(tConnection);
+		}
+	}
 }

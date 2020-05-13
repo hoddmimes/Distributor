@@ -62,13 +62,19 @@ public interface DistributorConnectionIf
 
 	/**
 	 * Return the average fill rate on in percentage of the UDP packages sent.
+	 * @return avg fill rate of allocated send buffers
 	 */
 	public double getPackageFillRate();
 
 	/**
 	 * Returns the average number of updates sent in an UDP package
+	 * @return avg number of updates in a physival write
 	 */
 	public double getUpdatesPerMessage();
 
-
+	/**
+	 * Return the average XTA time when issuing a physical UDP message write
+	 * @return avg XTA time in usec
+	 */
+	public long getAvgXtaTime();
 }

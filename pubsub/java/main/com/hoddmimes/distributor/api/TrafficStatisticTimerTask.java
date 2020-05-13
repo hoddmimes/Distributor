@@ -43,6 +43,7 @@ class TrafficStatisticTimerTask extends DistributorTimerTask {
 	AtomicLong mXtaTotalBytes;
 	AtomicLong mXtaTotalUpdates;
 	AtomicLong mXtaTotalSegments;
+	AtomicLong mXtaSendTimeUsec;
 	AtomicLong mRcvTotalBytes;
 	AtomicLong mRcvTotalUpdates;
 	AtomicLong mRcvTotalSegments;
@@ -157,6 +158,10 @@ class TrafficStatisticTimerTask extends DistributorTimerTask {
 		return mRcvTotalUpdates.get();
 	}
 
+	long getAvgXtaTime() {
+		return (mXtaTotalSegments.get() == 0) ? 0 : mXtaSendTimeUsec.get() / mXtaTotalSegments.get();
+	}
+
 	String[] getStatistics() {
 		String[] tResult = new String[6];
 		tResult[0] = mXtaBytes.toString();
@@ -204,9 +209,10 @@ class TrafficStatisticTimerTask extends DistributorTimerTask {
 		mRcvTotalBytes = new AtomicLong(0);
 		mRcvTotalUpdates = new AtomicLong(0);
 		mRcvTotalSegments = new AtomicLong(0);
+		mXtaSendTimeUsec = new AtomicLong(0);
 	}
 
-	void updateXtaStatistics(XtaSegment pSegment) {
+	void updateXtaStatistics(XtaSegment pSegment, long pXtaTimeUsec) {
 		mXtaMsgs.update(1);
 		mXtaMsgs1min.update(1);
 		mXtaMsgs5min.update(1);
@@ -216,6 +222,7 @@ class TrafficStatisticTimerTask extends DistributorTimerTask {
 
 		mXtaTotalBytes.getAndAdd(pSegment.getSize());
 		mXtaTotalSegments.getAndIncrement();
+		mXtaSendTimeUsec.getAndAdd( pXtaTimeUsec );
 
 		if (pSegment.isUpdateMessage()
 				&& ((pSegment.getHeaderSegmentFlags() & Segment.FLAG_M_SEGMENT_START) == Segment.FLAG_M_SEGMENT_START)

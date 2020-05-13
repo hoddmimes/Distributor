@@ -172,7 +172,7 @@ public class Publisher {
 	{
 		byte[] tBuffer;
 		Random mRandom = new Random();
-		long mSequenceNumber = 0;
+		long mSequenceNumber = 0, tXtaTime = 0;
 		mStatLastStat = System.currentTimeMillis();
 		parseSenderRate();
 
@@ -186,7 +186,7 @@ public class Publisher {
 						tBuffer = new byte[ tSize ];
 					} 
 					long2Buffer(++mSequenceNumber, tBuffer, 0);
-					mPublisher.publish(mSubjectName, tBuffer);
+					tXtaTime = mPublisher.publish(mSubjectName, tBuffer);
 					if ((mSequenceNumber % mUpdateDisplayFactor) == 0) {
 						long mFreeMem = Runtime.getRuntime().freeMemory();
 						long mTotalMem = Runtime.getRuntime().totalMemory();
@@ -195,7 +195,11 @@ public class Publisher {
 						long  tRate = ((mSequenceNumber - mStatUpdsSent) * 1000L) / tDeltaTime;
 						mStatUpdsSent = mSequenceNumber;
 						
-						System.out.println( cSDF.format(System.currentTimeMillis()) + " Upds/sec: " + tRate  + "  upds/msg: " + mPublisher.getUpdatesPerMessage() + " buffer fill rate: " + mPublisher.getBufferFillRate() + "  memory used: " + mUsedMem + " (KB)");
+						System.out.println( cSDF.format(System.currentTimeMillis()) + " Upds/sec: " + tRate  +
+								                       "  upds/msg: " + mPublisher.getUpdatesPerMessage() +
+													   "  avg xta time: " + mPublisher.getAvgXtaTime() +
+								                       " (usec)   buffer fill rate: " + mPublisher.getBufferFillRate() +
+								                       "  memory used: " + mUsedMem + " (KB)");
 						mStatLastStat = System.currentTimeMillis();
 					}
 				}

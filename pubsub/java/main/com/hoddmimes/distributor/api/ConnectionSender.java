@@ -453,7 +453,7 @@ class ConnectionSender {
 			} else {
 				try {
 					tSendTime = mMca.send(pSegment.getEncoder().getByteBuffer());
-					mConnection.mTrafficStatisticsTask.updateXtaStatistics(pSegment);
+					mConnection.mTrafficStatisticsTask.updateXtaStatistics(pSegment,tSendTime);
 				} catch (Exception e) {
 					mErrorSignaled = true;
 					cLogger.info("Failed to send segment, reason: " + e.getMessage());
