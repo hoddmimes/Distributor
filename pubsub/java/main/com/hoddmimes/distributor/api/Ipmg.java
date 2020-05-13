@@ -108,6 +108,7 @@ public class Ipmg
 					+ pBuffer.position() + ") MCA: "
 					+ mDestinationSocketAddress.toString());
 		}
+		//System.out.println("IPMG send: " + tPacket.getLength() + " xta time: " + tSendTime);
 		tPacket = null;
 		return (int) tSendTime;
 	}

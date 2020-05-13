@@ -77,10 +77,11 @@ class NetMsgUpdate extends NetMsg {
 	}
 
 
+
 	boolean addUpdate(XtaUpdate pXtaUpdate) {
 		MessageBinEncoder tEncoder = super.getEncoder();
 		if (pXtaUpdate.getSize() <= tEncoder.getRemaining()) {
-			tEncoder.add( pXtaUpdate.mSubjectName );
+			tEncoder.add( pXtaUpdate.mSubjectName, true );
 			tEncoder.add( pXtaUpdate.mData, pXtaUpdate.getDataLength());
 			mUpdateCount++;
 			return true;

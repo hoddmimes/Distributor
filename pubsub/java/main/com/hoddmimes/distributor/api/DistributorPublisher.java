@@ -98,4 +98,28 @@ public class DistributorPublisher implements DistributorPublisherIf {
 	public long getId() {
 		return mId;
 	}
+
+	@Override
+	public double getUpdatesPerMessage() {
+		DistributorConnection tConnection = null;
+		try {
+		   tConnection = DistributorConnectionController.getAndLockDistributor(mDistributorConnectionId);
+			return  (tConnection != null) ? tConnection.getUpdatesPerMessage() : 0;
+		}
+		finally {
+			DistributorConnectionController.unlockDistributor(tConnection);
+		}
+	}
+
+	@Override
+	public double getBufferFillRate() {
+		DistributorConnection tConnection = null;
+		try {
+			tConnection = DistributorConnectionController.getAndLockDistributor(mDistributorConnectionId);
+			return  (tConnection != null) ? tConnection.getPackageFillRate() : 0;
+		}
+		finally {
+				DistributorConnectionController.unlockDistributor(tConnection);
+		}
+	}
 }

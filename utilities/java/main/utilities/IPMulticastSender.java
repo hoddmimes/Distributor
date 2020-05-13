@@ -117,7 +117,7 @@ public class IPMulticastSender
 		int tSeqNo = 0;
 		DatagramPacket tPacket;
 		byte[] tBuffer = new byte[ mMessageSize ];
-		
+		long tStartTime, tSendTime;
 
 		try {
 			while( true ) 
@@ -125,14 +125,16 @@ public class IPMulticastSender
 				longToBuffer( tSeqNo++, tBuffer, 0 );
 
 				tPacket = new DatagramPacket(tBuffer, mMessageSize, mDestinationSocketAddress);
+				tStartTime = System.nanoTime();
 				mSocket.send(tPacket);
+				tSendTime = (System.nanoTime() - tStartTime) / 1000L;
 				if (mMessageSize != tPacket.getLength()) {
 					throw new IOException("Failed to send, send data("
 							+ mMessageSize + " != buffer length("
 							+ tPacket.getLength() + ") MCA: "
 							+ mDestinationSocketAddress.toString());
 				}
-				tStat.updateStatistics( tPacket.getLength() );
+				tStat.updateStatistics( tPacket.getLength(), tSendTime );
 			}
 		}
 		catch( Exception e ) {
@@ -154,6 +156,7 @@ public class IPMulticastSender
 		long mStartTime;
 		long mLastTimeStamp;
 		long mMsgsSent;
+		long mTotSendTime;
 		
 		
 		Statistics() {
@@ -165,11 +168,14 @@ public class IPMulticastSender
 			long tTimeDiff = tNow - mStartTime;
 			long tBitRate =  (8 * mBytesSent ) / tTimeDiff;
 			long tMessageRate = (mMsgsSent * 1000) / tTimeDiff;
-			System.out.println( cSDF.format(tNow) + " message rate: " + tMessageRate + " bit rate:" + tBitRate  + " kbit/sec");	
+			long tAvgSendTime = mTotSendTime / mMsgsSent;
+			System.out.println( cSDF.format(tNow) + " message rate: " + tMessageRate + " bit rate:" + tBitRate  +
+					" kbit/sec   Avg Xta Time: " + tAvgSendTime + " usec");
 		}
 		
-		void updateStatistics( int pMessageSize ) {
+		void updateStatistics( int pMessageSize, long pSendTime ) {
 			mMsgsSent++;
+			mTotSendTime += pSendTime;
 			mBytesSent += pMessageSize;
 			if ((mMsgsSent % 5000 ) == 0) {
 				presentStatistics();

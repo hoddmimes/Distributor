@@ -137,11 +137,24 @@ public class MessageBinEncoder {
 		}
 	}
 
+	private byte[] fastStringToBytes( String pString ) {
+		final int tSize = pString.length();
+		final byte[] tBuffer = new byte[tSize];
+		for( int i = 0; i < tSize; i++) {
+			tBuffer[i] = (byte) (pString.charAt(i) & 0xff);
+		}
+		return tBuffer;
+	}
+
 	public void add(String pString) {
+		add( pString, false);
+	}
+
+	public void add(String pString, boolean pFastEncode) {
 		if (pString == null) {
 			add(false);
 		} else {
-			byte[] tBytes = pString.getBytes();
+			byte[] tBytes = (pFastEncode) ? fastStringToBytes(pString) : pString.getBytes();
 			ensureCapacity(tBytes.length + 5);
 			add(true);
 			add(tBytes.length);

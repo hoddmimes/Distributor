@@ -148,6 +148,7 @@ public class GuiPublisher extends JFrame implements DistributorEventCallbackIf {
 	StatisticsThread									mStatisticsThread = null;  //  @jve:decl-index=0:
 	SenderThread										mSenderThread = null;
 	long												mSendSequenceNumber = 0;
+	boolean												mMaximize = false;
 
 	boolean 											mUseSimpleAsiiData = false;
 
@@ -785,6 +786,11 @@ public class GuiPublisher extends JFrame implements DistributorEventCallbackIf {
 				i++;
 			}
 
+			if (args[i].compareToIgnoreCase("-maximize") == 0) {
+				mMaximize = Boolean.parseBoolean(args[i+1]);
+				i++;
+			}
+
 			i++;
 		}
 		
@@ -874,6 +880,13 @@ public class GuiPublisher extends JFrame implements DistributorEventCallbackIf {
 
 			mSendSequenceNumber = 0;
 			
+			if (mMaximize) {
+				mBatchFactor = 5000;
+				mDismiss = (long) 1L;
+				return;
+			}
+
+
 			if (mRate == 0)
 			{
 				mBatchFactor = 5000;
@@ -991,7 +1004,7 @@ public class GuiPublisher extends JFrame implements DistributorEventCallbackIf {
 			while ((!mTimeToDie) && ( mMessagesSent <= mMessagesToSend)) {
 				for( int i = 0; i < mBatchFactor; i++) {
 				
-					if ((mMessagesSent % 1000) == 0) {
+					if ( (!mMaximize) && (mRate > 0) && (mMessagesSent % 1000) == 0) {
 						System.out.println("[SENT] " + mSDF.format( System.currentTimeMillis()) + " sent: " + mMessagesSent);
 					}
 					try {
@@ -1022,10 +1035,12 @@ public class GuiPublisher extends JFrame implements DistributorEventCallbackIf {
 						return;
 					}
 				}
+				if ((!mMaximize) && (mRate > 0)){
 				try { sleep( mDismiss ); }
 				catch( InterruptedException e) {}
 			}
 		}
+	}
 	}
 	
 	

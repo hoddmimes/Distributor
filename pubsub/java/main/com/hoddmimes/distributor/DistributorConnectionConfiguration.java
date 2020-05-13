@@ -96,7 +96,7 @@ public class DistributorConnectionConfiguration {
 	protected int  mRetransmissionRetries; // Max number of retransmission retries
 	protected int  mRetransmissionMaxCacheSize; // Max size of of the the elements in the cache
 	protected int  mRetransmissionCacheLifeTime; // Max time an elemnt will be keept in the retransmission cache
-	protected long mRetransmissonCacheCleanInterval; // How frequently the retransmission cach in cleaned
+	protected long mRetransmissonCacheCleanInterval; // How frequently the retransmission cache in cleaned/purged
 
 	/**
 	 * If there has been an retransmission within the nagging window for nagging
@@ -824,7 +824,7 @@ public class DistributorConnectionConfiguration {
 	/**
 	 * Returns the holdback treashold value
 	 * 
-	 * @return int, holdback treashold value
+	 * @return int, holdback treshold value
 	 */
 	public int getSendHoldbackThreshold() {
 		return mSendHoldbackThreshold;

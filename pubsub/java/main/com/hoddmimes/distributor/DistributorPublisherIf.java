@@ -54,4 +54,17 @@ public interface DistributorPublisherIf {
 	 * @return long publisher identifier
 	 */
 	public long getId();
+
+
+	/**
+	 * Returns statistics for the average number of updates in physical UDP packages sent
+	 * @return avg updates per physical message send
+	 */
+	public double getUpdatesPerMessage();
+
+	/**
+	 * Returns statistics for the average fill rate of each physical UDP buffer allocated.
+	 * @return avg buffer fill rate.
+	 */
+	public double getBufferFillRate();
 }

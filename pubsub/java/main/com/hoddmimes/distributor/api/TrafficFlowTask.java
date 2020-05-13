@@ -43,7 +43,6 @@ public class TrafficFlowTask extends DistributorTimerTask
 		mBitsRateIncrement = 0;
 		mUpdateRateIncrement = 0;
 		mLastEvalTime = tNow;
-		//std::cout << "Traffic Flow Execute Loop " << mLastEvalTime << std::endl;
 	}
 		
 	void increment( int pSegmentSize ) {
@@ -52,7 +51,7 @@ public class TrafficFlowTask extends DistributorTimerTask
 	}
 
 	int getUpdateRate() {
-		int tUpdateRatePerSecond = (int) (mCurrentUpdateRate * mSecondTimeFactor * mLastRelativeTimeFactor);
+		int tUpdateRatePerSecond = (int) (mCurrentUpdateRate * mSecondTimeFactor * mLastRelativeTimeFactor) + 1;
 		return tUpdateRatePerSecond;
 	}
 	

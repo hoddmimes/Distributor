@@ -38,6 +38,10 @@ public class Publisher {
 	private int 	mSendBatchFactor = 0;
 	private long 	mSendWait = 0;
 	private int 	mFakeErrorRate = 0;
+	private boolean mMaximize = false;
+
+	private long	mStatUpdsSent = 0;
+	private long 	mStatLastStat = 0;
 	
 	private int mLogFlags =  DistributorApplicationConfiguration.LOG_CONNECTION_EVENTS +
 	                         DistributorApplicationConfiguration.LOG_RMTDB_EVENTS +
@@ -60,6 +64,10 @@ public class Publisher {
 		while( i < pArgs.length) {
 			if (pArgs[i].equals("-minSize")) {
 				mMinSize = Integer.parseInt(pArgs[i+1]);
+				i++;
+			}
+			if (pArgs[i].equals("-maximize")) {
+				mMaximize = Boolean.parseBoolean(pArgs[i+1]);
 				i++;
 			}
 			if (pArgs[i].equals("-maxSize")) {
@@ -121,6 +129,7 @@ public class Publisher {
 		System.out.println("-device              " + mEthDevice );
 		System.out.println("-holdback            " + mHoldback );
 		System.out.println("-holdbackTreshold    " + mHoldbackThreshold );
+		System.out.println("-maximize		     " + mMaximize );
 		System.out.println("-ipBuffer            " + mIpBufferSize );
 		System.out.println("-segment             " + mSegmentSize );
 		System.out.println("-logFlags            " + "0x0" + Integer.toHexString(mLogFlags) );
@@ -164,6 +173,7 @@ public class Publisher {
 		byte[] tBuffer;
 		Random mRandom = new Random();
 		long mSequenceNumber = 0;
+		mStatLastStat = System.currentTimeMillis();
 		parseSenderRate();
 
 		try {
@@ -181,13 +191,18 @@ public class Publisher {
 						long mFreeMem = Runtime.getRuntime().freeMemory();
 						long mTotalMem = Runtime.getRuntime().totalMemory();
 						long mUsedMem = (mTotalMem - mFreeMem) / 1024L;
+						long tDeltaTime = System.currentTimeMillis() - mStatLastStat;
+						long  tRate = ((mSequenceNumber - mStatUpdsSent) * 1000L) / tDeltaTime;
+						mStatUpdsSent = mSequenceNumber;
 						
-						System.out.println( cSDF.format(System.currentTimeMillis()) +  " updates sent: " + mSequenceNumber + " memory used: " + mUsedMem + " (KB)");
+						System.out.println( cSDF.format(System.currentTimeMillis()) + " Upds/sec: " + tRate  + "  upds/msg: " + mPublisher.getUpdatesPerMessage() + " buffer fill rate: " + mPublisher.getBufferFillRate() + "  memory used: " + mUsedMem + " (KB)");
+						mStatLastStat = System.currentTimeMillis();
 					}
 				}
+				if (!mMaximize) {
 				try  { Thread.currentThread().sleep(mSendWait); }
 				catch(InterruptedException e) {};
-			
+				}
 			}
 		}
 		catch( DistributorException e) {
@@ -199,7 +214,7 @@ public class Publisher {
 	
 	void parseSenderRate() {
 		
-		if (mRate == 0)
+		if ((mRate == 0) || (mMaximize))
 		{
 			mSendBatchFactor = 5000;
 			mSendWait = (long) 1L;

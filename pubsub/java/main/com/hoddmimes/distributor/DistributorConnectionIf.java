@@ -59,4 +59,16 @@ public interface DistributorConnectionIf
 	 */
 	public long getMcaConnectionId();
 
+
+	/**
+	 * Return the average fill rate on in percentage of the UDP packages sent.
+	 */
+	public double getPackageFillRate();
+
+	/**
+	 * Returns the average number of updates sent in an UDP package
+	 */
+	public double getUpdatesPerMessage();
+
+
 }

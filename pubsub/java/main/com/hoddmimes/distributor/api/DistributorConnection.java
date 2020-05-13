@@ -182,6 +182,16 @@ public class DistributorConnection extends Thread implements DistributorConnecti
 		return mMcaConnectionId;
 	}
 
+	@Override
+	public double getPackageFillRate() {
+		return mConnectionSender.getStatPackageFillRate();
+	}
+
+	@Override
+	public double getUpdatesPerMessage() {
+		return mConnectionSender.getStatUpdatesPerPackage();
+	}
+
 	synchronized public void close() {
 		try {
 			lock();
@@ -365,7 +375,7 @@ public class DistributorConnection extends Thread implements DistributorConnecti
 	public void run() 
 	{
 		AsyncEvent 					tAsyncEvent = null;
-		ArrayList<AsyncEvent>		tEventList = new ArrayList<AsyncEvent>();
+		ArrayList<AsyncEvent>		tEventList = new ArrayList<AsyncEvent>(60);
 		
 		setName("AsynchThread: " + mIpmg.toString());
 		while( (mState == RunningStateType.RUNNING) || (mState == RunningStateType.INIT)) {
@@ -386,7 +396,7 @@ public class DistributorConnection extends Thread implements DistributorConnecti
 			
 				if (!mAsynchEventQueue.isEmpty()) {
 					tEventList.clear();
-					mAsynchEventQueue.drainTo(tEventList, 30);
+					mAsynchEventQueue.drainTo(tEventList, 60);
 					for( int i = 0; i < tEventList.size(); i++ ) {
 						if (mState != RunningStateType.RUNNING) {
 							mAsynchEventQueue.clear();
