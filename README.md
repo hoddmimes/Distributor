@@ -3,6 +3,8 @@
 The *Distributor* utility is a **publish/subscribe** messaging component. The utility provides an API allowing application to publish real time data received by one or many applications on a [LAN](https://www.cisco.com/c/en/us/products/switches/what-is-a-lan-local-area-network.html#~types).
 The utility is a true _one-to-many_ transport using IP multicast as transport.
 
+You can typically push over a million updates / sec  with a size of 50-60 bytes on X86-64 (i7-3930K) NIC Intel 82579V (Gibit) with a CPU Utilization < 20% and bandwidth utilization around 70%.
+
 
 Snipplets for minimalist [_Publisher_](#A-minimalist-Publisher-App) and [_Subscriber_](#A-minimalist-Subscriber-App) are found below.
 
@@ -212,21 +214,21 @@ The default interval for checking the publishing  rate is 250 ms.
 
 
 #### Ethernet Flow Control 
-Even if IP Multicast is Link Level 2 protocol without flow control the Ethernet standard 802.3x specify the a option for devices to send [MAC Pause messages](https://en.wikipedia.org/wiki/Ethernet_flow_control). 
-This will typically happen when massive data is sent out. When a device is overwheelmed with data it can publish a MAC pause Ethenet message asking sending device to 
-_slow down_ (i.e take a pause). If you are trying to push high numbers you might expiriance that you can not reach the full potetial of the CPU and or network. 
+Even if IP Multicast is Link Level 2 protocol without flow control the Ethernet standard 802.3x specify an option for devices to send [MAC Pause messages](https://en.wikipedia.org/wiki/Ethernet_flow_control). 
+This will typically happen when massive data is sent out. When a device is overwhelmed with data it can publish a MAC pause Ethenet message asking sending device to 
+_slow down_ (i.e take a pause). If you are trying to push high numbers you might expiriance that you can not reach the full potential of the CPU and or network. 
 There is then a good chance that someone has sent MAC pause messages. Normally this is what you want in order to avoid massive data overrun and broadcast storms.
 
-You can configure Ethernet controllers to ignore MAC pause request i.e. disable flow control. On windows you can do this by going into the Contral Panel, Networking, Adapters and change adapter properties. 
+You can however configure Ethernet controllers to ignore MAC pause request i.e. disable flow control. On windows you can do this by going into the Contral Panel, Networking, Adapters and change adapter properties. 
 On linux the NIC properties are configure with the [ethtool](https://www.thegeekstuff.com/2010/10/ethtool-command/)
 
-However disabling the flow control increases the risk for data overrun quite (quite) significantly. The problem is not on the sender side to push out data.
-The challge is to receive and process data, this normally requires a much bigger effort.  
+However disabling the flow control increases the risk for data overrun quitesignificantly. The problem is not on the sender side to push out data.
+The challange is to receive and process data, this normally requires a much bigger effort.  
 
 
 
 
-####Distributor Retransmission Cache 
+#### Distributor Retransmission Cache 
 The _Distributor_ keep sent messages in a memory cache. In case a subscriber has missed a messsage and request a 
 retransmission the publisher will lookup the the missed message in the cache and retransmitt the message.
 The size of the retransmission cache are configured on a multicast group level 
@@ -234,14 +236,14 @@ The size of the retransmission cache are configured on a multicast group level
                                                                             
 
 
-##Broadcast Gateways
+## Broadcast Gateways
 The multicast distribution is possible on LAN and is normally not working in a routed network. However multicast traffic can be _routed_ 
 using a Muticast Routing protocol (PIM, MOSPF etc.) These protocols are normally not enable and require some configuration in routers, if being supported.
 
 The _Distrbutor_ library includes some code allowing multicast to be _routed_ between two LAN using a P-2-P connection.
 For more information about the _Distributor_ broadcast gateway see [Distributor Broadcast Gateway] (https://github.com/hoddmimes/Distributor/blob/master/doc/bdxgwy.md) 
 
-##WEB Socket Gateway
+## WEB Socket Gateway
 There is also a gateway component allowing broadcast information to be published to Web Socket clients. 
 The component is kept in a separate GitHub repository and can be found [here, DistributorWsGateway](https://github.com/hoddmimes/DistributorWsGateway)   
 
