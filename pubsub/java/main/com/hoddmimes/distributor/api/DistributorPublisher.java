@@ -3,6 +3,7 @@ package com.hoddmimes.distributor.api;
 import com.hoddmimes.distributor.DistributorEventCallbackIf;
 import com.hoddmimes.distributor.DistributorException;
 import com.hoddmimes.distributor.DistributorPublisherIf;
+import com.hoddmimes.distributor.DistributorPublisherStatisticsIf;
 import com.hoddmimes.distributor.auxillaries.UUIDFactory;
 
 
@@ -100,38 +101,22 @@ public class DistributorPublisher implements DistributorPublisherIf {
 	}
 
 	@Override
-	public double getUpdatesPerMessage() {
+	public DistributorPublisherStatisticsIf getStatistics() throws DistributorException {
 		DistributorConnection tConnection = null;
+
+		tConnection = DistributorConnectionController.getAndLockDistributor(mDistributorConnectionId);
+
+		if (tConnection == null) {
+			throw new DistributorException("Distributon connection is closed or no longer valid");
+		}
+
 		try {
-		   tConnection = DistributorConnectionController.getAndLockDistributor(mDistributorConnectionId);
-			return  (tConnection != null) ? tConnection.getUpdatesPerMessage() : 0;
+			tConnection.checkStatus();
+			return tConnection.mTrafficStatisticsTask;
 		}
 		finally {
 			DistributorConnectionController.unlockDistributor(tConnection);
 		}
 	}
 
-	@Override
-	public double getBufferFillRate() {
-		DistributorConnection tConnection = null;
-		try {
-			tConnection = DistributorConnectionController.getAndLockDistributor(mDistributorConnectionId);
-			return  (tConnection != null) ? tConnection.getPackageFillRate() : 0;
-		}
-		finally {
-				DistributorConnectionController.unlockDistributor(tConnection);
-		}
-	}
-
-	@Override
-	public int getAvgXtaTime() {
-		DistributorConnection tConnection = null;
-		try {
-			tConnection = DistributorConnectionController.getAndLockDistributor(mDistributorConnectionId);
-			return  (tConnection != null) ? (int) tConnection.getAvgXtaTime(): 0;
-		}
-		finally {
-			DistributorConnectionController.unlockDistributor(tConnection);
-		}
-	}
 }

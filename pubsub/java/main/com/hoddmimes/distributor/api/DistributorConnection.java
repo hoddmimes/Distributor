@@ -182,20 +182,6 @@ public class DistributorConnection extends Thread implements DistributorConnecti
 		return mMcaConnectionId;
 	}
 
-	@Override
-	public double getPackageFillRate() {
-		return mConnectionSender.getStatPackageFillRate();
-	}
-
-	@Override
-	public double getUpdatesPerMessage() {
-		return mConnectionSender.getStatUpdatesPerPackage();
-	}
-
-	@Override
-	public long getAvgXtaTime() {
-		return mTrafficStatisticsTask.getAvgXtaTime();
-	}
 
 	synchronized public void close() {
 		try {
@@ -465,15 +451,15 @@ public class DistributorConnection extends Thread implements DistributorConnecti
 
 			try {
 				tSB.append("Traffic Statistics MCA " + tConnection.mIpmg.toString() + "\n");
-				tSB.append("\t XTA Byte Rate          " + tConnection.mTrafficStatisticsTask.mXtaBytes.mValueSec + "\n");
-				tSB.append("\t XTA Segment Rate       " + tConnection.mTrafficStatisticsTask.mXtaMsgs.mValueSec + "\n");
-				tSB.append("\t XTA Update Rate        " + tConnection.mTrafficStatisticsTask.mXtaUpdates.mValueSec + "\n");
+				tSB.append("\t XTA Byte Rate          " + tConnection.mTrafficStatisticsTask.mXtaBytes.getValueSec() + "\n");
+				tSB.append("\t XTA Segment Rate       " + tConnection.mTrafficStatisticsTask.mXtaMsgs.getValueSec() + "\n");
+				tSB.append("\t XTA Update Rate        " + tConnection.mTrafficStatisticsTask.mXtaUpdates.getValueSec() + "\n");
 				tSB.append("\t XTA Total Segments     " + tConnection.mTrafficStatisticsTask.getTotalXtaSegments() + "\n");
 				tSB.append("\t XTA Total Updates      " + tConnection.mTrafficStatisticsTask.getTotalXtaUpdates() + "\n");
-				tSB.append("\t XTA Avg snd time (usec)" + tConnection.mTrafficStatisticsTask.getAvgXtaTime() + "\n");
-				tSB.append("\t RCV Byte Rate          " + tConnection.mTrafficStatisticsTask.mRcvBytes.mValueSec + "\n");
-				tSB.append("\t RCV Segment Rate       " + tConnection.mTrafficStatisticsTask.mRcvMsgs.mValueSec + "\n");
-				tSB.append("\t RCV Update Rate        " + tConnection.mTrafficStatisticsTask.mRcvUpdates.mValueSec + "\n");
+				tSB.append("\t XTA Avg snd time (usec)" + tConnection.mTrafficStatisticsTask.getXtaAvgIOXTimeUsec() + "\n");
+				tSB.append("\t RCV Byte Rate          " + tConnection.mTrafficStatisticsTask.mRcvBytes.getValueSec() + "\n");
+				tSB.append("\t RCV Segment Rate       " + tConnection.mTrafficStatisticsTask.mRcvMsgs.getValueSec() + "\n");
+				tSB.append("\t RCV Update Rate        " + tConnection.mTrafficStatisticsTask.mRcvUpdates.getValueSec() + "\n");
 				tSB.append("\t RCV Total Segments     " + tConnection.mTrafficStatisticsTask.getTotalRcvSegments() + "\n");
 				tSB.append("\t RCV Total Updates      " + tConnection.mTrafficStatisticsTask.getTotalRcvUpdates() + "\n");
 				tSB.append("\t Delivery Queue         " + ClientDeliveryController.getInstance().getQueueLength() + "\n");

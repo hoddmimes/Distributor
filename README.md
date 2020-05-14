@@ -3,7 +3,12 @@
 The *Distributor* utility is a **publish/subscribe** messaging component. The utility provides an API allowing application to publish real time data received by one or many applications on a [LAN](https://www.cisco.com/c/en/us/products/switches/what-is-a-lan-local-area-network.html#~types).
 The utility is a true _one-to-many_ transport using IP multicast as transport.
 
-You can typically push over a million updates / sec  with a size of 50-60 bytes on X86-64 (i7-3930K) NIC Intel 82579V (Gibit) with a CPU Utilization < 20% and bandwidth utilization around 70%.
+## Area of Usage
+The distributor framework is primarily designed for application having a need for distributing high volumes of volatile real time information to
+to many receivers in a _reliable_ and _consistent_ way with low latecy. 
+ 
+It is possible to push over a million updates / sec  with a size of 50-60 bytes on a Gigabit LAN from a single publisher.
+For performance characteristics see [Publisher Performance Characteristics](#publisher-performance-characteristics) below.
 
 
 Snipplets for minimalist [_Publisher_](#A-minimalist-Publisher-App) and [_Subscriber_](#A-minimalist-Subscriber-App) are found below.
@@ -246,6 +251,37 @@ For more information about the _Distributor_ broadcast gateway see [Distributor 
 ## WEB Socket Gateway
 There is also a gateway component allowing broadcast information to be published to Web Socket clients. 
 The component is kept in a separate GitHub repository and can be found [here, DistributorWsGateway](https://github.com/hoddmimes/DistributorWsGateway)   
+
+## Publisher Performance Characteristics 
+
+Below you can find performance characteristics for a publisher application.
+
+**Configuration:**
+- Intel i7-3930K 3.20GHz
+- Manufacture ASUS [P9X79 PRO](https://www.asus.com/Motherboards/P9X79_PRO/specifications/)
+- NIC [Intel 82579V](https://ark.intel.com/content/www/us/en/ark/products/52963/intel-82579v-gigabit-ethernet-phy.html)
+- OS Windows 7 Professional (64 bit)
+
+**Application**
+- Java publisher app found in the sample directory, [see source here](https://github.com/hoddmimes/Distributor/blob/master/pubsub/java/main/com/hoddmimes/distributor/samples/Publisher.java)
+- started with the following VM parameters _"-Xms800m -Xmx1200m"_
+- started with the following program parameters _"-maximize true -holdback 100 -holdbackTreshold 0 -ipBuffer 265000 -segment 62000 -displayFactor 100000 -minSize 50 -maxSize 50 -device eth10 -rate 0"_
+
+_With the configuration above the application is pushing  updates with a size of 50 bytes as fast as possible._ 
+
+**Performance Characteristics**
+- Updates published per second > 1.000.000 updates / sec
+- Average number of published UDP message ~1260 msgs/sec.
+- Average I/O transmission time (blocking I/O) ~632 usec.
+- CPU utilization < 10%
+- Network utilization (1 GBit) ~65%.
+
+The bottleneck is NIC transmission, 87% of the walltime is spent in the I/O send method waiting for the I/O to complete.
+
+**_For solutions distributing high volume data with low latency in a reliable and consistent way, the hard part is not publishing the data.
+The challenge is for receiver applications to receive and processes data and not falling behind._**  
+ 
+
 
 
 ## A minimalist Publisher App

@@ -47,10 +47,7 @@ class ConnectionSender {
 	Random 						mRand;
 	private ServerSocket 		mSenderIdSocket;
 
-	// Stat for efficency debugging
-	private long 					mStatSentPackages = 0;
-	private long  					mStatSentUpdates = 0;
-	private long					mStatBytesSent = 0;
+
 	 
 	
 	
@@ -326,21 +323,6 @@ class ConnectionSender {
 		return queueCurrentUpdate(Segment.FLAG_M_SEGMENT_START + Segment.FLAG_M_SEGMENT_END);
 	}
 
-	public double getStatPackageFillRate() {
-		long tAvgBytesPkt = mStatBytesSent / mStatSentPackages;
-		double tRatio = (double) tAvgBytesPkt / mConfiguration.getSmallSegmentSize();
-		double x = Math.round(tRatio * 10000);
-		tRatio =  x / 100.f;
-		return tRatio;
-	}
-
-	public double getStatUpdatesPerPackage() {
-		double tRatio = ((double) mStatSentUpdates / (double) mStatSentPackages);
-		double x = Math.round(tRatio * 100);
-		tRatio = x /100.f;
-		return tRatio;
-
-	}
 
 
 	private void logProtocolData(XtaSegment pSegment)
@@ -467,13 +449,6 @@ class ConnectionSender {
 			if (pSegment.getHeaderMessageType() == Segment.MSG_TYPE_UPDATE) {
 				mRetransmissionCache.addSentUpdate(pSegment);
 				mHeartbeatTimerTask.dataHasBeenPublished();
-				// Update stats
-				mStatBytesSent +=  Math.min(pSegment.getSize(), mConfiguration.getSmallSegmentSize());
-				mStatSentPackages++;
-				mStatSentUpdates += pSegment.getUpdateUpdateCount();
-
-				//System.out.println("packes: " + mStatSentPackages + " updates: " + mStatSentUpdates + " upd/msg: " + (mStatSentUpdates/ mStatSentPackages) + " msg size: " + pSegment.getSize() + " upd count: " +pSegment.getUpdateUpdateCount());
-
 			} else {
 				pSegment = null;
 			}

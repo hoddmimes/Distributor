@@ -1,5 +1,7 @@
 package com.hoddmimes.distributor.api;
 
+import com.hoddmimes.distributor.DistributorPublisherStatisticsIf;
+import com.hoddmimes.distributor.DistributorSubscriberStatisticsIf;
 import com.hoddmimes.distributor.generated.messages.DataRateItem;
 
 import java.text.SimpleDateFormat;
@@ -10,11 +12,11 @@ import java.util.concurrent.atomic.AtomicLong;
 
 
 
-class TrafficStatisticTimerTask extends DistributorTimerTask {
-	static SimpleDateFormat cSDF = new SimpleDateFormat("HH:mm:ss.SSS");
+class TrafficStatisticTimerTask extends DistributorTimerTask implements DistributorPublisherStatisticsIf, DistributorSubscriberStatisticsIf {
 	long mLastTimeStamp;
 	long mLastTimeStamp_1_min;
 	long mLastTimeStamp_5_min;
+	long mStartTime;
 
 	CounterElement mXtaBytes;
 	CounterElement mXtaMsgs;
@@ -40,25 +42,28 @@ class TrafficStatisticTimerTask extends DistributorTimerTask {
 	CounterElement mRcvMsgs5min;
 	CounterElement mRcvUpdates5min;
 
-	AtomicLong mXtaTotalBytes;
-	AtomicLong mXtaTotalUpdates;
-	AtomicLong mXtaTotalSegments;
-	AtomicLong mXtaSendTimeUsec;
+	AtomicLong mXtaTotalBytes;			// total bytes send of all kinds
+	AtomicLong mXtaTotalSegments;		// total segments/messages sent of all kinds
+
+	AtomicLong mXtaUpdSendTimeUsec;		// total xta I/O time of user update UDP segments/messages
+
+	AtomicLong mXtaUpdFillTotalBufferAllocateSize;	// total buffer allocation size for user update segments/messages
+	AtomicLong mXtaUpdFillTotalUpdateBytes;			// total number of user data bytes sent
+	AtomicLong mXtaUpdPackages;						// total number of user data segments/messages sent
+	AtomicLong mXtaTotalUserDataUpdates;			// total number of user data updates sent
+
+
+
 	AtomicLong mRcvTotalBytes;
 	AtomicLong mRcvTotalUpdates;
 	AtomicLong mRcvTotalSegments;
 
 	private DataRateItem transform(CounterElement pCE) {
 		DataRateItem tDR = new DataRateItem();
-		tDR.setCurrValue(pCE.mValueSec);
-		tDR.setPeakValue(pCE.mMaxValueSec);
-		if (pCE.mMaxValueSecTime > 0) {
-			tDR.setPeakTime(cSDF.format(pCE.mMaxValueSecTime));
-		} else {
-			tDR.setPeakTime("00:00:00.000");
-		}
-
-		tDR.setTotal(pCE.mTotal.get());
+		tDR.setCurrValue(pCE.getValueSec());
+		tDR.setPeakValue(pCE.getPeakPerSec());
+		tDR.setPeakTime(pCE.getPeakTime());
+		tDR.setTotal(pCE.getTotal());
 		return tDR;
 	}
 
@@ -143,7 +148,7 @@ class TrafficStatisticTimerTask extends DistributorTimerTask {
 	}
 
 	long getTotalXtaUpdates() {
-		return mXtaTotalUpdates.get();
+		return mXtaTotalUserDataUpdates.get();
 	}
 
 	long getTotalRcvBytes() {
@@ -158,9 +163,7 @@ class TrafficStatisticTimerTask extends DistributorTimerTask {
 		return mRcvTotalUpdates.get();
 	}
 
-	long getAvgXtaTime() {
-		return (mXtaTotalSegments.get() == 0) ? 0 : mXtaSendTimeUsec.get() / mXtaTotalSegments.get();
-	}
+
 
 	String[] getStatistics() {
 		String[] tResult = new String[6];
@@ -175,6 +178,7 @@ class TrafficStatisticTimerTask extends DistributorTimerTask {
 
 	TrafficStatisticTimerTask(long pDistributorConnectionId) {
 		super(pDistributorConnectionId);
+		mStartTime = System.currentTimeMillis();
 		mLastTimeStamp = System.currentTimeMillis();
 		mLastTimeStamp_1_min = System.currentTimeMillis();
 		mLastTimeStamp_5_min = System.currentTimeMillis();
@@ -204,12 +208,15 @@ class TrafficStatisticTimerTask extends DistributorTimerTask {
 		mRcvUpdates5min = new CounterElement("RcvUpdates_5_min");
 
 		mXtaTotalBytes = new AtomicLong(0);
-		mXtaTotalUpdates = new AtomicLong(0);
+		mXtaTotalUserDataUpdates = new AtomicLong(0);
 		mXtaTotalSegments = new AtomicLong(0);
 		mRcvTotalBytes = new AtomicLong(0);
 		mRcvTotalUpdates = new AtomicLong(0);
 		mRcvTotalSegments = new AtomicLong(0);
-		mXtaSendTimeUsec = new AtomicLong(0);
+		mXtaUpdSendTimeUsec = new AtomicLong(0);
+		mXtaUpdFillTotalBufferAllocateSize = new AtomicLong(0);
+		mXtaUpdFillTotalUpdateBytes = new AtomicLong(0);
+		mXtaUpdPackages = new AtomicLong(0);
 	}
 
 	void updateXtaStatistics(XtaSegment pSegment, long pXtaTimeUsec) {
@@ -222,7 +229,7 @@ class TrafficStatisticTimerTask extends DistributorTimerTask {
 
 		mXtaTotalBytes.getAndAdd(pSegment.getSize());
 		mXtaTotalSegments.getAndIncrement();
-		mXtaSendTimeUsec.getAndAdd( pXtaTimeUsec );
+
 
 		if (pSegment.isUpdateMessage()
 				&& ((pSegment.getHeaderSegmentFlags() & Segment.FLAG_M_SEGMENT_START) == Segment.FLAG_M_SEGMENT_START)
@@ -231,8 +238,14 @@ class TrafficStatisticTimerTask extends DistributorTimerTask {
 			mXtaUpdates.update(tUpdateCount);
 			mXtaUpdates1min.update(tUpdateCount);
 			mXtaUpdates5min.update(tUpdateCount);
-			mXtaTotalUpdates.getAndAdd(tUpdateCount);
-					
+			mXtaTotalUserDataUpdates.getAndAdd(tUpdateCount);
+			mXtaUpdPackages.incrementAndGet();
+			mXtaUpdSendTimeUsec.getAndAdd( pXtaTimeUsec );
+			mXtaUpdFillTotalUpdateBytes.getAndAdd(pSegment.getSize());
+			mXtaUpdFillTotalBufferAllocateSize.getAndAdd( pSegment.getBufferAllocationSize());
+		} else if (pSegment.isUpdateMessage()) {
+			mXtaUpdPackages.incrementAndGet();
+			mXtaUpdSendTimeUsec.getAndAdd( pXtaTimeUsec );
 		}
 	}
 
@@ -301,54 +314,113 @@ class TrafficStatisticTimerTask extends DistributorTimerTask {
 
 	}
 
-	class CounterElement {
-
-		String mAttributeName;
-		AtomicLong mTotal;
-		AtomicInteger mCurrValueSec;
-		int mValueSec;
-		int mMaxValueSec;
-		long mMaxValueSecTime;
-
-		CounterElement(String pAttributeName) {
-			mAttributeName = pAttributeName;
-			mTotal = new AtomicLong(0);
-			mCurrValueSec = new AtomicInteger(0);
-			mValueSec = 0;
-			mMaxValueSec = 0;
-			mMaxValueSecTime = 0;
+	/**
+	 *===================================================================================
+	 * DistributorPublisherStatisticsIf
+	 * ==================================================================================
+	 */
+	@Override
+	public double getXtaAvgMessageFillRate() {
+		if (mXtaUpdFillTotalBufferAllocateSize.get() == 0) {
+			return 0;
 		}
-
-		void update(int pValue) {
-			mTotal.getAndAdd(pValue);
-			mCurrValueSec.getAndAdd(pValue);
-		}
-
-		void calculate(long pTimeDiff) {
-			if (pTimeDiff > 0) {
-				mValueSec = (mCurrValueSec.getAndSet(0) * 1000)
-						/ (int) pTimeDiff;
-				if (mValueSec > mMaxValueSec) {
-					mMaxValueSec = mValueSec;
-					mMaxValueSecTime = System.currentTimeMillis();
-				}
-			}
-		}
-
-		@Override
-		public String toString() {
-			String tTimeString;
-			if (mMaxValueSecTime == 0) {
-				tTimeString = "00:00:00.000";
-			} else {
-				tTimeString = cSDF.format(new Date(mMaxValueSecTime));
-			}
-			return mAttributeName + " Total: " + mTotal.get() + " "
-					+ mAttributeName + "/Sec : " + mValueSec + " Max "
-					+ mAttributeName + "/Sec : " + mMaxValueSec + " Max Time: "
-					+ tTimeString;
-		}
-
+		long x = (mXtaUpdFillTotalUpdateBytes.get() * 10000L) / mXtaUpdFillTotalBufferAllocateSize.get();
+		double tRatio =  (double) x / 100.0f;
+		return tRatio;
 	}
+
+	@Override
+	public double getXtaAvgUpdatesPerMessage() {
+		if (mXtaUpdPackages.get() == 0) {
+			return 0;
+		}
+		long x = (mXtaTotalUserDataUpdates.get() * 100L) / mXtaUpdPackages.get();
+		double tRatio =  (double) x / 100.0f;
+		return tRatio;
+	}
+
+	@Override
+	public double getXtaAvgIOXTimeUsec() {
+		return (mXtaTotalSegments.get() == 0) ? 0 : (int) (mXtaUpdSendTimeUsec.get() / mXtaTotalSegments.get());
+	}
+
+	@Override
+	public long getXtaTotalNumberOfUpdates() {
+		return mXtaTotalUserDataUpdates.get();
+	}
+
+	@Override
+	public long getXtaTotalNumberOfMessages() {
+		return mXtaTotalSegments.get();
+	}
+
+	@Override
+	public long getXtaTotalNumberOfBytes() {
+		return mXtaTotalBytes.get();
+	}
+
+	@Override
+	public CounterElement getXta1MinUpdates() {
+		return mXtaUpdates1min;
+	}
+
+	@Override
+	public CounterElement getXta1MinMessages() {
+		return mXtaMsgs1min;
+	}
+
+	@Override
+	public CounterElement getXta1MinBytes() {
+		return mXtaBytes1min;
+	}
+
+	/**
+	 *===================================================================================
+	 * DistributorSubscriberStatisticsIf
+	 * ==================================================================================
+	 */
+
+	@Override
+	public long getRcvTotalNumberOfUpdates() {
+		return this.mRcvTotalUpdates.get();
+	}
+
+	@Override
+	public long getRcvTotalNumberOfMessages() {
+		return this.mRcvTotalSegments.get();
+	}
+
+	@Override
+	public long getRcvTotalNumberOfBytes() {
+		return this.mRcvTotalBytes.get();
+	}
+
+	@Override
+	public CounterElement getRcv1MinUpdates() {
+		return mRcvUpdates1min;
+	}
+
+	@Override
+	public CounterElement getRcv1MinMessages() {
+		return mRcvMsgs1min;
+	}
+
+	@Override
+	public CounterElement getRcv1MinBytes() {
+		return mRcvBytes1min;
+	}
+
+	@Override
+	public String getInitTime() {
+		SimpleDateFormat tSDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+		return tSDF.format( mStartTime );
+	}
+
+	@Override
+	public int getSecondsSinceInit() {
+		long tSec = (System.currentTimeMillis() - mStartTime) / 1000L;
+		return (int) (tSec & 0xffffffff);
+	}
+
 
 }

@@ -167,13 +167,18 @@ public class Publisher {
 			e.printStackTrace();
 		}
 	}
-		
+
+	long getUpdatesPerSecond( long tTotalUpdates, long pStartTime ) {
+		long x = (tTotalUpdates * 1000L) / (System.currentTimeMillis() - pStartTime);
+		return x;
+	}
 	private void runPublisher() 
 	{
 		byte[] tBuffer;
 		Random mRandom = new Random();
 		long mSequenceNumber = 0, tXtaTime = 0;
 		mStatLastStat = System.currentTimeMillis();
+		long tStartTime = System.currentTimeMillis();
 		parseSenderRate();
 
 		try {
@@ -191,21 +196,22 @@ public class Publisher {
 						long mFreeMem = Runtime.getRuntime().freeMemory();
 						long mTotalMem = Runtime.getRuntime().totalMemory();
 						long mUsedMem = (mTotalMem - mFreeMem) / 1024L;
-						long tDeltaTime = System.currentTimeMillis() - mStatLastStat;
-						long  tRate = ((mSequenceNumber - mStatUpdsSent) * 1000L) / tDeltaTime;
+						long  tUpdateRate = (mSequenceNumber * 1000L) / (System.currentTimeMillis() - tStartTime);
 						mStatUpdsSent = mSequenceNumber;
-						
-						System.out.println( cSDF.format(System.currentTimeMillis()) + " Upds/sec: " + tRate  +
-								                       "  upds/msg: " + mPublisher.getUpdatesPerMessage() +
-													   "  avg xta time: " + mPublisher.getAvgXtaTime() +
-								                       " (usec)   buffer fill rate: " + mPublisher.getBufferFillRate() +
+
+						DistributorPublisherStatisticsIf tStat = mPublisher.getStatistics();
+
+						System.out.println( cSDF.format(System.currentTimeMillis()) + " Avg upds/sec: " + tUpdateRate  +
+								                       "  avg upds/msg: " + tStat.getXtaAvgUpdatesPerMessage() +
+													   "  avg xta time: " + tStat.getXtaAvgIOXTimeUsec() +
+								                       " (usec)   buffer fill rate: " + tStat.getXtaAvgMessageFillRate() +
 								                       "  memory used: " + mUsedMem + " (KB)");
 						mStatLastStat = System.currentTimeMillis();
 					}
 				}
 				if (!mMaximize) {
-				try  { Thread.currentThread().sleep(mSendWait); }
-				catch(InterruptedException e) {};
+				   try  { Thread.currentThread().sleep(mSendWait); }
+				   catch(InterruptedException e) {};
 				}
 			}
 		}

@@ -57,20 +57,9 @@ public interface DistributorPublisherIf {
 
 
 	/**
-	 * Returns statistics for the average number of updates in physical UDP packages sent
-	 * @return avg updates per physical message send
+	 * Returns publisher statistic counters
+	 * @return publisher statistic interface DistributorPublisherStatisticsIf
+	 * @throws DistributorException, in case the publisher has been closed
 	 */
-	public double getUpdatesPerMessage();
-
-	/**
-	 * Returns statistics for the average fill rate of each physical UDP buffer allocated.
-	 * @return avg buffer fill rate.
-	 */
-	public double getBufferFillRate();
-
-	/**
-	 * Returns statistics for the average transmission time in usec for writing physical UDP packages.
-	 * @return avg xta time in usec
-	 */
-	public int getAvgXtaTime();
+	public DistributorPublisherStatisticsIf getStatistics() throws DistributorException;
 }
