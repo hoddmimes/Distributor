@@ -1,5 +1,6 @@
 package com.hoddmimes.distributor.api;
 
+import com.hoddmimes.distributor.auxillaries.InetAddressConverter;
 import com.hoddmimes.distributor.messaging.MessageBinDecoder;
 import com.hoddmimes.distributor.messaging.MessageBinEncoder;
 
@@ -39,7 +40,7 @@ class NetMsgRetransmissionRqst extends NetMsg {
 		super.encode();
 
 		MessageBinEncoder tEncoder = super.getEncoder();
-		tEncoder.add( inetAddressToInt(mRequesstorAddress));
+		tEncoder.add( InetAddressConverter.inetAddrToInt( mRequesstorAddress));
 		tEncoder.add( mSenderId );
 		tEncoder.add( mSenderStartTime );
 		tEncoder.add( mLowSeqno );
@@ -52,7 +53,7 @@ class NetMsgRetransmissionRqst extends NetMsg {
 		super.decode();
 
 		MessageBinDecoder tDecoder = super.getDecoder();
-		mRequesstorAddress = intToInetAddress(tDecoder.readInt());
+		mRequesstorAddress = InetAddressConverter.intToInetAddr(tDecoder.readInt());
 		mSenderId = tDecoder.readInt();
 		mSenderStartTime = tDecoder.readInt();
 		mLowSeqno = tDecoder.readInt();

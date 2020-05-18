@@ -756,13 +756,14 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 		 else
 			 System.out.println("Distributor event: " + pDistributorEvent.toString());
 	 }
-	 
-	 public void distributorUpdate( String pSubjectName, byte[] pData, Object pCallbackParameter, int pQueueLength ) {
+
+	 @Override
+	 public void distributorUpdate( String pSubjectName, byte[] pData, Object pCallbackParameter, int pAppId, int pQueueLength ) {
 		 long tSequenceNumber = buffer2Long(pData, 0);
 
 		 if (mSubscriber != null) {
 			 if ((mStatisticsThread == null) && (pData[8] == 1)) {
-				 mStatisticsThread = new StatisticsThread();
+				 mStatisticsThread = new StatisticsThread(tSequenceNumber);
 				 mStatisticsThread.start();
 			 }
 
@@ -782,7 +783,7 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 			long						mMissedSequenceNumber;
 			int							mTotalOutOfSequence;
 			
-			StatisticsThread() {
+			StatisticsThread( long pSequenceNumber ) {
 				mLastSequenceNumberSeen = new AtomicLong(0);
 				mUpdatesReceived = new AtomicLong(0);
 				mBytesReceived = new AtomicLong(0);

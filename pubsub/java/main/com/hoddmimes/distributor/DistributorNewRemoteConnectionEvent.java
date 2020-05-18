@@ -1,6 +1,9 @@
 package com.hoddmimes.distributor;
 
+import com.hoddmimes.distributor.auxillaries.InetAddressConverter;
+
 import java.net.InetAddress;
+import java.text.SimpleDateFormat;
 
 /**
  * Event to be passed to publishers/ subscribers when a distributor connection is created on a remote host
@@ -15,32 +18,41 @@ public class DistributorNewRemoteConnectionEvent extends DistributorEvent
 	private int			mMcPort;
 	
 	private InetAddress mRemoteAddress;
-	private int		    mRemotePort;
 	
 	private String 		mApplicationName;
-	
+	private int			mAppId;
+	private int			mSenderId;
+	private long		mSendStartTime;
+	private SimpleDateFormat mSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	/**
 	 * Constructor for creating a <i>DistributorNewRemoteConnectionEvent</i>
 	 * @param pSourceAddress IP address of the node on which the distributor connection is created.
-	 * @param pSourcePort the sender id port used on the remote host 
 	 * @param pMcAddress distributor connection IP multicast InetAddress
 	 * @param pMcPort distributor connection UDP port used.
 	 * @param pApplicationName remote application name.
+	 * @param pAppId distributed global App id
+	 * @param pSenderId, remote sender id
+	 * @param pSenderStartTime, time when the sender was started
 	 */
-	public DistributorNewRemoteConnectionEvent(int pSourceAddress, int pSourcePort, int pMcAddress, 
-										int pMcPort, String pApplicationName) 
+	public DistributorNewRemoteConnectionEvent(int pSourceAddress, int pMcAddress,
+										int pMcPort, String pApplicationName, int pAppId, int pSenderId, long pSenderStartTime )
 	{
 		super( DistributorEventSignal.REMOTE_CONNECTION_CREATED );
-		mMcAddress = netAddressToInet4Address(pMcAddress);
+		mMcAddress = InetAddressConverter.intToInetAddr(pMcAddress);
 		mMcPort = pMcPort;
-		mRemoteAddress = netAddressToInet4Address(pSourceAddress);
-		mRemotePort = pSourcePort;
+		mRemoteAddress = InetAddressConverter.intToInetAddr(pSourceAddress);
 		mApplicationName = pApplicationName;
-				
+		mSenderId = pSenderId;
+		mSendStartTime =  pSenderStartTime;
+		mAppId = pAppId;
+
+
+
 		setMessage("New Remote Connection MCA-ADDR: " + mMcAddress.toString() + " MCA-Port: "
-				+ mMcPort + " Remote Address: " + mRemoteAddress.toString()
-				+ " Source Port: " + mRemotePort + " Application: " + pApplicationName);
+				+ mMcPort + " Remote Address: " + mRemoteAddress.toString() +
+				" Application: " + pApplicationName + " App Id: " + mAppId +
+				" sender id:" + mSenderId + " sender start: " + mSdf.format( mSendStartTime ));
 	}
 
 	/**
@@ -50,15 +62,6 @@ public class DistributorNewRemoteConnectionEvent extends DistributorEvent
 	 */
 	public InetAddress getRemoteAddress() {
 		return mRemoteAddress;
-	}
-
-	/**
-	 * Returns the source address
-	 * 
-	 * @return int remote source port being used.
-	 */
-	public int getremotePort() {
-		return mRemotePort;
 	}
 
 	/**
@@ -75,10 +78,17 @@ public class DistributorNewRemoteConnectionEvent extends DistributorEvent
 	 * 
 	 * @return int UDP port
 	 */
-	int getMcPort() {
+	public int getMcPort() {
 		return mMcPort;
 	}
 
+	/**
+	 * Method returning the distributed app id for the remote publisher
+	 * @return app id
+	 */
+	public int getAppId() {
+		return mAppId;
+	}
 	/**
 	 * Returns the application "name" creating the connection
 	 * 
@@ -88,4 +98,19 @@ public class DistributorNewRemoteConnectionEvent extends DistributorEvent
 		return mApplicationName;
 	}
 
+	/**
+	 * Returns the remote id for the sender
+	 * @return, remote sender id
+	 */
+	public int getRemoteSenderId() {
+		return mSenderId;
+	}
+
+	/**
+	 * Return time when the sender was started (omn the remote node)
+	 * @return, time string "yyyy-MM-dd HH:mm.ss"
+	 */
+	public String getSenderStartTime() {
+		return mSdf.format( mSendStartTime );
+	}
 }

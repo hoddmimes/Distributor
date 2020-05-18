@@ -1,6 +1,7 @@
 package com.hoddmimes.distributor.api;
 
 
+import com.hoddmimes.distributor.auxillaries.InetAddressConverter;
 import com.hoddmimes.distributor.messaging.MessageBinDecoder;
 import com.hoddmimes.distributor.messaging.MessageBinEncoder;
 
@@ -41,10 +42,10 @@ class NetMsg {
 	
 
 	void setHeader(byte pMessageType, byte pSegmentFlags,
-				   InetAddress pLocalAddress, int pSenderId, int pSenderStartTime) 
+				   InetAddress pLocalAddress, int pSenderId, int pSenderStartTime, int pAppId)
 	{
 		mSegment.setHeader(VERSION, pMessageType, pSegmentFlags,
-				pLocalAddress, pSenderId, pSenderStartTime);
+				pLocalAddress, pSenderId, pSenderStartTime, pAppId);
 	}
 
 	void setHeaderSegmentFlags(byte pSegmentFlags) {
@@ -63,7 +64,7 @@ class NetMsg {
 		return mSegment.getHeaderSenderStartTime();
 	}
 
-
+	int getHeaderAppId() { return mSegment.getHeaderAppId(); }
 
 	
 
@@ -94,16 +95,5 @@ class NetMsg {
 	void decode() {
 		mSegment.decode();
 	}
-	
-	InetAddress intToInetAddress( int pIntAddress ) {
-		return Segment.intToInetAddress(pIntAddress);
-	}
-	
-	int inetAddressToInt(InetAddress pInetAddress ) {
-		return Segment.inetAddressToInt( pInetAddress );
-	}
-		
-	String netAddressAsString( int pIpAddress ) {
-		return Segment.netAddressAsString( pIpAddress );
-	}
+
 }

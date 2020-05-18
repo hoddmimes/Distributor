@@ -39,7 +39,7 @@ public class BdxGwyMulticastGroupEntry implements DistributorUpdateCallbackIf
 	}
 
 	@Override
-	public void distributorUpdate(String pSubjectName, byte[] pData, Object pCallbackParameter, int pDeliveryQueueLength) {
+	public void distributorUpdate(String pSubjectName, byte[] pData, Object pCallbackParameter, int pAppId, int pDeliveryQueueLength) {
 		mBdxGatewayInterface.localDistributorUpdate(this.mDistConnetion.getMcaConnectionId(), pSubjectName, pData);
 	}
 

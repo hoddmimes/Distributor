@@ -69,8 +69,9 @@ public class ClientDeliveryController extends Thread
 	public void addEventListener( long pDistributorConnectionId, DistributorEventCallbackIf pCallbackIf ) 
 	{
 		synchronized( this ) 
-		{			
-		  mEventCallbackListeners.add( new EventCallbackCntx(pDistributorConnectionId, pCallbackIf));
+		{
+			EventCallbackCntx tCallbackCntx = new EventCallbackCntx(pDistributorConnectionId, pCallbackIf);
+		    mEventCallbackListeners.add( tCallbackCntx );
 		}
 	}	
 	
@@ -107,6 +108,10 @@ public class ClientDeliveryController extends Thread
 			mPeakTime = cSDF.format(System.currentTimeMillis());
 		}
 		mQueue.add( new ClientUpdateEvent(pDistributorConnectionId, pRcvUpdate));
+	}
+
+	void queueEvent( long pDistributorConnectionId, DistributorEvent pEvent, DistributorEventCallbackIf pCallback ) {
+		mQueue.add( new ClientDedicatedAppEvent(pDistributorConnectionId, pEvent, pCallback));
 	}
 	
 	void queueEvent( long pDistributorConnectionId, DistributorEvent pEvent ) 
@@ -156,14 +161,15 @@ public class ClientDeliveryController extends Thread
 				ClientUpdateEvent tUpdateEvent = (ClientUpdateEvent) pClientEvent;
 				if (tFilter != null) {
 				   if (tUpdateEvent.mRcvUpdate != null) {
-					 tFilter.match(tUpdateEvent.mRcvUpdate.getSubjectName(), tUpdateEvent.mRcvUpdate.getData(), mEventQueueLength.get() - 1);
+					 tFilter.match( tUpdateEvent.mRcvUpdate.getSubjectName(), tUpdateEvent.mRcvUpdate.getData(),
+							        tUpdateEvent.mRcvUpdate.getAppId(), mEventQueueLength.get() - 1);
 				   } else if (tUpdateEvent.mRcvUpdateList != null) {
 					   Iterator<RcvUpdate> tItr = tUpdateEvent.mRcvUpdateList.iterator();
 					   int tCount = 0;
 					   while(tItr.hasNext()) 
 					   {
 						   RcvUpdate tRcvUpd = tItr.next();
-						   tFilter.match( tRcvUpd.getSubjectName(), tRcvUpd.getData(),  (mEventQueueLength.get() - (++tCount)));
+						   tFilter.match( tRcvUpd.getSubjectName(), tRcvUpd.getData(),  tRcvUpd.getAppId(), (mEventQueueLength.get() - (++tCount)));
 					   }
 				   }
 			    }
@@ -186,6 +192,11 @@ public class ClientDeliveryController extends Thread
 					}
 				}
 			}
+		}
+
+		if (pClientEvent.mEventType == ClientEvent.DEDICATED_APPEVENT) {
+			ClientDedicatedAppEvent tAppEvent = (ClientDedicatedAppEvent) pClientEvent;
+			tAppEvent.mEventCallbackIf.distributorEventCallback( tAppEvent.mEvent );
 		}
 		
 		mEventQueueLength.addAndGet(-pClientEvent.getEventElements());
@@ -223,6 +234,7 @@ public class ClientDeliveryController extends Thread
 	{
 		public static final int UPDATE = 1;
 		public static final int APPEVENT = 2;
+		public static final int DEDICATED_APPEVENT = 3;
 	
 		long				mDistributorConnectionId;
 		int					mEventType;
@@ -266,11 +278,28 @@ public class ClientDeliveryController extends Thread
 	class ClientAppEvent extends ClientEvent
 	{
 		DistributorEvent mEvent;
-		
+
 		ClientAppEvent( long pDistributorConnectionId, DistributorEvent pEvent )
 		{
 			super( ClientEvent.APPEVENT, pDistributorConnectionId);
 			mEvent = pEvent;
+		}
+
+		int getEventElements() {
+			return 1;
+		}
+	}
+
+	class ClientDedicatedAppEvent extends ClientEvent
+	{
+		DistributorEvent 				mEvent;
+		DistributorEventCallbackIf		mEventCallbackIf;
+
+		ClientDedicatedAppEvent( long pDistributorConnectionId, DistributorEvent pEvent, DistributorEventCallbackIf pCallback )
+		{
+			super( ClientEvent.DEDICATED_APPEVENT, pDistributorConnectionId);
+			mEvent = pEvent;
+			mEventCallbackIf = pCallback;
 		}
 
 		int getEventElements() {

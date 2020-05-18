@@ -1,5 +1,6 @@
 package com.hoddmimes.distributor.api;
 
+import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -7,13 +8,16 @@ import java.util.List;
 import java.util.Map;
 
 import com.hoddmimes.distributor.DistributorApplicationConfiguration;
+import com.hoddmimes.distributor.DistributorEventCallbackIf;
+import com.hoddmimes.distributor.DistributorNewRemoteConnectionEvent;
+import com.hoddmimes.distributor.auxillaries.InetAddressConverter;
 
 class RemoteConnectionController {
 	Map<Segment, RemoteConnection> mRemoteConnections;
 	DistributorConnection mConnection;
 
 	RemoteConnectionController(DistributorConnection pConnection) {
-		mRemoteConnections = new HashMap<Segment, RemoteConnection>();
+		mRemoteConnections = new HashMap<>();
 		mConnection = pConnection;
 	}
 
@@ -27,6 +31,22 @@ class RemoteConnectionController {
 			tItr.remove();
 		}
 
+	}
+
+	void triggerRemoteConfigurationNotifications(DistributorEventCallbackIf pCallback ) {
+		for( RemoteConnection tRemoteConnection : mRemoteConnections.values()) {
+			DistributorNewRemoteConnectionEvent tEvent = new DistributorNewRemoteConnectionEvent(
+					InetAddressConverter.inetAddrToInt(tRemoteConnection.mRemoteHostInetAddress),
+					InetAddressConverter.inetAddrToInt( tRemoteConnection.mMca.mInetAddress ),
+					tRemoteConnection.mMca.mPort,
+					tRemoteConnection.mRemoteApplicationName,
+					tRemoteConnection.mRemoteAppId,
+					tRemoteConnection.mRemoteSenderId,
+					tRemoteConnection.mRemoteStartTime);
+
+			ClientDeliveryController.getInstance().queueEvent(mConnection.mConnectionId, tEvent, pCallback);
+
+		}
 	}
 
 	RemoteConnection getRemoteConnection( long pRemoteConnectionId ) {
@@ -47,21 +67,31 @@ class RemoteConnectionController {
 		RemoteConnection tRemoteConnection = null;
 
 		synchronized (mRemoteConnections) {
+
+
+
 			tRemoteConnection = mRemoteConnections.get(pSegment);
 
 			if (tRemoteConnection == null) {
-
 				tRemoteConnection = new RemoteConnection(pSegment, this, mConnection);
 				mRemoteConnections.put(pSegment, tRemoteConnection);
 
 				if (mConnection.isLogFlagSet(DistributorApplicationConfiguration.LOG_RMTDB_EVENTS)) {
-					if (tRemoteConnection.mRemoteHostInetAddress.getAddress().toString().contains("38.0.167.192")) {
-						System.out.println("debug");
-					}
 					mConnection.log("Remote Connection [CREATED] ("
 							+ Integer.toHexString(pSegment.hashCode()) + ")\n"
 							+ tRemoteConnection.toString());
 				}
+				// Notify clients
+				DistributorNewRemoteConnectionEvent tEvent = new DistributorNewRemoteConnectionEvent(
+						InetAddressConverter.inetAddrToInt(tRemoteConnection.mRemoteHostInetAddress),
+						InetAddressConverter.inetAddrToInt( tRemoteConnection.mMca.mInetAddress ),
+						tRemoteConnection.mMca.mPort,
+						tRemoteConnection.mRemoteApplicationName,
+						tRemoteConnection.mRemoteAppId,
+						tRemoteConnection.mRemoteSenderId,
+						tRemoteConnection.mRemoteStartTime);
+
+				ClientDeliveryController.getInstance().queueEvent(mConnection.mConnectionId, tEvent);
 			}
 			tRemoteConnection.mCfgIsActive = true;
 		}
@@ -108,6 +138,7 @@ class RemoteConnectionController {
 			tRemoteConnection.processUpdateSegment(pSegment);
 		}
 	}
+
 
 	class SegmentBatch {
 		List<RcvSegment> mList;

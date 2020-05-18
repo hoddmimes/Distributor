@@ -1,5 +1,6 @@
 package com.hoddmimes.distributor.api;
 
+import com.hoddmimes.distributor.auxillaries.InetAddressConverter;
 import com.hoddmimes.distributor.messaging.MessageBinDecoder;
 import com.hoddmimes.distributor.messaging.MessageBinEncoder;
 
@@ -15,16 +16,18 @@ class NetMsgConfiguration extends NetMsg
 	private int	mHbInterval;
 	private int	mCfgInterval;
 	private String mApplName;
-	private InetAddress mHostAddress;
-	private int mSenderStartTime;
 	private int mSenderId;
+	private InetAddress mHostAddress;
+	private long mSenderStartTime;
+
+
 
 	NetMsgConfiguration(Segment pSegment) {
 		super(pSegment);
 	}
 
 	void set(InetAddress pMcAddress, int pMcPort, int pSenderId,
-			int pStartTime, int pHeartbeatInterval, int pConfigurationInterval,
+			long pStartTime, int pHeartbeatInterval, int pConfigurationInterval,
 			InetAddress pHostAddress, String pApplicationName) {
 		setMcAddress(pMcAddress);
 		setMcPort(pMcPort);
@@ -39,36 +42,37 @@ class NetMsgConfiguration extends NetMsg
 	void encode() {
 		super.encode();
 		MessageBinEncoder tEncoder = super.getEncoder();
-		tEncoder.add( inetAddressToInt(mMcAddress));
+		tEncoder.add( InetAddressConverter.inetAddrToInt( mMcAddress));
 		tEncoder.add( mMcPort );
 		tEncoder.add( mSenderId );
 		tEncoder.add( mSenderStartTime );
 		tEncoder.add( mHbInterval);
 		tEncoder.add( mCfgInterval );
-		tEncoder.add( inetAddressToInt( mHostAddress ));
+		tEncoder.add( InetAddressConverter.inetAddrToInt( mHostAddress ));
 		tEncoder.add( mApplName );
+
 	}
 	
 	void decode() {
 		super.decode();
 		MessageBinDecoder tDecoder = super.getDecoder();
-		mMcAddress = intToInetAddress( tDecoder.readInt());
+		mMcAddress = InetAddressConverter.intToInetAddr( tDecoder.readInt());
 		mMcPort = tDecoder.readInt();
 		mSenderId = tDecoder.readInt();
-		mSenderStartTime = tDecoder.readInt();
+		mSenderStartTime = tDecoder.readLong();
 		mHbInterval = tDecoder.readInt();
 		mCfgInterval = tDecoder.readInt();
-		mHostAddress = intToInetAddress(tDecoder.readInt());
+		mHostAddress = InetAddressConverter.intToInetAddr(tDecoder.readInt());
 		mApplName = tDecoder.readString();
-		
+
 	}
 	
 	
 	void setHostAddress( InetAddress pHostAddress ) {
 		mHostAddress = pHostAddress;
 	}
-	
-	
+
+
 	void setApplicationName( String pApplicationName ) {
 		mApplName = pApplicationName;
 	}
@@ -90,6 +94,7 @@ class NetMsgConfiguration extends NetMsg
 	}
 
 
+
 	void setMcAddress(InetAddress pMcAddress) {
 		mMcAddress = pMcAddress;
 	}
@@ -98,11 +103,11 @@ class NetMsgConfiguration extends NetMsg
 		return mMcAddress;
 	}
 
-	void setSenderStartTime(int pStartTime) {
+	void setSenderStartTime(long pStartTime) {
 		mSenderStartTime = pStartTime;
 	}
 
-	int getSenderStartTime() {
+	long getSenderStartTime() {
 		return mSenderStartTime;
 	}
 

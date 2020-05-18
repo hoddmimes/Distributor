@@ -13,8 +13,10 @@ class NetMsgUpdate extends NetMsg {
 	final static AtomicLong cSeqnoStamp = new AtomicLong(1);
 
 	volatile int  mUpdateCount = 0; 			// Number of updates in segment
-	volatile long mFlushSequenceNumber; 	// Time when the NetMessage was create
-	volatile long mCreateTime;
+	volatile long mFlushSequenceNumber;
+	volatile long mCreateTime;					// Time when the NetMessage was create
+
+
 	NetMsgUpdate(Segment pSegment) {
 		super(pSegment);
 		mFlushSequenceNumber = cSeqnoStamp.getAndIncrement();
@@ -29,13 +31,15 @@ class NetMsgUpdate extends NetMsg {
 					byte pSegmentFlags,
 					InetAddress  pLocalAddress,
 					int  pSenderId, 
-					int  pSenderStartTime)
+					int  pSenderStartTime,
+					int	 pAppId )
 	{
 		super.setHeader( pMessageType,
 						 pSegmentFlags,
 						 pLocalAddress,
 						 pSenderId,
-						 pSenderStartTime);
+						 pSenderStartTime,
+						 pAppId);
 		
 		// now encode header
 		super.encode();
@@ -105,14 +109,15 @@ class NetMsgUpdate extends NetMsg {
 		for( int i = 0; i < mUpdateCount; i++) {
 		  tSubjectName = tDecoder.readString();
 		  tData = tDecoder.readBytes();
-		  tRcvUpdates[i] = new RcvUpdate(pDistributorConnectionId, tSubjectName, tData, super.isMsgFromBdxGwy());
+		  tRcvUpdates[i] = new RcvUpdate(pDistributorConnectionId, tSubjectName, tData, super.getHeaderAppId(), super.isMsgFromBdxGwy());
 		}
 		return tRcvUpdates;
 	}
 
-	void addLargeUpdateHeader(String pSubjectName, int pDataSize) {
+	void addLargeUpdateHeader(String pSubjectName, int pAppId, int pDataSize) {
 		MessageBinEncoder tEncoder = super.getEncoder();
 		tEncoder.add( pSubjectName );
+		tEncoder.add( pAppId );
 		tEncoder.add( true );
 		tEncoder.add( pDataSize );
 

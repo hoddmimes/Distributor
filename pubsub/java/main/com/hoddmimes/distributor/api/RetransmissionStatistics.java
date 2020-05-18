@@ -1,5 +1,6 @@
 package com.hoddmimes.distributor.api;
 
+import com.hoddmimes.distributor.auxillaries.InetAddressConverter;
 import com.hoddmimes.distributor.generated.messages.DistExploreRetransmissonsRsp;
 
 import java.net.InetAddress;
@@ -91,20 +92,13 @@ class RetransmissionStatistics {
 		}
 	}
 
-	private int InetAddressToInt(InetAddress pAddress) {
-		int x0 = pAddress.getAddress()[0];
-		int x1 = pAddress.getAddress()[1];
-		int x2 = pAddress.getAddress()[2];
-		int x3 = pAddress.getAddress()[3];
-		return (x0 << 24) + (x1 << 16) + (x2 << 8) + x3;
-	}
 
 	private Long getKey(InetAddress pMcaAddress, int pMcaPort,
 			InetAddress pAddress) {
-		long tValue = ((InetAddressToInt(pMcaAddress) & 0x00ffffff) << 40)
-				+ ((InetAddressToInt(pAddress) & 0x00ffffff) << 16)
+		long tValue = ((InetAddressConverter.inetAddrToInt(pMcaAddress) & 0x00ffffff) << 40)
+				+ ((InetAddressConverter.inetAddrToInt(pAddress) & 0x00ffffff) << 16)
 				+ (pMcaPort & 0xffff);
-		return new Long(tValue);
+		return tValue;
 	}
 
 	void updateInStatistics(InetAddress pMcaAddress, int pMcaPort,

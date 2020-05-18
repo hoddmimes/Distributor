@@ -1,5 +1,6 @@
 package com.hoddmimes.distributor.api;
 
+import com.hoddmimes.distributor.auxillaries.InetAddressConverter;
 import com.hoddmimes.distributor.messaging.MessageBinDecoder;
 import com.hoddmimes.distributor.messaging.MessageBinEncoder;
 
@@ -21,7 +22,7 @@ class NetMsgHeartbeat extends NetMsg {
 		super.encode();
 
 		MessageBinEncoder tEncoder = super.getEncoder();
-		tEncoder.add( inetAddressToInt(mMcAddress));
+		tEncoder.add( InetAddressConverter.inetAddrToInt( mMcAddress));
 		tEncoder.add( mMcPort );
 		tEncoder.add( mSenderId );
 		tEncoder.add( mSeqno );
@@ -31,7 +32,7 @@ class NetMsgHeartbeat extends NetMsg {
 		super.decode();
 
 		MessageBinDecoder tDecoder = super.getDecoder();
-		mMcAddress = intToInetAddress(tDecoder.readInt());
+		mMcAddress = InetAddressConverter.intToInetAddr( tDecoder.readInt());
 		mMcPort = tDecoder.readInt();
 		mSenderId = tDecoder.readInt();
 		mSeqno = tDecoder.readInt();

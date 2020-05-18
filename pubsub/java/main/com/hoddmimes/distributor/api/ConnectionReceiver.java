@@ -6,9 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Random;
 
-import com.hoddmimes.distributor.DistributorApplicationConfiguration;
-import com.hoddmimes.distributor.DistributorCommunicationErrorEvent;
-import com.hoddmimes.distributor.DistributorConnectionConfiguration;
+import com.hoddmimes.distributor.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -47,6 +45,18 @@ class ConnectionReceiver {
 			return false;
 		}
 	}
+
+	/**
+	 * This method is invoked as part of the creation of an subscriber and publisher (see DistributorConnection)
+	 * The method will dump the remote connection entries back to the client event notification method
+	 *
+	 * @param pCallback
+	 */
+	public void triggerRemoteConfigurationNotifications( DistributorEventCallbackIf pCallback )
+	{
+		this.mRemoteConnectionController.triggerRemoteConfigurationNotifications( pCallback);
+	}
+
 
 	private boolean checkVersion(Segment pSegment) {
 		int tMajorVersion = ((NetMsg.VERSION >> 8) & 0xff);

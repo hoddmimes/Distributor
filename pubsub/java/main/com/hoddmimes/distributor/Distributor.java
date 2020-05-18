@@ -1,5 +1,6 @@
 package com.hoddmimes.distributor;
 
+import java.net.InetAddress;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -7,6 +8,7 @@ import com.hoddmimes.distributor.api.DistributorConnection;
 import com.hoddmimes.distributor.api.DistributorConnectionController;
 import com.hoddmimes.distributor.api.DistributorManagementController;
 import com.hoddmimes.distributor.api.DistributorTimers;
+import com.hoddmimes.distributor.auxillaries.Application;
 import com.hoddmimes.distributor.auxillaries.UUIDFactory;
 import com.hoddmimes.distributor.bdxgwy.BdxGwyDistributorClient;
 import org.apache.logging.log4j.LogManager;
@@ -31,10 +33,10 @@ public class Distributor {
 	final Logger 							  mLogger = LogManager.getLogger( this.getClass().getSimpleName());
 	final long 							      mDistributorId;
 	final String 						      mStartTimeString;
-
-	final BdxGwyDistributorClient           mBdxGwyConnection;
-	final DistributorManagementController 	mMgmtController;
-
+	final int								  mAppId;
+	final BdxGwyDistributorClient             mBdxGwyConnection;
+	final DistributorManagementController 	  mMgmtController;
+	final InetAddress						  mLocalInetAddr;
 
 
 	/**
@@ -54,7 +56,10 @@ public class Distributor {
 		
 		String tComponentName = pApplicationConfiguration.getApplicationName().replaceAll("[\\/:*?\"<>|]","_");
 
-		
+		mLocalInetAddr = mApplicationConfiguration.getLocalInetAddress();
+		mAppId = Application.getId( mLocalInetAddr );
+
+
 		mLogger.info("Initialized distributor application " + mApplicationConfiguration.getApplicationName() +
 					"\n    DistributorId: " + Long.toHexString(mDistributorId));
 		DistributorTimers.createTimers(mApplicationConfiguration.getTimerThreads());
@@ -72,7 +77,12 @@ public class Distributor {
 		} else {
 			mBdxGwyConnection = null;
 		}
+
+
 	}
+
+
+
 
 	/**
 	 * Creates a transport connection i.e. multicast group. When having a connection
@@ -201,5 +211,22 @@ public class Distributor {
 	 */
 	public long getDistributorId() {
 		return mDistributorId;
+	}
+
+	/**
+	 * Method to return the dsitributed application id
+	 * @return, application id
+	 */
+	public int getAppId() {
+		return mAppId;
+	}
+
+	/**
+	 * Method returning the IP V4 local interface address used when
+	 * sending / receiving Distributor messages
+	 * @return IP V4 interface address
+	 */
+	public InetAddress getLocalInetAddr() {
+		return mLocalInetAddr;
 	}
 }

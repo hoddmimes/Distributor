@@ -127,7 +127,8 @@ public class DistributorConnection extends Thread implements DistributorConnecti
 				(byte)(Segment.FLAG_M_SEGMENT_START + Segment.FLAG_M_SEGMENT_END),
 				mConnectionSender.mLocalAddress,
 				mConnectionSender.mSenderId,
-				mConnectionSender.mConnectionStartTime);
+				(int) (mConnectionSender.mConnectionStartTime & 0xffffffff),
+				mDistributor.getAppId());
 
 		tMsg.set( mIpmg.mInetAddress,
 				mIpmg.mPort,
@@ -152,6 +153,7 @@ public class DistributorConnection extends Thread implements DistributorConnecti
 		mSubscribers.add(tSubscriber);
 		if (pEventCallback != null) {
 			ClientDeliveryController.getInstance().addEventListener(mConnectionId, pEventCallback);
+			this.mConnectionReceiver.triggerRemoteConfigurationNotifications( pEventCallback );
 		}
 		return tSubscriber;
 	}
@@ -160,12 +162,14 @@ public class DistributorConnection extends Thread implements DistributorConnecti
 	{
 		boolean tFloodRegulated = (mConfiguration.getMaxBandwidth() > 0) ? true : false;
 
-		DistributorPublisher tPublisher = new DistributorPublisher(mConnectionId, tFloodRegulated, pEventCallback);
-		if (pEventCallback != null) {
-			ClientDeliveryController.getInstance().addEventListener(mConnectionId, pEventCallback);
-		}
+		DistributorPublisher tPublisher = new DistributorPublisher(mConnectionId, this.mDistributor.getAppId(), tFloodRegulated, pEventCallback);
 		mPublishers.add(tPublisher);
 		pushOutConfiguration();
+
+		if (pEventCallback != null) {
+			ClientDeliveryController.getInstance().addEventListener(mConnectionId, pEventCallback);
+			this.mConnectionReceiver.triggerRemoteConfigurationNotifications( pEventCallback );
+		}
 		return tPublisher;
 	}
 	
@@ -290,7 +294,7 @@ public class DistributorConnection extends Thread implements DistributorConnecti
 			return;
 		}
 
-		mSubscriptionFilter.match(pUpdate.getSubjectName(), pUpdate.getData(),pQueueLength);
+		mSubscriptionFilter.match(pUpdate.getSubjectName(), pUpdate.getData(), pUpdate.getAppId(), pQueueLength);
 		pUpdate = null;
 	}
 

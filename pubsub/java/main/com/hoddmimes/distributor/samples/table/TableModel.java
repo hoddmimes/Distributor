@@ -6,12 +6,13 @@ import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class TableModel<T> extends AbstractTableModel
 {
-
-    List<T> mObjects = null;
+    private int mMaxItems;
+    LinkedList<T> mObjects = null;
     ColumnModel mTableColumnModel = null;
     ObjectRenderer mCellRenderer = new ObjectRenderer();
     HeaderRender mHeaderRender = new HeaderRender();
@@ -19,17 +20,36 @@ public class TableModel<T> extends AbstractTableModel
 
 
     public TableModel(Class<T> pObjectClass) {
-        mObjects = new ArrayList<>();
+        mMaxItems = Integer.MAX_VALUE;
+        mObjects = new LinkedList<>();
         mTableAttributeHandle = new TableAttributeHandler(pObjectClass );
         mTableColumnModel = new ColumnModel( mTableAttributeHandle.getHeaders(), mTableAttributeHandle.getAttributeTypes());
     }
 
-    public void add( T pObject ) {
-        mObjects.add( pObject );
+    public void setMaxItems( int pMaxItems ) {
+        mMaxItems = pMaxItems;
+    }
+
+    public void addFirst( T pObject ) {
+        mObjects.addFirst( pObject );
+        if (mObjects.size() > mMaxItems) {
+            mObjects.removeLast();
+        }
         super.fireTableDataChanged();
     }
 
+    public void add( T pObject ) {
+        mObjects.add( pObject );
+        if (mObjects.size() > mMaxItems) {
+            mObjects.removeFirst();
+        }
+        super.fireTableDataChanged();
+    }
 
+    public void removeRow( int pRow ) {
+        mObjects.remove( pRow );
+        super.fireTableDataChanged();
+    }
 
 
     @Override

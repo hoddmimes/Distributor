@@ -2,7 +2,6 @@ package com.hoddmimes.distributor.api;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
@@ -28,9 +27,10 @@ class RemoteConnection {
 
 	String mRemoteHostName;
 	String mRemoteApplicationName;
+	int mRemoteAppId;
 	String mRemoteHostAddressString;
 	InetAddress mRemoteHostInetAddress;
-	int mRemoteStartTime;
+	long mRemoteStartTime;
 	long mHeartbeatInterval;
 	long mConfigurationInterval;
 	String mConnectTime;
@@ -65,11 +65,12 @@ class RemoteConnection {
 			mHashCode = pSegment.hashCode();
 			NetMsgConfiguration tMsg = new NetMsgConfiguration(pSegment);
 			tMsg.decode();
+			mRemoteAppId = pSegment.getHeaderAppId();
 			mConnectTime = cSDF.format(new Date());
 			mRemoteHostAddressString = tMsg.getHostAddress().toString();
 			mRemoteHostInetAddress = tMsg.getHostAddress();
 			mRemoteSenderId = tMsg.getSenderId();
-			mRemoteStartTime = tMsg.getHeaderSenderStartTime();
+			mRemoteStartTime = tMsg.getSenderStartTime();
 			mHeartbeatInterval = tMsg.getHeartbeatInterval();
 			mConfigurationInterval = tMsg.getConfigurationInterval();
 			mRemoteApplicationName = tMsg.getApplicationName();
@@ -104,7 +105,7 @@ class RemoteConnection {
 		return "[ Host: " + mRemoteHostAddressString + " Name: "
 				+ mRemoteHostName + " SndrId: " + mRemoteSenderId + " Appl: "
 				+ mRemoteApplicationName + "\n        StartTime: "
-				+ Integer.toHexString(mRemoteStartTime) + " ConnTime: "
+				+ Long.toHexString(mRemoteStartTime) + " ConnTime: "
 				+ mConnectTime + " HashCode: " + Integer.toHexString(mHashCode)
 				+ "\n         HbIntvl: " + mHeartbeatInterval + " CfgIntvl: "
 				+ mConfigurationInterval + " LclMca : " + mMca + "]";
@@ -333,7 +334,8 @@ class RemoteConnection {
 									tRemoteConnection.mRemoteSenderId,
 									tRemoteConnection.mMca.mInetAddress,
 									tRemoteConnection.mMca.mPort,
-									tRemoteConnection.mRemoteApplicationName );
+									tRemoteConnection.mRemoteApplicationName,
+									tRemoteConnection.mRemoteAppId);
 					ClientDeliveryController.getInstance().queueEvent(pConnection.mConnectionId, tEvent);
 					cancel();
 					mRemoteConnectionController.removeRemoteConnection(RemoteConnection.this);
@@ -389,7 +391,8 @@ class RemoteConnection {
 							tRemoteConnection.mRemoteSenderId,
 							tRemoteConnection.mMca.mInetAddress,
 							tRemoteConnection.mMca.mPort,
-							tRemoteConnection.mRemoteApplicationName );
+							tRemoteConnection.mRemoteApplicationName,
+							tRemoteConnection.mRemoteAppId);
 					ClientDeliveryController.getInstance().queueEvent(pConnection.mConnectionId, tEvent);
 					cancel();
 				} else {

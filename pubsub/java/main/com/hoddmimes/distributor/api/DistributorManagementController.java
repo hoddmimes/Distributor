@@ -325,7 +325,7 @@ public class DistributorManagementController implements DistributorEventCallback
 	}
 
 	
-	public void distributorUpdate(String pSubjectName, byte[] pData, Object pCallbackParameter, int pDeliveryQueueLength) {
+	public void distributorUpdate(String pSubjectName, byte[] pData, Object pCallbackParameter, int pAppId, int pDeliveryQueueLength) {
 		MessageBinDecoder tDecoder = new MessageBinDecoder(pData);
 		DistNetMsg tNetMsg = new DistNetMsg();
 		tNetMsg.decode(tDecoder);

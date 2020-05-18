@@ -187,7 +187,7 @@ public class BdxGwySubscriber {
 
 		@Override
 		public void distributorUpdate(String pSubjectName, byte[] pData,
-				Object pCallbackParameter, int pDeliveryQueueLength) {
+				Object pCallbackParameter, int pAppId, int pDeliveryQueueLength) {
 
 
 			long tSeqno = buffer2Long(pData, 0);

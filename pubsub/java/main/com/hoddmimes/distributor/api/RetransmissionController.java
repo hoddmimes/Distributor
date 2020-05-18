@@ -122,7 +122,8 @@ class RetransmissionController {
 							(byte) (Segment.FLAG_M_SEGMENT_START + Segment.FLAG_M_SEGMENT_END),
 							pConnection.mConnectionSender.mLocalAddress,
 							pConnection.mConnectionSender.mSenderId,
-							pConnection.mConnectionSender.mConnectionStartTime);
+					        (int) (pConnection.mConnectionSender.mConnectionStartTime & 0xffffffff),
+							pConnection.mDistributor.getAppId());
 
 			tRqstMsg.set(   pConnection.mConnectionSender.mLocalAddress,
 							mLowSeqNo,
@@ -130,7 +131,7 @@ class RetransmissionController {
 							pConnection.mConnectionSender.mLocalAddress.getHostName(),
 							pConnection.mApplicationConfiguration.getApplicationName(),
 							pRemoteConnection.mRemoteSenderId,
-							pRemoteConnection.mRemoteStartTime);
+							(int) (pRemoteConnection.mRemoteStartTime&0xffffffff));
 
 			pConnection.mRetransmissionStatistics.updateOutStatistics(
 					pConnection.mIpmg.mInetAddress, mConnection.mIpmg.mPort,

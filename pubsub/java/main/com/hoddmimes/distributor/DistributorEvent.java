@@ -53,20 +53,5 @@ abstract public class DistributorEvent
 	DistributorEventSignal getEventType() {
 		return mSignal;
 	}	
-	
-	/**
-	 * Convers a IP address string "xxx.xxx.xxx.xxx" to an InetAddress object
-	 * @param pIpAddress, IP address string
-	 * @return INetAddress object 
-	 */
-	InetAddress netAddressToInet4Address( int pIpAddress ) {
-		byte[] tArr = NumberConvert.int2BytesSwap( pIpAddress);
-		try {
-			return Inet4Address.getByAddress(tArr);
-		}
-		catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+
 }

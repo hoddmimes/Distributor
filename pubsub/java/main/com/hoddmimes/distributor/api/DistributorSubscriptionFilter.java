@@ -44,9 +44,9 @@ public class DistributorSubscriptionFilter {
 				pCallbackParameter);
 	}
 
-	public void match(String pSubjectName, byte[] pData, int pQueueLength) {
+	public void match(String pSubjectName, byte[] pData, int pAppId, int pQueueLength) {
 		SubjectTokenParser tKeys = new SubjectTokenParser(pSubjectName);
-		mRoot.matchRecursive(pSubjectName, tKeys, pData, pQueueLength);
+		mRoot.matchRecursive(pSubjectName, tKeys, pData, pAppId, pQueueLength);
 	}
 
 	public boolean matchAny(String pSubjectName) {
@@ -107,7 +107,7 @@ public class DistributorSubscriptionFilter {
 			
 			String tUpdateSubjectName = "/foo/bar/fie";
 			System.out.println("MatchAny: " + this.matchAny(tUpdateSubjectName));
-			this.match(tUpdateSubjectName, null, 0);
+			this.match(tUpdateSubjectName, null, 0, 0);
 			
 			return;
 			
@@ -130,7 +130,7 @@ public class DistributorSubscriptionFilter {
 			mPattern = pPattern;
 		}
 
-		public void distributorUpdate(String pSubjectName, byte[] pData, Object pCallbackParameter, int pDeliveryQueueLength) {
+		public void distributorUpdate(String pSubjectName, byte[] pData, Object pCallbackParameter, int pAppId, int pDeliveryQueueLength) {
 			 System.out.println("SUBCRIBER Subject: [" + pSubjectName +  "] Matching Subscription: [" + mPattern + "]");
 		}
 	}
@@ -377,7 +377,7 @@ public class DistributorSubscriptionFilter {
 			return false;
 		}
 
-		void matchRecursive(String pSubjectName, SubjectTokenParser pKeys,byte[] pData, int pQueueLength) {
+		void matchRecursive(String pSubjectName, SubjectTokenParser pKeys,byte[] pData, int pAppId, int pQueueLength) {
 			if (!pKeys.hasMore()) {
 				if (mSubscriptions != null) {
 					Iterator<Subscription> tItr = mSubscriptions.iterator();
@@ -385,6 +385,7 @@ public class DistributorSubscriptionFilter {
 						Subscription tSubscription = tItr.next();
 						tSubscription.mCallback.distributorUpdate(pSubjectName,
 								pData, tSubscription.mCallbackParameter,
+								pAppId,
 								pQueueLength);
 					}
 				}
@@ -393,12 +394,12 @@ public class DistributorSubscriptionFilter {
 				if (mChildren != null) {
 					tKeyNode = mChildren.get(pKeys.getNextElement());
 					if (tKeyNode != null) {
-						tKeyNode.matchRecursive(pSubjectName, pKeys, pData,pQueueLength);
+						tKeyNode.matchRecursive(pSubjectName, pKeys,  pData, pAppId,pQueueLength);
 					}
 				}
 				if (mWildcardChild != null) {
 					pKeys.getNextElement();
-					mWildcardChild.matchRecursive(pSubjectName, pKeys, pData, pQueueLength);
+					mWildcardChild.matchRecursive(pSubjectName, pKeys, pData, pAppId, pQueueLength);
 				}
 			}
 
@@ -408,7 +409,7 @@ public class DistributorSubscriptionFilter {
 					Subscription tSubscription = tItr.next();
 					tSubscription.mCallback.distributorUpdate(pSubjectName,
 							pData, tSubscription.mCallbackParameter,
-							pQueueLength);
+							pAppId, pQueueLength);
 				}
 			}
 

@@ -13,10 +13,14 @@ public interface DistributorUpdateCallbackIf {
 	 * Method invoked when an subject/topic has been updated.
 	 * 
 	 * @param pSubjectName subject being updated
-	 * @param pData new data
+	 * @param pPayload new data
 	 * @param pCallbackParameter callback parameter associated with the subscription
+	 * @param, pRemoteAppId, id of the remote application publishing the data
 	 * @param pDeliveryQueueLength  number of messages in queue for being delivered to the  application.
 	 */
-	public void distributorUpdate(String pSubjectName, byte[] pData,
-			Object pCallbackParameter, int pDeliveryQueueLength);
+	public void distributorUpdate(String pSubjectName,
+								  byte[] pPayload,
+								  Object pCallbackParameter,
+								  int pRemoteAppId,
+								  int pDeliveryQueueLength);
 }

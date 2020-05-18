@@ -612,8 +612,9 @@ public class DistributorConsole extends JFrame implements
 		return tsb;
 	}
 
+	@Override
 	public void distributorUpdate(String pSubjectName, byte[] pData,
-			Object pCallbackParameter, int pQueueLength) {
+			Object pCallbackParameter, int pAppId, int pQueueLength) {
 		DistNetMsg tNetMsg = new DistNetMsg();
 		MessageBinDecoder tDecoder = new MessageBinDecoder(pData);
 		tNetMsg.decode(tDecoder);

@@ -12,15 +12,18 @@ public class DistributorPublisher implements DistributorPublisherIf {
 	boolean mIsFloodRegulated;
 	DistributorEventCallbackIf mEventCallback;
 	long mId;
+	int  mAppId;
 	TrafficFlowClientContext mFlowContext;
 
-	public DistributorPublisher( long pDistributorConnectionId,  
+	public DistributorPublisher( long pDistributorConnectionId,
+								 int pAppId,
 								 boolean pIsFloodRegulated,
 								 DistributorEventCallbackIf pEventCallback)
 	{
 		mDistributorConnectionId = pDistributorConnectionId;
 		mIsFloodRegulated = pIsFloodRegulated;
 		mEventCallback = pEventCallback;
+		mAppId = pAppId;
 		mId = UUIDFactory.getId();
 		
 		if (mIsFloodRegulated) {
@@ -28,10 +31,6 @@ public class DistributorPublisher implements DistributorPublisherIf {
 		} else {
 			mFlowContext = null;
 		}
-		
-		if (pEventCallback != null) {
-			ClientDeliveryController.getInstance().addEventListener(mDistributorConnectionId, pEventCallback);
-		}	
 	}
 
 	public int publish(String pSubjectName, byte[] pData) throws DistributorException

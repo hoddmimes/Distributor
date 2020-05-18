@@ -1,0 +1,6 @@
+<DistributorSnoop ethDevice="eth10" cmaAddress="224.42.42.100" cmaPort="4242">
+    <MulticastGroups>
+        <MulticastGroup address="224.42.42.1" port="4201"/>
+        <MulticastGroup address="224.66.66.1" port="4201"/>
+    </MulticastGroups>
+</DistributorSnoop>

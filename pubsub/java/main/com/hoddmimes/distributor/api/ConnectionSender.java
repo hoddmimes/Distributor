@@ -27,7 +27,7 @@ class ConnectionSender {
 	InetAddress				    mLocalAddress; 			// Local host address
 	DistributorConnectionConfiguration 	mConfiguration; 		// Connection configuration
 	Ipmg 						mMca; 					// MCA ip multicast group instance
-	volatile int 				mConnectionStartTime; 	// Time when this sender was started
+	volatile long 				mConnectionStartTime; 	// Time when this sender was started
 	volatile int 				mSenderId; 				// Unique sender id within this host
 	volatile boolean 			mErrorSignaled;
 
@@ -59,11 +59,11 @@ class ConnectionSender {
 			mConfiguration = pConnection.mConfiguration;
 
 			mRand = new Random(System.currentTimeMillis());
-			mConnectionStartTime = (int) (System.currentTimeMillis() & 0xffffffff);
+			mConnectionStartTime = System.currentTimeMillis();
 			mLastUpdateFlushSeqno = 0;
 
 			// Pickup local address
-		    mLocalAddress = getLocalAddress();
+		    mLocalAddress = pConnection.mDistributor.getLocalInetAddr();
 	
 
 			if (mConfiguration.getSenderIdPort() == 0) {
@@ -101,51 +101,7 @@ class ConnectionSender {
 	}
 	
 	
-	InetAddress getLocalAddress() throws DistributorException
-	{
-		// Check if local host address is configured, if so just use it as being defined.
-		InetAddress tLocalHostAddress = null;
-		try {
 
-			if ((mConnection.mApplicationConfiguration.getLocalHostAddress() != null)  && (mConnection.mApplicationConfiguration.getLocalHostAddress() .length() > 0)) {
-				tLocalHostAddress = InetAddress.getByName(mConnection.mApplicationConfiguration.getLocalHostAddress() );
-				return tLocalHostAddress;
-			}
-		}
-		catch (UnknownHostException e) {
-			throw new DistributorException( "Invalid localhost address ("+ mConnection.mApplicationConfiguration.getLocalHostAddress()  + ") UnknownHostException: " + e.getMessage());
-		}
-		
-			
-		// Get IP address from device specified
-		String tEthDevice = mConnection.mApplicationConfiguration.getEthDevice(); 
-		if ((tEthDevice == null) || (tEthDevice.length() == 0)) {
-			throw new DistributorException( "Parameter EthDevice must be defined for the connection" );	
-		}
-		
-		try {
-			Enumeration<NetworkInterface> tEnumInterface = NetworkInterface.getNetworkInterfaces();
-			while( tEnumInterface.hasMoreElements()) {
-				NetworkInterface tInterface = tEnumInterface.nextElement();
-				if (tInterface.getName().equals( tEthDevice )) {
-					Enumeration<InetAddress> tEnumInetAddr = tInterface.getInetAddresses();
-					while(tEnumInetAddr.hasMoreElements()) {
-						InetAddress tAdr = tEnumInetAddr.nextElement();
-						if (tAdr instanceof Inet4Address) {
-							tLocalHostAddress = tAdr;
-							return tLocalHostAddress;
-						}
-					}
-				}
-			}
-		}
-		catch( SocketException e) {
-			throw new DistributorException( "Failed to get local ip host address for ethernet device ("+ tEthDevice + ") UnknownHostException: " + e.getMessage());
-		}
-
-		throw new DistributorException( "Failed to get local ip host address for ethernet device ("+ tEthDevice + ") ");
-	
-	}
 	
     void evalTrafficFlow( TrafficFlowClientContext pClientFlowContext ) 
     {
@@ -203,7 +159,7 @@ class ConnectionSender {
 	}
 
 	void retransmit(NetMsgRetransmissionRqst pMsg) {
-		if ((pMsg.getSenderStartTime() == mConnectionStartTime) && (pMsg.getSenderId() == mSenderId)) {
+		if ((pMsg.getSenderStartTime() == getStartTimeAsInt()) && (pMsg.getSenderId() == mSenderId)) {
 			mConnection.updateInRetransmissionStatistics(mMca, pMsg, true);
 			mRetransmissionCache.retransmit(pMsg.getLowSeqNo(), pMsg.getHighSeqNo());
 		} else {
@@ -220,7 +176,9 @@ class ConnectionSender {
 		return updateToSegment(pXtaUpdate);
 	}
 
-	
+	private int getStartTimeAsInt() {
+		return (int) (this.mConnectionStartTime & 0xffffffff);
+	}
 
 	void getNewCurrentUpdate() 
 	{
@@ -229,7 +187,7 @@ class ConnectionSender {
 		}
 		mCurrentUpdate = new NetMsgUpdate(new XtaSegment(mConfiguration.getSegmentSize()));
 		mCurrentUpdate.setHeader( Segment.MSG_TYPE_UPDATE, Segment.FLAG_M_SEGMENT_START, 
-								  mLocalAddress, mSenderId, mConnectionStartTime);
+								  mLocalAddress, mSenderId, getStartTimeAsInt(), mConnection.mDistributor.getAppId());
 	}
 
 	int queueCurrentUpdate(int pSegmentFlags) {
@@ -277,7 +235,7 @@ class ConnectionSender {
 		 */
 		queueCurrentUpdate(Segment.FLAG_M_SEGMENT_START + Segment.FLAG_M_SEGMENT_END);
 
-		mCurrentUpdate.addLargeUpdateHeader(pXtaUpdate.mSubjectName, pXtaUpdate.mData.length );
+		mCurrentUpdate.addLargeUpdateHeader(pXtaUpdate.mSubjectName, mConnection.mDistributor.getAppId(), pXtaUpdate.mData.length );
 
 		while (pOffset < pXtaUpdate.mData.length) {
 			pOffset += mCurrentUpdate.addLargeData(pXtaUpdate.mData, pOffset);
@@ -313,9 +271,6 @@ class ConnectionSender {
 			return 0;
 		}
 
-		if (mCurrentUpdate.mUpdateCount == 1) {
-			System.out.println("updateToSegment [1] send holdback delay: " + mConfiguration.getSendHoldbackDelay() +  " update rate: " + mTrafficFlowTask.getUpdateRate() + " time since create: " + (System.currentTimeMillis() - mCurrentUpdate.mCreateTime) );
-		}
 
 		/**
 		 * Send message
@@ -505,7 +460,8 @@ class ConnectionSender {
 					(byte) (Segment.FLAG_M_SEGMENT_START + Segment.FLAG_M_SEGMENT_END),
 					pConnection.mConnectionSender.mLocalAddress,
 					pConnection.mConnectionSender.mSenderId,
-					pConnection.mConnectionSender.mConnectionStartTime);
+					getStartTimeAsInt(),
+					pConnection.mDistributor.getAppId());
 
 			tHeartbeat.set(pConnection.mIpmg.mInetAddress,
 					pConnection.mIpmg.mPort,

@@ -1,5 +1,7 @@
 package com.hoddmimes.distributor;
 
+import com.hoddmimes.distributor.auxillaries.InetAddressConverter;
+
 import java.net.InetAddress;
 
 /**
@@ -27,7 +29,7 @@ public class DistributorConnectionClosedErrorEvent extends DistributorErrorEvent
 	 */
 	public DistributorConnectionClosedErrorEvent(int pMcAddress, int pMcPort) {
 		super(DistributorEventSignal.CONNECTION_CLOSING);
-		mMcAddress = netAddressToInet4Address(pMcAddress);
+		mMcAddress = InetAddressConverter.intToInetAddr(pMcAddress);
 		mMcPort = pMcPort;
 	
 		setMessage( "Distributor Connection Closing McAddress: " + mMcAddress.toString() + " McPort " + mMcPort );

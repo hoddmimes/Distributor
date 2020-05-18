@@ -1,5 +1,8 @@
 package com.hoddmimes.distributor;
 
+import java.net.*;
+import java.util.Enumeration;
+
 /**
  * An <I>DistributorApplicationConfiguration</I> object specifies global
  * settings for a Distributor. The parameter context is passed as parameter to
@@ -387,4 +390,52 @@ public class DistributorApplicationConfiguration {
 	public boolean isBroadcastGateway() {
 		return mIsBdxGwy;
 	}
+
+
+	InetAddress getLocalInetAddress() throws DistributorException
+	{
+		// Check if local host address is configured, if so just use it as being defined.
+		InetAddress tLocalHostAddress = null;
+		try {
+
+			if ((this.mLocalHostAddress != null) && (this.mLocalHostAddress.length() > 0)) {
+				tLocalHostAddress = InetAddress.getByName(this.mLocalHostAddress );
+				return tLocalHostAddress;
+			}
+		}
+		catch (UnknownHostException e) {
+			throw new DistributorException( "Invalid localhost address ("+ this.mLocalHostAddress  + ") UnknownHostException: " + e.getMessage());
+		}
+
+
+		// Get IP address from device specified
+		String tEthDevice = this.mEthDevice;
+		if ((tEthDevice == null) || (tEthDevice.length() == 0)) {
+			throw new DistributorException( "Parameter EthDevice must be defined for the connection" );
+		}
+
+		try {
+			Enumeration<NetworkInterface> tEnumInterface = NetworkInterface.getNetworkInterfaces();
+			while( tEnumInterface.hasMoreElements()) {
+				NetworkInterface tInterface = tEnumInterface.nextElement();
+				if (tInterface.getName().equals( tEthDevice )) {
+					Enumeration<InetAddress> tEnumInetAddr = tInterface.getInetAddresses();
+					while(tEnumInetAddr.hasMoreElements()) {
+						InetAddress tAdr = tEnumInetAddr.nextElement();
+						if (tAdr instanceof Inet4Address) {
+							tLocalHostAddress = tAdr;
+							return tLocalHostAddress;
+						}
+					}
+				}
+			}
+		}
+		catch( SocketException e) {
+			throw new DistributorException( "Failed to get local ip host address for ethernet device ("+ tEthDevice + ") UnknownHostException: " + e.getMessage());
+		}
+
+		throw new DistributorException( "Failed to get local ip host address for ethernet device ("+ tEthDevice + ") ");
+
+	}
+
 }

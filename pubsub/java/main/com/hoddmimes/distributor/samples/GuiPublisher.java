@@ -781,7 +781,7 @@ public class GuiPublisher extends JFrame implements DistributorEventCallbackIf {
 				i++;
 			}
 
-			if (args[i].compareToIgnoreCase("-ascciData") == 0) {
+			if (args[i].compareToIgnoreCase("-asciiData") == 0) {
 				mUseSimpleAsiiData = Boolean.parseBoolean(args[i+1]);
 				i++;
 			}

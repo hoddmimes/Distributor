@@ -89,7 +89,8 @@ class RetransmissionCache {
 				(byte) (Segment.FLAG_M_SEGMENT_END + Segment.FLAG_M_SEGMENT_START),
 				mSender.mLocalAddress,
 				mSender.mSenderId,
-				mSender.mConnectionStartTime);
+				(int) (mSender.mConnectionStartTime & 0xffffffff),
+				mSender.mConnection.mDistributor.getAppId());
 
 		tNAKMsg.set(mSender.mMca.mInetAddress, mSender.mMca.mPort, mSender.mSenderId);
 		tNAKMsg.setNakSeqNo(pNAKSeqNumbers);

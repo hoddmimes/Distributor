@@ -1,5 +1,6 @@
 package com.hoddmimes.distributor.api;
 
+import com.hoddmimes.distributor.auxillaries.InetAddressConverter;
 import com.hoddmimes.distributor.auxillaries.NumberConvert;
 import com.hoddmimes.distributor.messaging.MessageBinDecoder;
 import com.hoddmimes.distributor.messaging.MessageBinEncoder;
@@ -13,7 +14,7 @@ import java.util.Comparator;
 abstract class Segment implements Comparable<Segment>, Comparator<Segment> 
 {
 
-	final static int SEGMENT_HEADER_SIZE = 16;
+	final static int SEGMENT_HEADER_SIZE = 20;
 
 	/**
 	 * +---------------------------------+----------- + 
@@ -29,6 +30,8 @@ abstract class Segment implements Comparable<Segment>, Comparator<Segment>
 	 * +---------------------------------+----------- + 
 	 * | Sender Start Time               |     Byte 4 |
 	 * +---------------------------------+----------- +
+	 * | Application Id 				 | 	   Byte 4 |
+	 * +---------------------------------+------------+
 	 */
 
 	final static byte MSG_TYPE_UPDATE = 1;
@@ -53,7 +56,7 @@ abstract class Segment implements Comparable<Segment>, Comparator<Segment>
 	private InetAddress	mHdrLocalHostAddr;
 	private int	  		mHdrSenderId;
 	private int	  		mHdrSenderStartTime;
-	
+	private int			mHdrAppId;
 	
 	private MessageBinDecoder mDecoder;
 	private MessageBinEncoder mEncoder;
@@ -103,13 +106,14 @@ abstract class Segment implements Comparable<Segment>, Comparator<Segment>
 	
 	
 	void setHeader(short pVersion, byte pMessageType, byte pSegmentFlags,
-			InetAddress pLocalAddress, int pSenderId, int pSenderStartTime) {
+			InetAddress pLocalAddress, int pSenderId, int pSenderStartTime, int pAppId) {
 		setHeaderVersion(pVersion);
 		setHeaderMessageType(pMessageType);
 		setHeaderSegmentFlags(pSegmentFlags);
 		setHeaderLocalAddress(pLocalAddress);
 		setHeaderSenderId(pSenderId);
 		setHeaderSenderStartTime(pSenderStartTime);
+		setHeaderAppId(pAppId);
 	}
 	
 	void encode() {
@@ -117,9 +121,10 @@ abstract class Segment implements Comparable<Segment>, Comparator<Segment>
 		mEncoder.add(mHdrVersion);
 		mEncoder.add(mHdrMsgType);
 		mEncoder.add(mHdrSegmentFlags);
-		mEncoder.add(inetAddressToInt(mHdrLocalHostAddr));
+		mEncoder.add(InetAddressConverter.inetAddrToInt(mHdrLocalHostAddr));
 		mEncoder.add(mHdrSenderId);
 		mEncoder.add(mHdrSenderStartTime);
+		mEncoder.add(mHdrAppId);
 	}
 
 	void decode() {
@@ -127,16 +132,17 @@ abstract class Segment implements Comparable<Segment>, Comparator<Segment>
 		mHdrVersion = mDecoder.readShort();
 		mHdrMsgType = mDecoder.readByte();
 		mHdrSegmentFlags = mDecoder.readByte();
-		mHdrLocalHostAddr = intToInetAddress(mDecoder.readInt());
+		mHdrLocalHostAddr = InetAddressConverter.intToInetAddr(mDecoder.readInt());
 		mHdrSenderId = mDecoder.readInt();
 		mHdrSenderStartTime = mDecoder.readInt();
-
+		mHdrAppId = mDecoder.readInt();
 	}
 	
 	
 	
 	
-	
+	void setHeaderAppId( int pAppId ) { mHdrAppId = pAppId; }
+	int  getHeaderAppId() { return mHdrAppId;}
 
 	void setHeaderVersion(short pVersion) {
 	    mHdrVersion = pVersion;
@@ -231,8 +237,11 @@ abstract class Segment implements Comparable<Segment>, Comparator<Segment>
 	@Override
 	public boolean equals(Object pObj) {
 		Segment tObj = (Segment) pObj;
-		
-		
+
+		if (pObj == this) {
+			return true;
+		}
+
 		if ((mHdrLocalHostAddr.equals(tObj.mHdrLocalHostAddr)) &&
 			(mHdrSenderId == tObj.mHdrSenderId) && 
 			(mHdrSenderStartTime == tObj.mHdrSenderStartTime)) {
@@ -316,29 +325,10 @@ abstract class Segment implements Comparable<Segment>, Comparator<Segment>
 
 		return "UNKNOWN (" + mHdrMsgType + ")";
 	}
-	
 
-   public static int inetAddressToInt(InetAddress pInetAddress )
-	{
-
-		int tIntAddress = NumberConvert.bytes2Int(pInetAddress.getAddress());
-		return tIntAddress;
-	}
    
    
-   public static InetAddress intToInetAddress(int intAddress )
-	{
-	   InetAddress tInetAddress = null;
-	   byte[] tByteAddress = NumberConvert.int2Bytes( intAddress );
-	   try {
-		   tInetAddress = Inet4Address.getByAddress(tByteAddress);
-		   return tInetAddress;
-	   }
-	   catch( UnknownHostException e) {
-		   e.printStackTrace();
-	   }
-	   return null;
-	}
+
 	
    static public String netAddressAsString( int pIpAddress ) {
 		byte[] tArr = NumberConvert.int2Bytes( pIpAddress );
@@ -368,6 +358,8 @@ abstract class Segment implements Comparable<Segment>, Comparator<Segment>
 		sb.append( mHdrSenderStartTime );
 		sb.append(" Vrs: ");
 		sb.append(Integer.toHexString(mHdrVersion));
+		sb.append(" AppId: ");
+		sb.append(Integer.toHexString(mHdrAppId));
 
 		if ((mHdrMsgType == MSG_TYPE_UPDATE) || (mHdrMsgType == MSG_TYPE_RETRANSMISSION)) {
 	      int pValue;
