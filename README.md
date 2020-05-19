@@ -407,7 +407,7 @@ public class MiniSubscriber implements DistributorEventCallbackIf, DistributorUp
 	}
 
 	@Override
-	public void distributorUpdate(String pSubjectName, byte[] pData, Object pCallbackParameter, int pDeliveryQueueLength) {
+	public void distributorUpdate(String pSubjectName, byte[] pData, Object pCallbackParameter, int pRemoteAppId, int pDeliveryQueueLength) {
 
 	}
 }
