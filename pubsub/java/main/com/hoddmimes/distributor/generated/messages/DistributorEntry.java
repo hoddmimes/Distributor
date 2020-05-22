@@ -29,6 +29,7 @@ public class DistributorEntry implements MessageInterface
 	private String  mHostname;
 	private String  mHostaddress;
 	private String  mApplicationName;
+	private int  mApplicationId;
 	private String  mStartTime;
 	private int  mConnections;
 	private long  mDistributorId;
@@ -98,6 +99,22 @@ public void setApplicationName( String pApplicationName ) {
  
 public  String getApplicationName() {
   return  mApplicationName ;
+}
+
+
+
+
+
+public void setApplicationId( int pApplicationId ) {
+   mApplicationId  = pApplicationId ;
+   synchronized( this) { 
+   	mMessageBytesCached = null;
+   }
+}
+
+ 
+public  int getApplicationId() {
+  return  mApplicationId ;
 }
 
 
@@ -285,6 +302,11 @@ public String getFullMessageName() {
 	   
 	pEncoder.add(  mApplicationName );
 	    /**
+	    * Encode Attribute: mApplicationId Type: int
+	    */
+	   
+	pEncoder.add(  mApplicationId );
+	    /**
 	    * Encode Attribute: mStartTime Type: String
 	    */
 	   
@@ -361,6 +383,11 @@ public String getFullMessageName() {
 	    */
 	   
      mApplicationName = pDecoder.readString(); 
+	   /**
+	    * Decoding Attribute: mApplicationId Type: int
+	    */
+	   
+     mApplicationId = pDecoder.readInt(); 
 	   /**
 	    * Decoding Attribute: mStartTime Type: String
 	    */
@@ -467,6 +494,9 @@ public String toString( int pCount, boolean pExtention ) {
        tSB.append( blanks( pCount + 2 ) + "mApplicationName: ");
        tSB.append( String.valueOf( mApplicationName ));
        tSB.append("\n"); 
+       tSB.append( blanks( pCount + 2 ) + "mApplicationId: ");
+       tSB.append( String.valueOf( mApplicationId ));
+       tSB.append("\n"); 
        tSB.append( blanks( pCount + 2 ) + "mStartTime: ");
        tSB.append( String.valueOf( mStartTime ));
        tSB.append("\n"); 
@@ -504,6 +534,7 @@ public String toString( int pCount, boolean pExtention ) {
 			treeNode.add( new TreeNode( "hostname"  + " : " + String.valueOf( mHostname )));
 			treeNode.add( new TreeNode( "hostaddress"  + " : " + String.valueOf( mHostaddress )));
 			treeNode.add( new TreeNode( "applicationName"  + " : " + String.valueOf( mApplicationName )));
+			treeNode.add( new TreeNode( "applicationId"  + " : " + String.valueOf( mApplicationId )));
 			treeNode.add( new TreeNode( "startTime"  + " : " + String.valueOf( mStartTime )));
 			treeNode.add( new TreeNode( "connections"  + " : " + String.valueOf( mConnections )));
 			treeNode.add( new TreeNode( "distributorId"  + " : " + String.valueOf( mDistributorId )));
@@ -529,6 +560,7 @@ public String toString( int pCount, boolean pExtention ) {
 			treeNode.add( new TreeNode( "hostname"  + " : " + String.valueOf( mHostname )));
 			treeNode.add( new TreeNode( "hostaddress"  + " : " + String.valueOf( mHostaddress )));
 			treeNode.add( new TreeNode( "applicationName"  + " : " + String.valueOf( mApplicationName )));
+			treeNode.add( new TreeNode( "applicationId"  + " : " + String.valueOf( mApplicationId )));
 			treeNode.add( new TreeNode( "startTime"  + " : " + String.valueOf( mStartTime )));
 			treeNode.add( new TreeNode( "connections"  + " : " + String.valueOf( mConnections )));
 			treeNode.add( new TreeNode( "distributorId"  + " : " + String.valueOf( mDistributorId )));

@@ -92,14 +92,15 @@ public class DistributorConsole extends JFrame implements
 	 * My Frame variables
 	 */
 	String mAddressString = DistributorApplicationConfiguration.DEFAULT_CMA_ADDRESS; // @jve:decl-index=0:
-	String mPortString = String
-			.valueOf(DistributorApplicationConfiguration.DEAFULT_CMA_PORT);
+	String mPortString = String.valueOf(DistributorApplicationConfiguration.DEAFULT_CMA_PORT);
 	Component mFameInstance = null;
 	DistributorConnectionIf mConnection = null;
 	DistributorPublisherIf mPublisher = null;
 	DistributorSubscriberIf mSubscriber = null;
 	long mCurrentRequestId;
 	RootTreeNode mTreeRoot = new RootTreeNode(); // @jve:decl-index=0:
+	Distributor mDistributor;
+	DistributorApplicationConfiguration mDistributorConfiguration;
 
 	private JLabel jTransportLabel = null;
 
@@ -463,20 +464,26 @@ public class DistributorConsole extends JFrame implements
 	}
 
 	void establishConnection() throws Exception {
-		DistributorApplicationConfiguration tApplConfig = new DistributorApplicationConfiguration(
-				"DistributorConsole");
-		tApplConfig.setMgmtControlEnabled(false);
-		tApplConfig.setLocalHostAddress("127.0.0.1");
-		Distributor tDistributor = new Distributor(tApplConfig);
+		mDistributorConfiguration = new DistributorApplicationConfiguration("DistributorConsole");
+		mDistributorConfiguration.setMgmtControlEnabled(false);
+		mDistributorConfiguration.setLocalHostAddress("127.0.0.1");
+		mDistributor = new Distributor(mDistributorConfiguration);
 		DistributorConnectionConfiguration tConfiguration = new DistributorConnectionConfiguration(
 				getJAddressTextField().getText(), 					// CMA IP multicast Address
 				Integer.parseInt(getJPortTextField().getText()));	// CMA UDP port
 		tConfiguration.setCmaConnection(false);						// Do not start CMS controller
 		
-		mConnection = tDistributor.createConnection(tConfiguration);
-		mPublisher = tDistributor.createPublisher(mConnection, this);
-		mSubscriber = tDistributor.createSubscriber(mConnection, null, this);
+		mConnection = mDistributor.createConnection(tConfiguration);
+		mPublisher = mDistributor.createPublisher(mConnection, this);
+		mSubscriber = mDistributor.createSubscriber(mConnection, null, this);
 		mSubscriber.addSubscription(cConsoleSubjectControlTopic, null);
+
+		/**
+		 * Just send out a request to distributors for retreving their config faster.
+		 */
+		DistNetMsg tNetMsg = new DistNetMsg();
+		tNetMsg.setMessage(new MessageWrapper(new DistTriggerCofigurationRqst()));
+		sendRequest(tNetMsg);
 	}
 
 	void sendRequest(DistNetMsg pNetMsg) {
@@ -797,19 +804,30 @@ public class DistributorConsole extends JFrame implements
 		}
 
 		public void mousePressed(MouseEvent e) {
-			int selRow = mConsole.getJDistributorTree().getRowForLocation(
-					e.getX(), e.getY());
-			TreePath selPath = mConsole.getJDistributorTree()
-					.getPathForLocation(e.getX(), e.getY());
+			int selRow = mConsole.getJDistributorTree().getRowForLocation( e.getX(), e.getY());
+			TreePath selPath = mConsole.getJDistributorTree().getPathForLocation(e.getX(), e.getY());
 			if (selRow != -1) {
-				System.out.println("MOUSE-EVENT Row: " + selRow + " Object: "
+				System.out.println("MOUSE-EVENT button: " + e.getButton()  + " clicks: " + e.getClickCount() + " Row: " + selRow + " Object: "
 						+ selPath.getPath()[selPath.getPath().length - 1]);
-				DefaultMutableTreeNode tNode = (DefaultMutableTreeNode) selPath
-						.getLastPathComponent(); // jDistributorTree.getLastSelectedPathComponent();
-				DistNetMsg tRequestMessage = ((DistributorTreeNodeIf) tNode)
-						.getRequestMessage();
-				if (tRequestMessage != null) {
-					sendRequest(tRequestMessage);
+				if (e.getClickCount() == 2) {
+					DefaultMutableTreeNode tNode = (DefaultMutableTreeNode) selPath.getLastPathComponent();
+					if (tNode instanceof DistributorTreeNode) {
+
+						DistDomainDistributorEntry tDistEntry = ((DistributorTreeNode) tNode).mDistributorInfo;
+						SnoopFrame tSnoopFrame = new SnoopFrame( mDistributor, mDistributorConfiguration, tDistEntry );
+						tSnoopFrame.pack();
+						tSnoopFrame.setVisible( true );
+
+						DistNetMsg tNetMsg = new DistNetMsg();
+						tNetMsg.setMessage(new MessageWrapper(new DistTriggerCofigurationRqst()));
+						sendRequest(tNetMsg);
+					}
+				} else {
+					DefaultMutableTreeNode tNode = (DefaultMutableTreeNode) selPath.getLastPathComponent(); // jDistributorTree.getLastSelectedPathComponent();
+					DistNetMsg tRequestMessage = ((DistributorTreeNodeIf) tNode).getRequestMessage();
+					if (tRequestMessage != null) {
+						sendRequest(tRequestMessage);
+					}
 				}
 			}
 		}

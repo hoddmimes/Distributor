@@ -16,6 +16,7 @@ import com.hoddmimes.distributor.DistributorException;
 import com.hoddmimes.distributor.DistributorPublisherIf;
 import com.hoddmimes.distributor.DistributorSubscriberIf;
 import com.hoddmimes.distributor.DistributorUpdateCallbackIf;
+import com.hoddmimes.distributor.auxillaries.InetAddressConverter;
 import com.hoddmimes.distributor.generated.messages.*;
 import com.hoddmimes.distributor.messaging.MessageBinDecoder;
 import com.hoddmimes.distributor.messaging.MessageBinEncoder;
@@ -112,6 +113,7 @@ public class DistributorManagementController implements DistributorEventCallback
 		
 		DistExploreDomainRsp tResponse = new DistExploreDomainRsp();
 		tResponse.setDistributor(new DistDomainDistributorEntry());
+		tResponse.getDistributor().setApplicationId(mDistributor.getAppId());
 		tResponse.getDistributor().setApplicationName(mApplicationConfiguration.getApplicationName());
 		tResponse.getDistributor().setDistributorId(mDistributor.getDistributorId());
 		tResponse.getDistributor().setHostname( mLocalHostName);
@@ -128,7 +130,7 @@ public class DistributorManagementController implements DistributorEventCallback
 			   DistDomainConnectionEntry tEntry = new DistDomainConnectionEntry();
 			   DistributorConnection tConnection = tConnectedConnections.get(i);
 			   tEntry.setConnectionId(tConnection.mConnectionId);
-			   tEntry.setMcaAddress(tConnection.mIpmg.mInetAddress.getHostAddress().toString().substring(1));
+			   tEntry.setMcaAddress(tConnection.mIpmg.mInetAddress.getHostAddress().toString());
 			   tEntry.setMcaPort(tConnection.mIpmg.mPort);
 			   tEntry.setSubscriptions(tConnection.mSubscriptionFilter.getActiveSubscriptions());
 			   tEntry.setInRetransmissions(tConnection.mRetransmissionStatistics.mTotalIn);
@@ -156,6 +158,7 @@ public class DistributorManagementController implements DistributorEventCallback
 		DistExploreDistributorRsp tResponse = new DistExploreDistributorRsp();
 		tResponse.setDistributor(new DistributorEntry());
 		tResponse.getDistributor().setApplicationName(mApplicationConfiguration.getApplicationName());
+		tResponse.getDistributor().setApplicationId( mDistributor.getAppId());
 		tResponse.getDistributor().setConnections(tConnectedConnections.size());
 		tResponse.getDistributor().setDistributorId(mDistributor.getDistributorId());
 		tResponse.getDistributor().setHostaddress( getLocalAddresses(tConnectedConnections));
@@ -289,6 +292,14 @@ public class DistributorManagementController implements DistributorEventCallback
 		sendResponse(tNetRsp);
 	}
 
+
+	void serveDistTriggerConfigurationRqst( DistNetMsg pNetMsg ) {
+		List<DistributorConnection> tConnectedConnections = DistributorConnectionController.getDistributorConnection();
+		for( DistributorConnection tConn : tConnectedConnections) {
+			tConn.pushOutConfiguration();
+		}
+	}
+
 	void serveDistExploreSubscriptionsRqst(DistNetMsg pNetMsg) {
 		DistExploreSubscriptionsRqst tRequest = (DistExploreSubscriptionsRqst) pNetMsg
 				.getMessage().getWrappedMessage();
@@ -337,6 +348,10 @@ public class DistributorManagementController implements DistributorEventCallback
 
 		if (tMessage instanceof DistExploreDomainRqst) {
 			serveDistExploreDomainRqst(tNetMsg);
+		}
+
+		if (tMessage instanceof DistTriggerCofigurationRqst) {
+			serveDistTriggerConfigurationRqst(tNetMsg);
 		}
 
 		if (tMessage instanceof DistExploreDistributorRqst) {

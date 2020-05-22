@@ -239,6 +239,15 @@ retransmission the publisher will lookup the the missed message in the cache and
 The size of the retransmission cache are configured on a multicast group level 
 [setRetransmissionMaxCacheSize​(int pValue)](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/DistributorConnectionConfiguration.html#setRetransmissionMaxCacheSize(int))
                                                                             
+## Distributor Console
+The _Distributor Console_ is a management application. The app communicates with other Distrbutor application using _Distributor broadcasts_
+The application will discover other other active Distributor application on the LAN. With the application detailed statistics can be 
+retrieved for active publishers and subscribers. It is also possible to start retrieving live broadcasts from a specific publisher 
+to se  message rates, subjects published  and message live stream.
+
+The distributor console can be started with the script files _console.sh_ or _console.bat_
+In the app the configuration multicast address and port  used by application should be configured.
+
 
 
 ## Broadcast Gateways

@@ -51,6 +51,10 @@ public class TableModel<T> extends AbstractTableModel
         super.fireTableDataChanged();
     }
 
+    public void clear() {
+        mObjects.clear();
+        super.fireTableDataChanged();
+    }
 
     @Override
     public int getRowCount() {

@@ -1,8 +1,12 @@
 package com.hoddmimes.distributor.samples;
 
 import com.hoddmimes.distributor.*;
+import com.hoddmimes.distributor.auxillaries.InetAddressConverter;
+import sun.jvm.hotspot.runtime.StaticBaseConstructor;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 
@@ -14,9 +18,12 @@ public class Publisher {
 
 	private final static SimpleDateFormat cSDF = new SimpleDateFormat("HH:mm:ss.SSS");
 	private Distributor mDistributor;
-	private DistributorConnectionIf mDistributorConnection;
-	private DistributorPublisherIf mPublisher;
+	private List<DistributorPublisherIf> mPublishers;
+	private Random mRandom;
 
+
+	private int mPublisherInstances = 1;
+	private int mSubjectInstances = 1;
 
 	private String mEthDevice = "eth0";
 	private String mIpAddress = "224.10.10.44";
@@ -42,7 +49,10 @@ public class Publisher {
 
 	private long	mStatUpdsSent = 0;
 	private long 	mStatLastStat = 0;
-	
+
+
+	private List<String> mSubjectNames;
+
 	private int mLogFlags =  DistributorApplicationConfiguration.LOG_CONNECTION_EVENTS +
 	                         DistributorApplicationConfiguration.LOG_RMTDB_EVENTS +
 					         DistributorApplicationConfiguration.LOG_RETRANSMISSION_EVENTS;
@@ -98,6 +108,14 @@ public class Publisher {
 				mHoldbackThreshold = Integer.parseInt(pArgs[i+1]);
 				i++;
 			}
+			if (pArgs[i].equals("-publisherInstances")) {
+				mPublisherInstances = Integer.parseInt(pArgs[i+1]);
+				i++;
+			}
+			if (pArgs[i].equals("-subjectNames")) {
+				mSubjectInstances = Integer.parseInt(pArgs[i+1]);
+				i++;
+			}
 			if (pArgs[i].equals("-ipBuffer")) {
 				mIpBufferSize = Integer.parseInt(pArgs[i+1]);
 				i++;
@@ -121,6 +139,8 @@ public class Publisher {
 			
 			i++;
 		}
+		System.out.println("-publisherInstances  " + mPublisherInstances );
+		System.out.println("-subjectNames        " + mSubjectInstances );
 		System.out.println("-minSize             " + mMinSize );
 		System.out.println("-maxSize             " + mMaxSize );
 		System.out.println("-rate                " + mRate );
@@ -143,29 +163,47 @@ public class Publisher {
 	
 	private void setup() 
 	{
-		try {
-		 DistributorApplicationConfiguration tApplConfig = new DistributorApplicationConfiguration( mApplicationName );
-		 tApplConfig.setEthDevice( mEthDevice );
-		 tApplConfig.setLogFlags( mLogFlags );
-    	
-		mDistributor = new Distributor(tApplConfig);
-		
-		DistributorConnectionConfiguration tConnConfig = new DistributorConnectionConfiguration( mIpAddress, mIpPort );
-		tConnConfig.setIpBufferSize( mIpBufferSize );
-		tConnConfig.setSendHoldbackDelay( mHoldback );
-		tConnConfig.setSendHoldbackThreshold( mHoldbackThreshold );
-		tConnConfig.setFakeRcvErrorRate(mFakeErrorRate);
-		tConnConfig.setSegmentSize(mSegmentSize);
-		
-		
-		mDistributorConnection = mDistributor.createConnection( tConnConfig );
-		mPublisher = mDistributor.createPublisher( mDistributorConnection, new DistributorEventCallbackHandler("PUBLISHER"));
-
-		
+		mRandom = new Random();
+		mSubjectNames = new ArrayList<>();
+		if (mSubjectInstances == 1) {
+			mSubjectNames.add( mSubjectName );
+		} else {
+			for( int i = 0; i < mSubjectInstances; i++) {
+				mSubjectNames.add( mSubjectName + "-" + String.valueOf(i));
+			}
 		}
-		catch( DistributorException e) {
+
+		try {
+			DistributorApplicationConfiguration tApplConfig = new DistributorApplicationConfiguration(mApplicationName);
+			tApplConfig.setEthDevice(mEthDevice);
+			tApplConfig.setLogFlags(mLogFlags);
+
+			mDistributor = new Distributor(tApplConfig);
+
+			mPublishers = new ArrayList<>();
+			for (int i = 0; i < mPublisherInstances; i++) {
+				String tIpAddress = getIpAddress(mIpAddress, i);
+				DistributorConnectionConfiguration tConnConfig = new DistributorConnectionConfiguration(tIpAddress, mIpPort);
+				tConnConfig.setIpBufferSize(mIpBufferSize);
+				tConnConfig.setSendHoldbackDelay(mHoldback);
+				tConnConfig.setSendHoldbackThreshold(mHoldbackThreshold);
+				tConnConfig.setFakeRcvErrorRate(mFakeErrorRate);
+				tConnConfig.setSegmentSize(mSegmentSize);
+
+
+				DistributorConnectionIf tDistributorConnection = mDistributor.createConnection(tConnConfig);
+				DistributorPublisherIf tPublisher = mDistributor.createPublisher(tDistributorConnection, new DistributorEventCallbackHandler("PUBLISHER"));
+				mPublishers.add( tPublisher );
+			}
+		}
+		catch(DistributorException e){
 			e.printStackTrace();
 		}
+	}
+
+	String getIpAddress( String pIpAddressBase, int pOffset ){
+		int tIntAddr = InetAddressConverter.stringToIntAddr( pIpAddressBase );
+		return InetAddressConverter.intToAddrString( tIntAddr + pOffset );
 	}
 
 	long getUpdatesPerSecond( long tTotalUpdates, long pStartTime ) {
@@ -174,6 +212,8 @@ public class Publisher {
 	}
 	private void runPublisher() 
 	{
+		Statistics tStat = (mPublisherInstances > 1) ? new Statistics() : null;
+
 		byte[] tBuffer;
 		Random mRandom = new Random();
 		long mSequenceNumber = 0, tXtaTime = 0;
@@ -181,6 +221,7 @@ public class Publisher {
 		long tStartTime = System.currentTimeMillis();
 		parseSenderRate();
 
+		if (mPublisherInstances > 1)
 		try {
 			while( true ) {
 				for( int i = 0; i < mSendBatchFactor; i++) {
@@ -191,22 +232,39 @@ public class Publisher {
 						tBuffer = new byte[ tSize ];
 					} 
 					long2Buffer(++mSequenceNumber, tBuffer, 0);
-					tXtaTime = mPublisher.publish(mSubjectName, tBuffer);
+
+
+					DistributorPublisherIf tPublisher = getPublisher();
+					tXtaTime = tPublisher.publish(getSubject(), tBuffer);
+					if (tStat != null) {
+						tStat.update( tXtaTime, tBuffer.length);
+					}
+
+
+
 					if ((mSequenceNumber % mUpdateDisplayFactor) == 0) {
 						long mFreeMem = Runtime.getRuntime().freeMemory();
 						long mTotalMem = Runtime.getRuntime().totalMemory();
 						long mUsedMem = (mTotalMem - mFreeMem) / 1024L;
-						long  tUpdateRate = (mSequenceNumber * 1000L) / (System.currentTimeMillis() - tStartTime);
-						mStatUpdsSent = mSequenceNumber;
+						if (tStat == null) {
 
-						DistributorPublisherStatisticsIf tStat = mPublisher.getStatistics();
+							long tUpdateRate = (mSequenceNumber * 1000L) / (System.currentTimeMillis() - tStartTime);
+							mStatUpdsSent = mSequenceNumber;
 
-						System.out.println( cSDF.format(System.currentTimeMillis()) + " Avg upds/sec: " + tUpdateRate  +
-								                       "  avg upds/msg: " + tStat.getXtaAvgUpdatesPerMessage() +
-													   "  avg xta time: " + tStat.getXtaAvgIOXTimeUsec() +
-								                       " (usec)   buffer fill rate: " + tStat.getXtaAvgMessageFillRate() +
-								                       "  memory used: " + mUsedMem + " (KB)");
-						mStatLastStat = System.currentTimeMillis();
+							DistributorPublisherStatisticsIf tPubStat = tPublisher.getStatistics();
+
+							System.out.println(cSDF.format(System.currentTimeMillis()) + " Avg upds/sec: " + tUpdateRate +
+									"  avg upds/msg: " + tPubStat.getXtaAvgUpdatesPerMessage() +
+									"  avg xta time: " + tPubStat.getXtaAvgIOXTimeUsec() +
+									" (usec)   buffer fill rate: " + tPubStat.getXtaAvgMessageFillRate() +
+									"  memory used: " + mUsedMem + " (KB)");
+							mStatLastStat = System.currentTimeMillis();
+						} else {
+							System.out.println(cSDF.format(System.currentTimeMillis()) + " Avg upds/sec: " + tStat.getUpdatesSec() +
+									"  KBytes/sec: " + tStat.getKbytesSec() +
+									"  avg xta time: " + tStat.getAvgXtaTime() +
+									"  memory used: " + mUsedMem + " (KB)");
+						}
 					}
 				}
 				if (!mMaximize) {
@@ -220,8 +278,21 @@ public class Publisher {
 		}
 	}
 	
-	
-	
+	private DistributorPublisherIf getPublisher() {
+		if (mPublishers.size() == 1) {
+			return mPublishers.get(0);
+		}
+		return mPublishers.get( mRandom.nextInt( mPublishers.size()));
+	}
+
+	private String getSubject() {
+		if (mSubjectNames.size() == 1) {
+			return mSubjectNames.get(0);
+		}
+		return mSubjectNames.get( mRandom.nextInt( mSubjectNames.size()));
+	}
+
+
 	void parseSenderRate() {
 		
 		if ((mRate == 0) || (mMaximize))
@@ -276,8 +347,7 @@ public class Publisher {
 	
 
 	
-	
-	
+
 	class DistributorEventCallbackHandler implements DistributorEventCallbackIf 
 	{
 		String mType;
@@ -304,7 +374,42 @@ public class Publisher {
 		pBuffer[ pOffset + 6] = (byte) (pValue >>> 8);
 		pBuffer[ pOffset + 7] = (byte) (pValue >>> 0);
 	}
-	
+
+
+	class Statistics
+	{
+		long mUpdates;
+		long mBytes;
+		long mXtaTime;
+		long mStartTime;
+
+		void update( long pXtaTime, long pBytes ) {
+			mBytes += pBytes;
+			mUpdates++;
+			mXtaTime += pXtaTime;
+		}
+
+		long getAvgXtaTime() {
+			if (mUpdates == 0) {
+				return 0;
+			}
+			return mXtaTime / mUpdates;
+		}
+
+		double getUpdatesSec() {
+			long x = (mUpdates * 10000) / (System.currentTimeMillis() - mStartTime);
+			return (double) x / 10.0d;
+		}
+
+		double getKbytesSec() {
+			long x = (mBytes * 10) / (System.currentTimeMillis() - mStartTime);
+			return (double) x / 10.0d;
+		}
+		Statistics(){
+			mStartTime = System.currentTimeMillis();
+		}
+	}
+
 	
 
 	

@@ -168,7 +168,15 @@ public class DistributorMessagesFactory implements MessageFactoryInterface
             	return tMessage;
             }
 
-            case ((1 << 16) + 19): // ConfigurationXmlLoadRqst 
+            case ((1 << 16) + 19): // DistTriggerCofigurationRqst 
+            {
+            	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
+            	DistTriggerCofigurationRqst tMessage = new DistTriggerCofigurationRqst();
+            	tMessage.decode( pDecoder );
+            	return tMessage;
+            }
+
+            case ((1 << 16) + 20): // ConfigurationXmlLoadRqst 
             {
             	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
             	ConfigurationXmlLoadRqst tMessage = new ConfigurationXmlLoadRqst();
@@ -176,7 +184,7 @@ public class DistributorMessagesFactory implements MessageFactoryInterface
             	return tMessage;
             }
 
-            case ((1 << 16) + 20): // ConfigurationXmlLoadRsp 
+            case ((1 << 16) + 21): // ConfigurationXmlLoadRsp 
             {
             	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
             	ConfigurationXmlLoadRsp tMessage = new ConfigurationXmlLoadRsp();
@@ -184,7 +192,7 @@ public class DistributorMessagesFactory implements MessageFactoryInterface
             	return tMessage;
             }
 
-            case ((1 << 16) + 21): // DistBdxGwyHello 
+            case ((1 << 16) + 22): // DistBdxGwyHello 
             {
             	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
             	DistBdxGwyHello tMessage = new DistBdxGwyHello();
@@ -192,7 +200,7 @@ public class DistributorMessagesFactory implements MessageFactoryInterface
             	return tMessage;
             }
 
-            case ((1 << 16) + 22): // DistBdxGwySubscrInterestItem 
+            case ((1 << 16) + 23): // DistBdxGwySubscrInterestItem 
             {
             	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
             	DistBdxGwySubscrInterestItem tMessage = new DistBdxGwySubscrInterestItem();
@@ -200,7 +208,7 @@ public class DistributorMessagesFactory implements MessageFactoryInterface
             	return tMessage;
             }
 
-            case ((1 << 16) + 23): // DistBdxGwySubscrInterest 
+            case ((1 << 16) + 24): // DistBdxGwySubscrInterest 
             {
             	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
             	DistBdxGwySubscrInterest tMessage = new DistBdxGwySubscrInterest();
@@ -208,7 +216,7 @@ public class DistributorMessagesFactory implements MessageFactoryInterface
             	return tMessage;
             }
 
-            case ((1 << 16) + 24): // DistBdxGwyPingRqst 
+            case ((1 << 16) + 25): // DistBdxGwyPingRqst 
             {
             	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
             	DistBdxGwyPingRqst tMessage = new DistBdxGwyPingRqst();
@@ -216,7 +224,7 @@ public class DistributorMessagesFactory implements MessageFactoryInterface
             	return tMessage;
             }
 
-            case ((1 << 16) + 25): // DistBdxGwyPingRsp 
+            case ((1 << 16) + 26): // DistBdxGwyPingRsp 
             {
             	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
             	DistBdxGwyPingRsp tMessage = new DistBdxGwyPingRsp();
@@ -224,7 +232,7 @@ public class DistributorMessagesFactory implements MessageFactoryInterface
             	return tMessage;
             }
 
-            case ((1 << 16) + 26): // DistBdxGwyUpdateItem 
+            case ((1 << 16) + 27): // DistBdxGwyUpdateItem 
             {
             	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
             	DistBdxGwyUpdateItem tMessage = new DistBdxGwyUpdateItem();
@@ -232,7 +240,7 @@ public class DistributorMessagesFactory implements MessageFactoryInterface
             	return tMessage;
             }
 
-            case ((1 << 16) + 27): // DistBdxGwyUpdate 
+            case ((1 << 16) + 28): // DistBdxGwyUpdate 
             {
             	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
             	DistBdxGwyUpdate tMessage = new DistBdxGwyUpdate();

@@ -11,8 +11,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 
 
-public class DistributorTreeNode extends DefaultMutableTreeNode implements
-		DistributorTreeNodeIf {
+public class DistributorTreeNode extends DefaultMutableTreeNode implements DistributorTreeNodeIf {
 	private static final long serialVersionUID = 1L;
 	DistDomainDistributorEntry mDistributorInfo;
 

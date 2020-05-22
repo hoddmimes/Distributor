@@ -20,7 +20,7 @@ import com.hoddmimes.distributor.messaging.TreeNode;
 
 public class DistBdxGwyPingRsp implements MessageInterface   
 {
-    public static final int MESSAGE_ID = ((1 << 16) + 25);
+    public static final int MESSAGE_ID = ((1 << 16) + 26);
 	
    protected volatile byte[]  mMessageBytesCached=null;
    
@@ -102,7 +102,7 @@ public String getFullMessageName() {
 }
  
  public int getMessageId() {
-   	return  (1 << 16) + 25;
+   	return  (1 << 16) + 26;
   }
    
 

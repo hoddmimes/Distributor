@@ -20,7 +20,7 @@ import com.hoddmimes.distributor.messaging.TreeNode;
 
 public class DistBdxGwySubscrInterest implements MessageInterface   
 {
-    public static final int MESSAGE_ID = ((1 << 16) + 23);
+    public static final int MESSAGE_ID = ((1 << 16) + 24);
 	public static final int ADD_INTEREST = 1; 
    public static final int REMOVE_INTEREST = 0; 
    
@@ -155,7 +155,7 @@ public String getFullMessageName() {
 }
  
  public int getMessageId() {
-   	return  (1 << 16) + 23;
+   	return  (1 << 16) + 24;
   }
    
 

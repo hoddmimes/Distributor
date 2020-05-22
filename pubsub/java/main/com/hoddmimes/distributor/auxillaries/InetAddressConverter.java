@@ -37,6 +37,12 @@ public class InetAddressConverter
         }
     }
 
+    public static int stringToIntAddr( String pStringAddr ) {
+        InetAddress tInetAddr = stringToInetAddr( pStringAddr );
+        return inetAddrToInt( tInetAddr );
+    }
+
+
     public static String intToAddrString( int pValue ) {
         return intToInetAddr( pValue ).getHostAddress().toString();
     }

@@ -120,7 +120,7 @@ public class DistributorConnection extends Thread implements DistributorConnecti
 	}
 	
 	
-	void pushOutConfiguration()
+	public void pushOutConfiguration()
 	{
 		NetMsgConfiguration tMsg = new NetMsgConfiguration( new XtaSegment(mConfiguration.getSmallSegmentSize()));
 		tMsg.setHeader(Segment.MSG_TYPE_CONFIGURATION,

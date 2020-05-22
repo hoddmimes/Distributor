@@ -20,7 +20,7 @@ import com.hoddmimes.distributor.messaging.TreeNode;
 
 public class DistBdxGwyUpdate implements MessageInterface   
 {
-    public static final int MESSAGE_ID = ((1 << 16) + 27);
+    public static final int MESSAGE_ID = ((1 << 16) + 28);
 	
    protected volatile byte[]  mMessageBytesCached=null;
    
@@ -136,7 +136,7 @@ public String getFullMessageName() {
 }
  
  public int getMessageId() {
-   	return  (1 << 16) + 27;
+   	return  (1 << 16) + 28;
   }
    
 
