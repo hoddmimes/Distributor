@@ -5,7 +5,7 @@ The utility is a true _one-to-many_ transport using IP multicast as transport.
 
 ## Area of Usage
 The distributor framework is primarily designed for application having a need for distributing high volumes of volatile real time information to
-to many receivers in a _reliable_ and _consistent_ way with low latecy. 
+many receivers in a _reliable_ and _consistent_ way with low latecy. 
  
 It is possible to push over a million updates / sec  with a size of 50-60 bytes on a Gigabit LAN from a single publisher.
 For performance characteristics see [Publisher Performance Characteristics](#publisher-performance-characteristics) below.
@@ -18,7 +18,7 @@ Snipplets for minimalist [_Publisher_](#A-minimalist-Publisher-App) and [_Subscr
 
 Using the Distributor API is trivial.  
   
-An application create a Distributor object. The Distributor object is like a handle to the Distributor utility.  
+An application create a _Distributor_ object. The Distributor object is like a handle to the Distributor utility.  
 Having a Distributor instance the application can create Distributor Connections (i.e. communication channels) , Publishers and Subscriber instances.
 
 -   **_[Distributor](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/blob/master/javadoc/com/hoddmimes/distributor/Distributor.html)_** object, handle encapsulating the distributor utility.
@@ -98,11 +98,11 @@ Subject names are case sensitive.
 Some typical matching rules.
 - “/foo/bar” will not match “/foo/bar/fie”
 
-- “/foo/*” will  match all subjects with two levels and starting with “/foo”
+- “/foo/\*” will  match all subjects with two levels and starting with “/foo”
 
-- “/foo/*/bar/*” will match all subjects with four levels where level one is equal with “/foo” level three
+- “/foo/\*/bar/\*” will match all subjects with four levels, where level one is equal with “/foo” level three
        with “/bar” and level two and four being whatever.
-“/foo/bar/…” with match anything with three or more levels starting with “/foo” and “/bar” at level  one and two. 
+“/foo/bar/…” with match anything with three or more levels, starting with “/foo” and “/bar” at level one and two. 
 
 
 ## Nagging Distributor Connections
@@ -113,7 +113,7 @@ application implement error detection, retransmissions and and a sort of flow co
 publisher and subscriber.   
 
 Each distributor connection having subscribers monitors itself to examine that it does not generate too many retransmissions, constantly. This could typically happen 
-if the distributor get overloaded (i.e. running out of CPU). Receiver buffers will then be filled up and overwritten    
+if the distributor gets overloaded (i.e. running out of CPU). Receiver buffers will then be filled up and overwritten    
 
 Three configurable parameters are used to control the nagging monitor behavior:
 - naggingWindowInterval
@@ -234,24 +234,24 @@ The challange is to receive and process data, this normally requires a much bigg
 
 
 #### Distributor Retransmission Cache 
-The _Distributor_ keep sent messages in a memory cache. In case a subscriber has missed a messsage and request a 
-retransmission the publisher will lookup the the missed message in the cache and retransmitt the message.
+The _Distributor_ keep sent messages in a memory cache. In case a subscriber has missed a message and request a 
+retransmission, the publisher will lookup the the missed message in the cache and retransmit the message.
 The size of the retransmission cache are configured on a multicast group level 
 [setRetransmissionMaxCacheSize​(int pValue)](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/DistributorConnectionConfiguration.html#setRetransmissionMaxCacheSize(int))
                                                                             
 ## Distributor Console
-The _Distributor Console_ is a management application. The app communicates with other Distrbutor application using _Distributor broadcasts_
-The application will discover other other active Distributor application on the LAN. With the application detailed statistics can be 
+The _Distributor Console_ is a management gui application. The app communicates with other Distrbutor applications using _Distributor broadcasts_
+The application will discover  other active Distributor application on the LAN. With the console application detailed statistics can be 
 retrieved for active publishers and subscribers. It is also possible to start retrieving live broadcasts from a specific publisher 
-to se  message rates, subjects published  and message live stream.
+to see message rates statistics, subjects published and message live streams.
 
 The distributor console can be started with the script files _console.sh_ or _console.bat_
-In the app the configuration multicast address and port  used by application should be configured.
-
+In the app the configuration multicast address and port used by application should be configured to match the (configuration multicast) address and port used by other 
+distributor subscribers and publishers.
 
 
 ## Broadcast Gateways
-The multicast distribution is possible on LAN and is normally not working in a routed network. However multicast traffic can be _routed_ 
+Multicast distribution is possible on LAN and is normally not working in a routed network. However multicast traffic can be _routed_ 
 using a Muticast Routing protocol (PIM, MOSPF etc.) These protocols are normally not enable and require some configuration in routers, if being supported.
 
 The _Distrbutor_ library includes some code allowing multicast to be _routed_ between two LAN using a P-2-P connection.
