@@ -2,7 +2,7 @@ package com.hoddmimes.distributor.samples;
 
 import com.hoddmimes.distributor.*;
 import com.hoddmimes.distributor.auxillaries.InetAddressConverter;
-import sun.jvm.hotspot.runtime.StaticBaseConstructor;
+
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

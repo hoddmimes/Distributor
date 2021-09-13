@@ -13,6 +13,13 @@ For performance characteristics see [Publisher Performance Characteristics](#pub
 
 Snipplets for minimalist [_Publisher_](#A-minimalist-Publisher-App) and [_Subscriber_](#A-minimalist-Subscriber-App) are found below.
 
+## Background
+The Distributor utility history derives from the financial industry and dissemination of market data. Some of the earlies ideas goes back as far as
+to the mid -80 and the Digital Equipment NWAY protocol.  [Digital Equipment](https://en.wikipedia.org/wiki/Digital_Equipment_Corporation) at that time
+sold a product in London to the trading rooms for disseminating market data using a true reliable multicast
+transport based on the NWAY protocol. I then had the opertunity and pleasure to envolve the ideas when developing the OMdu component at [OMX/NASDAQ Nordic](https://en.wikipedia.org/wiki/Nasdaq_Nordic). OMdu was (is?) the reliable multicast
+distribution mechanism used to distribute real time market data using LAN/Multicast. The first implementation was taken into
+production -92 and it was still i production 2015.
 
 ## API Usage
 
