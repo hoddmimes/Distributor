@@ -1,0 +1,70 @@
+
+
+
+def distVrs = tasks.distributorVersion.version()
+
+task(generateMessageClasses, type: JavaExec) {
+    mainClass = 'com.hoddmimes.transform.MessageCompiler'
+    classpath = files("../libs/messageCompiler-" + "$distVrs" + ".jar")
+    args "-xml","./xml/DistributorMessagesFileSet.xml"
+}
+
+task deleteGeneratedFiles(type: Delete) {
+    delete fileTree('src/main/java/com/hoddmimes/distributor/generated/messages') {
+        include '*.java'
+    }
+
+    delete fileTree('../libs/') {
+        include 'distributor-*.jar'
+    }
+    doLast {
+        println('Distributor generated filed successfully deleted!')
+    }
+}
+
+task buildDistributorJar( type: Jar ) {
+    Date date = new Date()
+    String dateTime = date.format("yy-MM-dd");
+
+    archivesBaseName = 'distributor';
+    archiveVersion =  "$distVrs" + "-" + dateTime;
+    destinationDirectory = file("../libs/")
+    from('./build/classes/java/main/') {
+        include '**/*'
+    }
+    from('./') {
+        include '*log4j.xml'
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+
+    exclude "META-INF/*.SF"
+    exclude "META-INF/*.DSA"
+    exclude "META-INF/*.RSA"
+
+    duplicatesStrategy = 'exclude'
+
+    doLast {
+        println('***** Distributor JAR successfully built!')
+    }
+}
+
+generateMessageClasses.dependsOn(':msggen:buildGenerateJar')
+generateMessageClasses.dependsOn(deleteGeneratedFiles)
+compileJava.dependsOn(generateMessageClasses)
+
+classes.finalizedBy(buildDistributorJar)
+
+dependencies {
+    implementation project (':msggen')
+    implementation group: 'com.jcraft', name: 'jzlib', version: '1.1.3'
+    implementation  group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.20.0'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.20.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+test {
+    useJUnitPlatform()
+}

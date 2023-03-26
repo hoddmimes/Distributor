@@ -29,8 +29,5 @@ hs_err_pid*
 .gradle/
 .idea/
 gradle/
-/build/
-/pubsub/out/
 /pubsub/build/
-/msggen/out/
 /msggen/build/

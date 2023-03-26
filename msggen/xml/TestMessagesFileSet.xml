@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<MessageFiles>
-	<SingleMessageFactory language="java" outPath="../../java/test/generated/" package="generated"/>
-	<MessageFile language="java" file="./msggen/xml/TestMessage.xml" outPath="./msggen/java/test/generated/" package="generated" messageBase="1000"/>
-</MessageFiles>

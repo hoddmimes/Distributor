@@ -1,0 +1,51 @@
+
+def distVrs = tasks.distributorVersion.version()
+
+configurations.implementation.setCanBeResolved(true)
+
+task buildGenerateJar (type: Jar) {
+    archiveBaseName = 'messageCompiler';
+    archiveVersion = "$distVrs"
+    destinationDirectory = file("../libs/")
+
+    from {
+        configurations.implementation.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    from('build/classes/java/main') {
+        include '**/*.class'
+    }
+
+    from('xsl') {
+        include '*.xsl'
+    }
+
+    doLast {
+        println("***** Built messageCompiler-" + "$distVrs" + " JAR")
+    }
+}
+
+task deleteGenerateJar( type: Delete ) {
+    def generateJar = "../libs/messageCompiler-" + "$distVrs" + ".jar"
+    delete "$generateJar"
+
+
+    doLast {
+        print("***** Delete $generateJar")
+    }
+
+}
+
+
+
+buildGenerateJar.dependsOn(deleteGenerateJar)
+classes.finalizedBy(buildGenerateJar)
+
+dependencies {
+    implementation  group: 'xalan', name: 'xalan', version: '2.7.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <MessageFiles>
-  <MessageFile language="java" file="./xml/DistributorMessages.xml" outPath="./java/main/com/hoddmimes/distributor/generated/messages/" package="com.hoddmimes.distributor.generated.messages" messageBase="1"/>
+  <MessageFile language="java" file="./xml/DistributorMessages.xml" outPath="./src/main/java//com/hoddmimes/distributor/generated/messages/" package="com.hoddmimes.distributor.generated.messages" messageBase="1"/>
 </MessageFiles>

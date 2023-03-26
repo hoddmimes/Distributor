@@ -12,7 +12,7 @@
 	</Message>
 	<!--
 	 * Top level query, exploring the domain. What distributors are started 
-	 * and what connetions do they have 
+	 * and what connections do they have
 	 -->
 	<Message name="DistDomainConnectionEntry">
 		<Attribute name="connectionId" type="long"/>
