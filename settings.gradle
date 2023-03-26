@@ -2,4 +2,5 @@ rootProject.name = 'Distributor'
 include 'msggen'
 include 'pubsub'
 include 'pubsub'
+include 'utilities'
 
