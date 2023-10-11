@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class ClientDeliveryController extends Thread  
@@ -21,13 +20,11 @@ public class ClientDeliveryController extends Thread
 	LinkedList<SubscriptionFiltersCntx> 	mSubscriptionFiltersList;
 	LinkedList<EventCallbackCntx> 			mEventCallbackListeners;
 	LinkedBlockingDeque<ClientEvent>        mQueue;
-	AtomicInteger							mEventQueueLength;
 	int 									mPeakSize;
 	String 									mPeakTime;
 	
 	private ClientDeliveryController() 
 	{
-		mEventQueueLength = new AtomicInteger(0);
 		mSubscriptionFiltersList = new LinkedList<SubscriptionFiltersCntx>();
 		mEventCallbackListeners = new LinkedList<EventCallbackCntx>();
 		mQueue = new LinkedBlockingDeque<ClientEvent>();
@@ -90,51 +87,53 @@ public class ClientDeliveryController extends Thread
 			}
 		}
 	}
-	
-	void queueUpdate( long  pDistributorConnectionId, List<RcvUpdate> pRcvUpdateList ) 
-	{
-		mEventQueueLength.addAndGet(pRcvUpdateList.size());
-		if (mEventQueueLength.get() > mPeakSize) {
-			mPeakSize = mEventQueueLength.get();
+
+	public int getQueueLength() {
+		synchronized (this) {
+			int tLength = 0;
+			Iterator<ClientEvent> tItr = this.mQueue.iterator();
+			while (tItr.hasNext()) {
+				tLength += tItr.next().getEventElements();
+			}
+			return tLength;
+		}
+	}
+	private void checkPeak() {
+		int tLength = getQueueLength();
+		if (tLength > mPeakSize) {
+			mPeakSize = tLength;
 			mPeakTime = cSDF.format(System.currentTimeMillis());
 		}
+	}
+	void queueUpdate( long  pDistributorConnectionId, List<RcvUpdate> pRcvUpdateList ) 
+	{
+		checkPeak();
 		mQueue.add( new ClientUpdateEvent(pDistributorConnectionId, pRcvUpdateList));
 	}
 	
 	void queueUpdate( long pDistributorConnectionId, RcvUpdate pRcvUpdate ) {
-		mEventQueueLength.incrementAndGet();
-		if (mEventQueueLength.get() > mPeakSize) {
-			mPeakSize = mEventQueueLength.get();
-			mPeakTime = cSDF.format(System.currentTimeMillis());
-		}
+		checkPeak();
 		mQueue.add( new ClientUpdateEvent(pDistributorConnectionId, pRcvUpdate));
 	}
 
 	void queueEvent( long pDistributorConnectionId, DistributorEvent pEvent, DistributorEventCallbackIf pCallback ) {
+		checkPeak();
 		mQueue.add( new ClientDedicatedAppEvent(pDistributorConnectionId, pEvent, pCallback));
 	}
 	
 	void queueEvent( long pDistributorConnectionId, DistributorEvent pEvent ) 
 	{
-		mEventQueueLength.incrementAndGet();
-		if (mEventQueueLength.get() > mPeakSize) {
-			mPeakSize = mEventQueueLength.get();
-			mPeakTime = cSDF.format(System.currentTimeMillis());
-		}
+		checkPeak();
 		mQueue.add( new ClientAppEvent(pDistributorConnectionId, pEvent));
 	}
 
-	int	getQueueLength()
-	{
-		return mEventQueueLength.get();
-	}
 	
 	QueueSizeItem getQueueSize()
 	{
 		QueueSizeItem tItem = new QueueSizeItem();
 		tItem.setPeakSize(mPeakSize);
 		tItem.setPeakTime(mPeakTime);
-		tItem.setSize(mEventQueueLength.get());
+		tItem.setSize((long) getQueueLength());
 		return tItem;
 	}
 	
@@ -151,7 +150,7 @@ public class ClientDeliveryController extends Thread
 		return null;
 	}
 	
-	private void processEvent( ClientEvent pClientEvent ) 
+	private void processEvent( ClientEvent pClientEvent)
 	{
 		if (pClientEvent.mEventType == ClientEvent.UPDATE)
 		{
@@ -162,21 +161,20 @@ public class ClientDeliveryController extends Thread
 				if (tFilter != null) {
 				   if (tUpdateEvent.mRcvUpdate != null) {
 					 tFilter.match( tUpdateEvent.mRcvUpdate.getSubjectName(), tUpdateEvent.mRcvUpdate.getData(),
-							        tUpdateEvent.mRcvUpdate.getAppId(), mEventQueueLength.get() - 1);
+							        tUpdateEvent.mRcvUpdate.getAppId(), getQueueLength());
 				   } else if (tUpdateEvent.mRcvUpdateList != null) {
 					   Iterator<RcvUpdate> tItr = tUpdateEvent.mRcvUpdateList.iterator();
-					   int tCount = 0;
 					   while(tItr.hasNext()) 
 					   {
 						   RcvUpdate tRcvUpd = tItr.next();
-						   tFilter.match( tRcvUpd.getSubjectName(), tRcvUpd.getData(),  tRcvUpd.getAppId(), (mEventQueueLength.get() - (++tCount)));
+						   tFilter.match( tRcvUpd.getSubjectName(), tRcvUpd.getData(),  tRcvUpd.getAppId(),  getQueueLength());
 					   }
 				   }
 			    }
 			}
 		}
 
-		// If the an application event notify all registetered listeners
+		// If the event is an application event notify all registered listeners
 		if (pClientEvent.mEventType == ClientEvent.APPEVENT)
 		{
 			ClientAppEvent tAppEvent = (ClientAppEvent) pClientEvent;
@@ -199,7 +197,7 @@ public class ClientDeliveryController extends Thread
 			tAppEvent.mEventCallbackIf.distributorEventCallback( tAppEvent.mEvent );
 		}
 		
-		mEventQueueLength.addAndGet(-pClientEvent.getEventElements());
+
 	}
 	
 	

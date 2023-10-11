@@ -24,6 +24,14 @@ public class CounterElement {
     }
 
     /**
+     * return the CounterElement name
+     * @return entity attribute name
+     */
+    public String getAttributeName() {
+        return this.mAttributeName;
+    }
+
+    /**
      * returns the counter aggregated total value
      * @return total value
      */

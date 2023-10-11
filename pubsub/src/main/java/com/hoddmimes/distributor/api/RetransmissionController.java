@@ -90,6 +90,9 @@ class RetransmissionController {
 		} // End synchronized
 	}
 
+	/*
+
+	 */
 	class RetransmissionRequestItem extends DistributorTimerTask {
 		long mRemoteConnectionId;
 		int mLowSeqNo;

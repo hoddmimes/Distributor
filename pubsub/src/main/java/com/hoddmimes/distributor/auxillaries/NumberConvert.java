@@ -1,9 +1,5 @@
 package com.hoddmimes.distributor.auxillaries;
 
-
-import com.hoddmimes.distributor.messaging.MessageBinDecoder;
-import com.hoddmimes.distributor.messaging.MessageBinEncoder;
-
 public class NumberConvert
 {
     public static byte[] short2Bytes(short value) {
@@ -85,11 +81,8 @@ public class NumberConvert
 
     public static void main( String[] args ) {
         byte[] b;
-       MessageBinEncoder e = new MessageBinEncoder(12);
-       e.add( 11223344 );
-       b = e.getBytes();
-       MessageBinDecoder d = new MessageBinDecoder( e.getBytes());
-       int x = d.readInt();
+        int x;
+
 
        b = int2Bytes( 11223344);
        x = bytes2Int(b);

@@ -35,7 +35,6 @@ class RemoteConnection {
 	long mConfigurationInterval;
 	String mConnectTime;
 	int mRemoteSenderId;
-	int mHashCode;
 	long mRemoteConnectionId;
 
 	InetSocketAddress mRetransmissionDestinationAddress;
@@ -46,7 +45,7 @@ class RemoteConnection {
 	boolean mStartSynchronized;
 	int mNextExpectedSeqno;
 	int mHighiestSeenSeqNo;
-	volatile boolean mHbIsActive;
+	volatile boolean mIsActive;  // True if data and/or heartbeats are received
 	volatile boolean mCfgIsActive;
 	volatile boolean isDead;
 	RcvSegmentBatch mRcvSegmentBatch;
@@ -57,31 +56,30 @@ class RemoteConnection {
 	CheckHeartbeatTask mCheckHeartbeatTask;
 	CheckConfigurationTask mCheckConfigurationTask;
 
-	RemoteConnection(Segment pSegment, RemoteConnectionController pController,
-			DistributorConnection pConnection) {
+	RemoteConnection(NetMsgConfiguration pCfgMsg,
+					 RemoteConnectionController pController,
+					 DistributorConnection pConnection) {
+
 		synchronized (this) {
 			mRemoteConnectionId = UUIDFactory.getId();
 			mConnection = pConnection;
-			mHashCode = pSegment.hashCode();
-			NetMsgConfiguration tMsg = new NetMsgConfiguration(pSegment);
-			tMsg.decode();
-			mRemoteAppId = pSegment.getHeaderAppId();
+			mRemoteAppId = pCfgMsg.getHeaderAppId();
 			mConnectTime = cSDF.format(new Date());
-			mRemoteHostAddressString = tMsg.getHostAddress().toString();
-			mRemoteHostInetAddress = tMsg.getHostAddress();
-			mRemoteSenderId = tMsg.getSenderId();
-			mRemoteStartTime = tMsg.getSenderStartTime();
-			mHeartbeatInterval = tMsg.getHeartbeatInterval();
-			mConfigurationInterval = tMsg.getConfigurationInterval();
-			mRemoteApplicationName = tMsg.getApplicationName();
-			mRemoteHostName = tMsg.getHostAddress().getHostName(); // Watch out for DNS issues !!!
+			mRemoteHostAddressString = pCfgMsg.getHostAddress().toString();
+			mRemoteHostInetAddress = pCfgMsg.getHostAddress();
+			mRemoteSenderId = pCfgMsg.getSenderId();
+			mRemoteStartTime = pCfgMsg.getSenderStartTime();
+			mHeartbeatInterval = pCfgMsg.getHeartbeatInterval();
+			mConfigurationInterval = pCfgMsg.getConfigurationInterval();
+			mRemoteApplicationName = pCfgMsg.getApplicationName();
+			mRemoteHostName = pCfgMsg.getHostAddress().getHostName(); // Watch out for DNS issues !!!
 			mConfiguration = pConnection.mConfiguration;
 			mMca = pConnection.mIpmg;
 			mRemoteConnectionController = pController;
 			mRetransmissionController = pConnection.mRetransmissionController;
 			mRcvSegmentBatch = null;
 
-			mHbIsActive = true;
+			mIsActive = true;
 			mCfgIsActive = true;
 
 			mStartSynchronized = false;
@@ -89,41 +87,43 @@ class RemoteConnection {
 			mHighiestSeenSeqNo = 0;
 
 			isDead = false;
-			mCheckHeartbeatTask = new CheckHeartbeatTask(mConnection.mConnectionId, mRemoteConnectionId);
-			mCheckConfigurationTask = new CheckConfigurationTask(mConnection.mConnectionId, mRemoteConnectionId);
 
+			mCheckHeartbeatTask = new CheckHeartbeatTask(mConnection.mConnectionId, mRemoteConnectionId);
 			long tInterval = ((mConfiguration.getHearbeatMaxLost() + 1) * mHeartbeatInterval);
 			DistributorTimers.getInstance().queue( tInterval, tInterval, mCheckHeartbeatTask );
 
+			mCheckConfigurationTask = new CheckConfigurationTask(mConnection.mConnectionId, mRemoteConnectionId);
 			tInterval = ((mConfiguration.getConfigurationMaxLost() + 1) * mConfigurationInterval);
 			DistributorTimers.getInstance().queue( tInterval, tInterval, mCheckConfigurationTask );
 		}
 	}
 
-	@Override
+
 	public String toString() {
-		return "[ Host: " + mRemoteHostAddressString + " Name: "
-				+ mRemoteHostName + " SndrId: " + mRemoteSenderId + " Appl: "
-				+ mRemoteApplicationName + "\n        StartTime: "
-				+ Long.toHexString(mRemoteStartTime) + " ConnTime: "
-				+ mConnectTime + " HashCode: " + Integer.toHexString(mHashCode)
-				+ "\n         HbIntvl: " + mHeartbeatInterval + " CfgIntvl: "
-				+ mConfigurationInterval + " LclMca : " + mMca + "]";
+		return "[ Host: " + mRemoteHostAddressString +
+				" Name: " + mRemoteHostName +
+				" Remote Conn Id: " + Long.toHexString(mRemoteConnectionId) +
+				" SndrId: " + mRemoteSenderId +
+				" Appl: " + mRemoteApplicationName + "\n" +
+				" StartTime: " + cSDF.format(mRemoteStartTime) +
+				" ConnTime: " + mConnectTime +
+				" HbIntvl: " + mHeartbeatInterval +
+				" CfgIntvl: " + mConfigurationInterval + " LclMca : " + mMca + "]";
 
 	}
 
+
 	void processHeartbeatMsg(RcvSegment pSegment) {
-		NetMsgHeartbeat tMsg = new NetMsgHeartbeat(pSegment);
-		tMsg.decode();
-		
-		mHbIsActive = true;
-		// mConnection.log("Received heartbeat Application: " +
-		// this.mRemoteApplicationName + " HashCode: " + Integer.toHexString(
-		// this.mHashCode ));
-		if ((mStartSynchronized) && (mHighiestSeenSeqNo < tMsg.getSeqNo())) {
+
+		NetMsgHeartbeat tHbMsg = new NetMsgHeartbeat( pSegment );
+		tHbMsg.decode();
+
+		mIsActive = true;
+
+		if ((mStartSynchronized) && (mHighiestSeenSeqNo < tHbMsg.getSeqNo())) {
 			mRetransmissionController.createRetransmissionRequest(this,
-					mHighiestSeenSeqNo + 1, tMsg.getSeqNo());
-			mHighiestSeenSeqNo = tMsg.getSeqNo();
+					mHighiestSeenSeqNo + 1, tHbMsg.getSeqNo());
+			mHighiestSeenSeqNo = tHbMsg.getSeqNo();
 		}
 	}
 
@@ -309,7 +309,6 @@ class RemoteConnection {
 		@Override
 		public void execute( DistributorConnection pConnection) {
 			RemoteConnection tRemoteConnection = pConnection.mConnectionReceiver.mRemoteConnectionController.getRemoteConnection( mRemoteConnectionId );
-			
 			if (tRemoteConnection == null) {
 				this.cancel();
 				return;
@@ -324,9 +323,9 @@ class RemoteConnection {
 					cancel();
 					return;
 				}
-				if (!tRemoteConnection.mHbIsActive) {
+				if (!tRemoteConnection.mIsActive) {
 					if (pConnection.isLogFlagSet(DistributorApplicationConfiguration.LOG_RMTDB_EVENTS)) {
-						pConnection.log("Remote connction disconnected (no heartbeats) \n        "
+						pConnection.log("Remote connection disconnected (no heartbeats) \n        "
 										+ tRemoteConnection.toString());
 					}
 					DistributorRemoveRemoteConnectionEvent tEvent = new DistributorRemoveRemoteConnectionEvent(
@@ -340,7 +339,7 @@ class RemoteConnection {
 					cancel();
 					mRemoteConnectionController.removeRemoteConnection(RemoteConnection.this);
 				} else {
-					tRemoteConnection.mHbIsActive = false;
+					tRemoteConnection.mIsActive = false;
 				}
 			} catch (Throwable e) {
 				e.printStackTrace();
@@ -352,7 +351,7 @@ class RemoteConnection {
 		private long mRemoteConnectionId;
 
 		CheckConfigurationTask( long pDistributorConnectionId, long pRemoteConnectionId ) {
-			super( pDistributorConnectionId );
+			super(pDistributorConnectionId);
 			mRemoteConnectionId = pRemoteConnectionId;
 		}
 

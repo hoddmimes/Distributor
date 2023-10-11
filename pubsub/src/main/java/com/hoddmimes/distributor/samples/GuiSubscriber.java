@@ -658,10 +658,6 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 //	    							 DistributorApplicationConfiguration.LOG_RETRANSMISSION_EVENTS + 
 //	    							 DistributorApplicationConfiguration.LOG_SEGMENTS_EVENTS );
 
-			if ((mBdxGwyHost != null) && (mBdxGwyPort != 0)) {
-				tApplConfig.setBroadcastGatewayAddress( mBdxGwyHost);
-				tApplConfig.setBroadcastGatewayPort( mBdxGwyPort );
-			}
 
 	    	mDistributor = new Distributor( tApplConfig );
 	    	DistributorConnectionConfiguration tConfig = new DistributorConnectionConfiguration( mAddressString, Integer.parseInt( mPortString ));

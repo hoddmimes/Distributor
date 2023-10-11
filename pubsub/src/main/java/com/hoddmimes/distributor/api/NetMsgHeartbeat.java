@@ -12,6 +12,7 @@ class NetMsgHeartbeat extends NetMsg {
 	private InetAddress	 mMcAddress;
 	private int	 		 mMcPort;
 	private int	 		 mSenderId;
+	private long 		 mSenderStartTime;
 	private int  		 mSeqno;
 
 	NetMsgHeartbeat(Segment pSegment) {
@@ -25,6 +26,7 @@ class NetMsgHeartbeat extends NetMsg {
 		tEncoder.add( InetAddressConverter.inetAddrToInt( mMcAddress));
 		tEncoder.add( mMcPort );
 		tEncoder.add( mSenderId );
+		tEncoder.add( mSenderStartTime );
 		tEncoder.add( mSeqno );
 	}
 
@@ -35,15 +37,24 @@ class NetMsgHeartbeat extends NetMsg {
 		mMcAddress = InetAddressConverter.intToInetAddr( tDecoder.readInt());
 		mMcPort = tDecoder.readInt();
 		mSenderId = tDecoder.readInt();
+		mSenderStartTime = tDecoder.readLong();
 		mSeqno = tDecoder.readInt();
-		mSegment.setSeqno( mSeqno );
 	}
 
-	void set(InetAddress pMcAddress, int pMcPort, int pSenderId, int pSeqNo) {
+	void set(InetAddress pMcAddress, int pMcPort, int pSenderId, long pSenderStartTime, int pSeqNo) {
 		setMcAddress(pMcAddress);
 		setMcPort(pMcPort);
 		setSenderId(pSenderId);
+		setSenderStartTime(pSenderStartTime);
 		setSeqNo(pSeqNo);
+	}
+
+	void setSenderStartTime( long pStartTime ) {
+		mSenderStartTime = pStartTime;
+	}
+
+	long getSenderStartTime() {
+		return mSenderStartTime;
 	}
 
 

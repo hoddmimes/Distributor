@@ -195,7 +195,7 @@ class ConnectionReceiver {
 	{
 		RcvUpdate[] tUpdates = pRcvSegmentBatch.getUpdates( mConnection.mConnectionId );
 
-		// If the update is originate from the local broadcast and this server is
+		// If the update originates from the local broadcast and this server is
 		// the broadcast gateway suppress the update this for circumvent a recursive loop
 		if (tUpdates.length == 1) {
 			ClientDeliveryController.getInstance().queueUpdate( mConnection.mConnectionId, tUpdates[0] );

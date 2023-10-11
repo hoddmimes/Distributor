@@ -56,14 +56,16 @@ public class Ipmg
 			throw new DistributorException( "Could not set the network interface \"" + pNetworkInterface + "\"  SocketException: " + e4.getMessage());
 		}
 
+
+
 		try {
 			mSocket.setTimeToLive(pTTL);
 		} catch (IOException e5) {
 			throw new DistributorException( "Could not set the TTL  IOException: " + e5.getMessage());
 		}
-		try {
-			mSocket.setOption( StandardSocketOptions.IP_MULTICAST_LOOP, false);
 
+		try {
+			mSocket.setOption( StandardSocketOptions.IP_MULTICAST_LOOP, true);
 		} catch (IOException e6) {
 			throw new DistributorException("Could not set loopback mode,  SocketException: " + e6.getMessage());
 		}
@@ -108,19 +110,10 @@ public class Ipmg
 		pBuffer.clear();
 		DatagramPacket tPacket = new DatagramPacket(pBuffer.array(), pBuffer.capacity());
 		mSocket.receive(tPacket);
-
 		pBuffer.position(tPacket.getLength());
 		return tPacket.getSocketAddress();
 	}
 
-	public long getMcaConnectionId() {
-		byte[] tBuffer = mInetAddress.getAddress();
-		long tHigh = ((tBuffer[0] & 0xff) << 24) + ((tBuffer[1] & 0xff) << 16)
-				+ ((tBuffer[2] & 0xff) << 8) + (tBuffer[3] & 0xff);
-		long tLow = mPort;
-
-		return ((tHigh << 24) + tLow);
-	}
 
 	@Override
 	public String toString() {

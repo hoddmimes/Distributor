@@ -2,7 +2,9 @@ package com.hoddmimes.distributor.api;
 
 import com.hoddmimes.distributor.*;
 import com.hoddmimes.distributor.auxillaries.UUIDFactory;
-import com.hoddmimes.distributor.bdxgwy.BdxGwyDistributorClient;
+import com.hoddmimes.distributor.generated.messages.MgmtConnection;
+import com.hoddmimes.distributor.generated.messages.MgmtConnectionView;
+import com.hoddmimes.distributor.generated.messages.MgmtDistributorBdx;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -35,9 +37,8 @@ public class DistributorConnection extends Thread implements DistributorConnecti
 	RetransmissionController			mRetransmissionController; // Retransmission controller for this connection
 	
 	long 								mConnectionId;
-	long 								mMcaConnectionId;
+
 	RetransmissionStatistics 			mRetransmissionStatistics;
-	boolean 							mIsCmaConnection;
 	RunningStateType 					mState;
 	String 								mLastKnownError = null;
 
@@ -55,15 +56,12 @@ public class DistributorConnection extends Thread implements DistributorConnecti
 
 	
 
-	DistributorConnection(Distributor pDistributor, DistributorConnectionConfiguration pConfiguration, DistributorApplicationConfiguration pApplicationConfiguration) throws DistributorException {
-		this(pDistributor, pConfiguration, pApplicationConfiguration, false  );
-	}
 
-	DistributorConnection(Distributor pDistributor,DistributorConnectionConfiguration pConfiguration, DistributorApplicationConfiguration pApplicationConfiguration, boolean pCmaConnection) throws DistributorException {
+
+	DistributorConnection(Distributor pDistributor,DistributorConnectionConfiguration pConfiguration, DistributorApplicationConfiguration pApplicationConfiguration) throws DistributorException {
 		mLogger = LogManager.getLogger( this.getClass().getSimpleName());
 		mMutext = new ReentrantLock();
 		mState = RunningStateType.INIT;
-		mIsCmaConnection = pCmaConnection;
 		mConnectionId = UUIDFactory.getId();
 		mTimeToDie = false;
 		mDistributor = pDistributor;
@@ -83,7 +81,6 @@ public class DistributorConnection extends Thread implements DistributorConnecti
 		// Open MCA
 		mIpmg = new Ipmg(pConfiguration.getMca(),pConfiguration.getMcaNetworkInterface(), pConfiguration.getMcaPort(), pConfiguration.getIpBufferSize(), pConfiguration.getTTL());
 
-		mMcaConnectionId = mIpmg.getMcaConnectionId();
 		// Start connection receiver
 		mConnectionReceiver = new ConnectionReceiver(this);
 
@@ -98,7 +95,9 @@ public class DistributorConnection extends Thread implements DistributorConnecti
 
 		if (mConfiguration.getStatisticsLogInterval() > 0) {
 			mLogStatisticTask = new LogStatisticsTimerTask(mConnectionId);
-			DistributorTimers.getInstance().queue( mConfiguration.getStatisticsLogInterval(), mConfiguration.getStatisticsLogInterval(), mLogStatisticTask);
+			DistributorTimers.getInstance().queue( mConfiguration.getStatisticsLogInterval(),
+					                               mConfiguration.getStatisticsLogInterval(),
+					                               mLogStatisticTask);
 		} else {
 			mLogStatisticTask = null;
 		}
@@ -137,10 +136,9 @@ public class DistributorConnection extends Thread implements DistributorConnecti
 	
 	
 	public DistributorSubscriberIf createSubscriber(  DistributorEventCallbackIf pEventCallback,
-											   DistributorUpdateCallbackIf pUpdateCallback,
-											   BdxGwyDistributorClient pBdxGwyConnction ) throws DistributorException
+													  DistributorUpdateCallbackIf pUpdateCallback) throws DistributorException
 	{
-		DistributorSubscriber tSubscriber =  new DistributorSubscriber(this, pEventCallback, pUpdateCallback, pBdxGwyConnction);
+		DistributorSubscriber tSubscriber =  new DistributorSubscriber(this, pEventCallback, pUpdateCallback);
 		mSubscribers.add(tSubscriber);
 		if (pEventCallback != null) {
 			ClientDeliveryController.getInstance().addEventListener(mConnectionId, pEventCallback);
@@ -151,7 +149,7 @@ public class DistributorConnection extends Thread implements DistributorConnecti
 	
 	public DistributorPublisherIf createPublisher(  DistributorEventCallbackIf pEventCallback ) throws DistributorException
 	{
-		boolean tFloodRegulated = (mConfiguration.getMaxBandwidth() > 0) ? true : false;
+		boolean tFloodRegulated = (mConfiguration.getMaxBandwidthKbit() > 0) ? true : false;
 
 		DistributorPublisher tPublisher = new DistributorPublisher(mConnectionId, this.mDistributor.getAppId(), tFloodRegulated, pEventCallback);
 		mPublishers.add(tPublisher);
@@ -172,9 +170,44 @@ public class DistributorConnection extends Thread implements DistributorConnecti
 		mMutext.unlock();
 	}
 
-	@Override
-	public long getMcaConnectionId() {
-		return mMcaConnectionId;
+
+	public void updateMgmtDistributorBdx(MgmtDistributorBdx bdx )
+	{
+		bdx.setPublishers( bdx.getPublishers() + this.mPublishers.size());
+		bdx.setSubscribers( bdx.getSubscribers()+ this.mSubscribers.size());
+		bdx.setSubscriptions(bdx.getSubscriptions() + this.mSubscriptionFilter.getActiveSubscriptions());
+		bdx.setRetransIn( bdx.getRetransIn() + this.mRetransmissionStatistics.mTotalIn);
+		bdx.setRetransOut( bdx.getRetransOut() + this.mRetransmissionStatistics.mTotalOut);
+	}
+
+	public MgmtConnection getMgmtConnection() {
+		MgmtConnection mgmtConn = new MgmtConnection();
+		mgmtConn.setConnectionId( this.mConnectionId );
+		mgmtConn.setMcaPort( this.getMcPort());
+		mgmtConn.setMcaAddress( this.getMcAddress());
+		mgmtConn.setPublishers( this.mPublishers.size());
+		mgmtConn.setSubscribers( this.mSubscribers.size());
+		mgmtConn.setSubscriptions( this.mSubscriptionFilter.getActiveSubscriptions() );
+		mgmtConn.setInRetransmissions( this.mRetransmissionStatistics.mTotalIn );
+		mgmtConn.setOutRetransmissions( this.mRetransmissionStatistics.mTotalOut );
+		mgmtConn.setUpdateIn( this.mTrafficStatisticsTask.mRcvUpdates.getTotal() );
+		mgmtConn.setUpdateOut( this.mTrafficStatisticsTask.mXtaUpdates.getTotal() );
+		return mgmtConn;
+	}
+
+	public MgmtConnectionView getMgmtConnectionDetails() {
+		MgmtConnectionView tMsg = new MgmtConnectionView();
+		tMsg.setConnectionId( this.getConnectionId());
+		tMsg.setPublishers( this.mPublishers.size() );
+		tMsg.setSubscribers( this.mSubscribers.size());
+		tMsg.setSubscriptions( this.mSubscriptionFilter.getActiveSubscriptions() );
+		tMsg.setMcaPort( this.getMcPort());
+		tMsg.setMcaAddress( this.getMcAddress());
+		tMsg.setTrafficInfo( this.mTrafficStatisticsTask.getMgmtTrafficInfo());
+		tMsg.setDeliverUpdateQueue( ClientDeliveryController.getInstance().getQueueSize());
+		tMsg.setRetransmissionInfo( this.mRetransmissionStatistics.geRetransmissionStatistics());
+		tMsg.setSubscriptionTopic( this.mSubscriptionFilter.getActiveSubscriptionsStrings());
+		return tMsg;
 	}
 
 
@@ -293,7 +326,7 @@ public class DistributorConnection extends Thread implements DistributorConnecti
 	
 	
 	public void evalTrafficFlow( TrafficFlowClientContext pClientFlowContext ) {
-		mConnectionSender.evalTrafficFlow( pClientFlowContext );
+		mConnectionSender.evalTrafficFlow();
 	}
 	
 

@@ -44,7 +44,7 @@ abstract class Segment implements Comparable<Segment>, Comparator<Segment>
 	final static byte FLAG_M_SEGMENT_START = 1;
 	final static byte FLAG_M_SEGMENT_MORE = 2;
 	final static byte FLAG_M_SEGMENT_END = 4;
-	final static byte FLAG_M_SEGMENT_BDXGWY = 8; // Sender of this segment is a bdxgwy
+
 
 
 	/**
@@ -60,8 +60,7 @@ abstract class Segment implements Comparable<Segment>, Comparator<Segment>
 	
 	private MessageBinDecoder mDecoder;
 	private MessageBinEncoder mEncoder;
-	
-	volatile int	mHashCodeValue;		// Segment hash code, use data in the NetHeader to compile the hash code
+
 	volatile int	mSeqno;				// Sequence number only applicable for NetUpdate messages.
 	
 
@@ -73,7 +72,6 @@ abstract class Segment implements Comparable<Segment>, Comparator<Segment>
 	{
 		mEncoder = new MessageBinEncoder(pBufferSize);
 		mDecoder = null;
-		mHashCodeValue = 0;
 		mSeqno = 0;
 	}
 	
@@ -85,7 +83,6 @@ abstract class Segment implements Comparable<Segment>, Comparator<Segment>
 	{
 		mEncoder = null;
 		mDecoder = new MessageBinDecoder(pByteBuffer);
-		mHashCodeValue = 0;
 		mSeqno = 0;
 	}
 
@@ -137,9 +134,7 @@ abstract class Segment implements Comparable<Segment>, Comparator<Segment>
 		mHdrSenderStartTime = mDecoder.readInt();
 		mHdrAppId = mDecoder.readInt();
 	}
-	
-	
-	
+
 	
 	void setHeaderAppId( int pAppId ) { mHdrAppId = pAppId; }
 	int  getHeaderAppId() { return mHdrAppId;}
@@ -221,18 +216,8 @@ abstract class Segment implements Comparable<Segment>, Comparator<Segment>
 		return mSeqno;
 	}
 
-	@Override
-	public int hashCode() {
-		if (mHashCodeValue == 0) {
-			int tAddr = ((mHdrLocalHostAddr.getAddress()[3]) << 24);
-			int tSndrId = ((mHdrSenderId & 0xff) << 16);
-			int tTime = (mHdrSenderStartTime & 0xffff);
-			mHashCodeValue = tAddr + tSndrId + tTime;
-		}
-		return mHashCodeValue;
-	}
 
-	
+
 	
 	@Override
 	public boolean equals(Object pObj) {
@@ -295,9 +280,6 @@ abstract class Segment implements Comparable<Segment>, Comparator<Segment>
 		}
 		if ((mHdrSegmentFlags & FLAG_M_SEGMENT_END) != 0) {
 			sb.append("END+");
-		}
-		if ((mHdrSegmentFlags & FLAG_M_SEGMENT_BDXGWY) != 0) {
-			sb.append("BDXGWY+");
 		}
 		return sb.substring(0,sb.length() - 1);
 	}
@@ -417,6 +399,8 @@ abstract class Segment implements Comparable<Segment>, Comparator<Segment>
 		}
 		return mEncoder.getByteBuffer().getInt(SEGMENT_HEADER_SIZE + 4);
 	}
-	
-	
+
+	public long getSourceId() {
+		return (this.mHdrSenderId << 32 ) + (this.mHdrSenderStartTime);
+	}
 }

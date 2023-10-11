@@ -152,4 +152,5 @@ class NetMsgConfiguration extends NetMsg
 		return sb.toString();
 	}
 
+
 }

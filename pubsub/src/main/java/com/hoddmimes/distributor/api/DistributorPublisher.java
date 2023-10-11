@@ -33,17 +33,9 @@ public class DistributorPublisher implements DistributorPublisherIf {
 		}
 	}
 
-	public int publish(String pSubjectName, byte[] pData) throws DistributorException
-	{
-		 if (pData == null) {
-			 return publish( pSubjectName, pData, 0);
-		 }
-		 return publish( pSubjectName, pData, pData.length);
-	}
-
 
 	@SuppressWarnings("static-access")
-	public int publish(String pSubjectName, byte[] pData, int pLength) throws DistributorException
+	public int publish(String pSubjectName, byte[] pData) throws DistributorException
 	{
 		XtaUpdate tXtaUpdate = null;
 		DistributorConnection tConnection = null;
@@ -57,7 +49,7 @@ public class DistributorPublisher implements DistributorPublisherIf {
 		
 		try {
 			tConnection.checkStatus();
-			tXtaUpdate = new XtaUpdate( pSubjectName, pData, pLength, false);
+			tXtaUpdate = new XtaUpdate( pSubjectName, pData);
 			tSendDelay = tConnection.publishUpdate(tXtaUpdate);
 			
 			if (mIsFloodRegulated) {

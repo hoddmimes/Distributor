@@ -7,14 +7,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class DistributorTimers {
 	static private DistributorTimers cInstance = null;
 
-	int 					mIndex = 0;
-	private int 			mThreads;
-	private Timer[] 		mTimerThreads;
+	int 						mIndex = 0;
+	private int 				mThreads;
+	private Timer[] 			mTimerThreads;
 
 	private AtomicInteger 		mSecondTicks;
 	SecondTickTask 				mSecondTickTask;
 
-	static DistributorTimers getInstance() {
+	public static DistributorTimers getInstance() {
 		return cInstance;
 	}
 
@@ -54,10 +54,10 @@ public class DistributorTimers {
 	}
 
 	public void queue( long pTimeBeforeFirstExecution, 
-							 long pDelayBetweenExecutions, 
-							 DistributorTimerTask pTask ) 
+					   long pDelayBetweenExecutions,
+					   DistributorTimerTask pTask )
 	{
-		TimerTaskWrapper tTask = new TimerTaskWrapper( pTask );
+		TimerTaskWrapper tTask = new TimerTaskWrapper( pTask, pDelayBetweenExecutions );
 		
 		if (pDelayBetweenExecutions >= 1000) {
 			mTimerThreads[0].schedule(tTask, pTimeBeforeFirstExecution, pDelayBetweenExecutions);
@@ -73,7 +73,7 @@ public class DistributorTimers {
 
 	public void queue( long pDelay, DistributorTimerTask pTask) {
 
-		TimerTaskWrapper tTask = new TimerTaskWrapper( pTask );
+		TimerTaskWrapper tTask = new TimerTaskWrapper( pTask, pDelay );
 		if (pDelay >= 1000) {
 			mTimerThreads[0].schedule(tTask, pDelay);
 		} else {
@@ -89,23 +89,33 @@ public class DistributorTimers {
 	class TimerTaskWrapper extends TimerTask 
 	{
 		DistributorTimerTask mDistributorTimerTask;
-		
-		TimerTaskWrapper( DistributorTimerTask pTask ) {
+		long				 mDelay;
+		TimerTaskWrapper( DistributorTimerTask pTask, long pDelay )
+		{
 			mDistributorTimerTask = pTask;
+			mDelay = pDelay;
 		}
 		
 		@Override
 		public void run() 
 		{
-			if (mDistributorTimerTask.mCanceled) {
+			if (mDistributorTimerTask.isCanceled()) {
 				this.cancel();
 				return;
 			}
-			DistributorConnection tConnection = null;
-			tConnection = DistributorConnectionController.getAndLockDistributor(mDistributorTimerTask.mDistributorConnectionId);
-			if (tConnection != null) {
-				try { mDistributorTimerTask.execute( tConnection ); }
-				finally { DistributorConnectionController.unlockDistributor(tConnection); }
+			// ConnectionId == 0 is special case used for testing
+			if (mDistributorTimerTask.mDistributorConnectionId == 0) {
+				mDistributorTimerTask.execute( null );
+			} else {
+				DistributorConnection tConnection = DistributorConnectionController.getAndLockDistributor(mDistributorTimerTask.mDistributorConnectionId);
+				if (tConnection != null)  {
+					try {
+						mDistributorTimerTask.execute( tConnection );
+					}
+					finally {
+						DistributorConnectionController.unlockDistributor(tConnection);
+					}
+				}
 			}
 		}
 	}

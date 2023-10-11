@@ -489,9 +489,9 @@ public void add<xsl:value-of select="extensions:upperFirst (@name)"/>ToArray( <x
    
     if (m<xsl:value-of select="extensions:upperFirst (@name)"/> == null) {
 <xsl:if test="$dataType='byte[]'">
-      byte[][] m<xsl:value-of select="extensions:upperFirst (@name)"/> = new byte[1][]; </xsl:if>
+      m<xsl:value-of select="extensions:upperFirst (@name)"/> = new byte[1][]; </xsl:if>
 <xsl:if test="$dataType='String'">
-      String[] m<xsl:value-of select="extensions:upperFirst (@name)"/> = new String[1]; </xsl:if>
+      m<xsl:value-of select="extensions:upperFirst (@name)"/> = new String[1]; </xsl:if>
       m<xsl:value-of select="extensions:upperFirst (@name)"/>[0] = pValue;
 	} else {
 		int tSize =  m<xsl:value-of select="extensions:upperFirst (@name)"/>.length + 1;

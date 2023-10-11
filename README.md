@@ -19,7 +19,7 @@ to the mid -80 and the Digital Equipment NWAY protocol.  [Digital Equipment](htt
 sold a product in London to the trading rooms for disseminating market data using a true reliable multicast
 transport based on the NWAY protocol. I then had the opertunity and pleasure to envolve the ideas when developing the OMdu component at [OMX/NASDAQ Nordic](https://en.wikipedia.org/wiki/Nasdaq_Nordic). OMdu was (is?) the reliable multicast
 distribution mechanism used to distribute real time market data using LAN/Multicast. The first implementation was taken into
-production -92 and it was still i production 2015.
+production -92 and it was still i production 2015. It was then implemented in C.
 
 ## API Usage
 
@@ -257,17 +257,18 @@ In the app the configuration multicast address and port used by application shou
 distributor subscribers and publishers.
 
 
+
+## HTTP Monitor Interface
+A Distributor instance can be configured to be started with a management controller. The management controller 
+may be started and exposing a WEB interface. By the fault the Management controller and HTTP service are enabled.
+The HTTP port used by default is 8888. Whatever to enable/disable the management controller, the HTTP service and HTTP port interface 
+is configuration parameters being passed when creating a _Distributor_ instance.
+
 ## Broadcast Gateways
-Multicast distribution is possible on LAN and is normally not working in a routed network. However multicast traffic can be _routed_ 
-using a Muticast Routing protocol (PIM, MOSPF etc.) These protocols are normally not enable and require some configuration in routers, if being supported.
 
-The _Distrbutor_ library includes some code allowing multicast to be _routed_ between two LAN using a P-2-P connection.
-For more information about the _Distributor_ broadcast gateway see [Distributor Broadcast Gateway] (https://github.com/hoddmimes/Distributor/blob/master/doc/bdxgwy.md) 
-
+_**Currently being excluded from the project**_
 ## WEB Socket Gateway
-There is also a gateway component allowing broadcast information to be published to Web Socket clients. 
-The component is kept in a separate GitHub repository and can be found [here, DistributorWsGateway](https://github.com/hoddmimes/DistributorWsGateway)   
-
+_**Currently being excluded from the project**_
 ## Publisher Performance Characteristics 
 
 Below you can find performance characteristics for a publisher application.

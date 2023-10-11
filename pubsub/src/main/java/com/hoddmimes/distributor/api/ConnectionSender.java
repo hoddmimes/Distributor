@@ -76,7 +76,7 @@ class ConnectionSender {
 
 			// Create flow regulator
 			long tInterval = mConfiguration.getFlowRateRecalculateInterval();
-			mTrafficFlowTask = new TrafficFlowTask(mConnection.mConnectionId, tInterval, mConfiguration.getMaxBandwidth() );
+			mTrafficFlowTask = new TrafficFlowTask(mConnection.mConnectionId, tInterval, mConfiguration.getMaxBandwidthKbit() );
 			DistributorTimers.getInstance().queue(tInterval, tInterval, mTrafficFlowTask);
 			
 			// Create heartbeat timer task
@@ -97,9 +97,13 @@ class ConnectionSender {
 	
 
 	
-    void evalTrafficFlow( TrafficFlowClientContext pClientFlowContext ) 
+    void evalTrafficFlow()
     {
-    	mTrafficFlowTask.calculateWaitTime( pClientFlowContext );
+    	long tWaitTime = mTrafficFlowTask.calculateWaitTime();
+		if (tWaitTime > 0) {
+			try { Thread.currentThread().wait(tWaitTime);}
+			catch(InterruptedException e) {}
+		}
     }
     
     
@@ -191,11 +195,6 @@ class ConnectionSender {
 		
 		if (mCurrentUpdate.mUpdateCount == 0) {
 			return 0; // No updates in segment we can continue to use this one
-		}
-		
-
-		if (mConnection.mApplicationConfiguration.isBroadcastGateway()) {
-			pSegmentFlags += Segment.FLAG_M_SEGMENT_BDXGWY;
 		}
 
 		mCurrentUpdate.setHeaderSegmentFlags((byte) (pSegmentFlags & 0xff));
@@ -435,7 +434,9 @@ class ConnectionSender {
 				return;
 			}
 
-			if ((pConnection.mPublishers.isEmpty()) && (!pConnection.mIsCmaConnection)) {
+			// No publisher there is no reason for sending heartbeats
+			// and not being a CMA
+			if (pConnection.mPublishers.isEmpty()) {
 				return;
 			}
 
@@ -445,6 +446,8 @@ class ConnectionSender {
 
 			mConnectionIsSending = false;
 		}
+
+
 
 		private void sendHeartbeat(DistributorConnection pConnection) {
 
@@ -460,6 +463,7 @@ class ConnectionSender {
 			tHeartbeat.set(pConnection.mIpmg.mInetAddress,
 					pConnection.mIpmg.mPort,
 					pConnection.mConnectionSender.mSenderId,
+					pConnection.mConnectionSender.mConnectionStartTime,
 					pConnection.mConnectionSender.mCurrentSeqNo);
 
 			tHeartbeat.encode();
@@ -476,7 +480,6 @@ class ConnectionSender {
 
 		void sendConfiguration( DistributorConnection pConnection) {
 		    pConnection.pushOutConfiguration();
-		    pConnection.pushOutConfiguration();
 		}
 
 		@Override
@@ -486,7 +489,7 @@ class ConnectionSender {
 				return;
 			}
 
-			if ((mConnection.mPublishers.isEmpty()) && (!mConnection.mIsCmaConnection)) {
+			if (mConnection.mPublishers.isEmpty()) {
 				return;
 			}
 

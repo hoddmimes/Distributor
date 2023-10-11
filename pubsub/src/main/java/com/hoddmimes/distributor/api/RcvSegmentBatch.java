@@ -38,7 +38,7 @@ class RcvSegmentBatch {
 				tOffset = tMsg.getLargeData(tBuffer, tOffset);
 			}
 
-			tUpdates[0] = new RcvUpdate(pDistributorConnectionId, tSubjectName, tBuffer, tMsg.getHeaderAppId(), tMsg.isMsgFromBdxGwy());
+			tUpdates[0] = new RcvUpdate(pDistributorConnectionId, tSubjectName, tBuffer, tMsg.getHeaderAppId());
 			return tUpdates;
 		}
 	}

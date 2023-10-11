@@ -8,7 +8,7 @@ import com.hoddmimes.distributor.auxillaries.InetAddressConverter;
 import java.util.*;
 
 class RemoteConnectionController {
-	Map<Segment, RemoteConnection> mRemoteConnections;
+	Map<Long, RemoteConnection> mRemoteConnections;
 	DistributorConnection mConnection;
 
 	RemoteConnectionController(DistributorConnection pConnection) {
@@ -55,26 +55,26 @@ class RemoteConnectionController {
 		}
 		return null;
 	}
-	
+
+
 	
 	RemoteConnection processConfigurationMessage(Segment pSegment) {
 
-		RemoteConnection tRemoteConnection = null;
+		NetMsgConfiguration tMsg = new NetMsgConfiguration( pSegment );
+		tMsg.decode();
 
+
+		RemoteConnection tRemoteConnection = null;
 		synchronized (mRemoteConnections) {
 
-
-
-			tRemoteConnection = mRemoteConnections.get(pSegment);
+			tRemoteConnection = mRemoteConnections.get(pSegment.getSourceId());
 
 			if (tRemoteConnection == null) {
-				tRemoteConnection = new RemoteConnection(pSegment, this, mConnection);
-				mRemoteConnections.put(pSegment, tRemoteConnection);
+				tRemoteConnection = new RemoteConnection(tMsg, this, mConnection);
+				mRemoteConnections.put(pSegment.getSourceId(), tRemoteConnection);
 
 				if (mConnection.isLogFlagSet(DistributorApplicationConfiguration.LOG_RMTDB_EVENTS)) {
-					mConnection.log("Remote Connection [CREATED] ("
-							+ Integer.toHexString(pSegment.hashCode()) + ")\n"
-							+ tRemoteConnection.toString());
+					mConnection.log("Remote Connection [CREATED] \n" + tRemoteConnection );
 				}
 				// Notify clients
 				DistributorNewRemoteConnectionEvent tEvent = new DistributorNewRemoteConnectionEvent(
@@ -97,10 +97,10 @@ class RemoteConnectionController {
 		RemoteConnection tConnection = null;
 
 		synchronized (mRemoteConnections) {
-			tConnection = mRemoteConnections.get(pSegment);
+			tConnection = mRemoteConnections.get(pSegment.getSourceId());
 		}
 		if (tConnection != null) {
-			tConnection.mHbIsActive = true;
+			tConnection.mIsActive = true;
 		}
 		return tConnection;
 	}
@@ -115,7 +115,7 @@ class RemoteConnectionController {
 		RemoteConnection tConnection = null;
 
 		synchronized (mRemoteConnections) {
-			tConnection = mRemoteConnections.get(pSegment);
+			tConnection = mRemoteConnections.get(pSegment.getSourceId());
 		}
 
 		if (tConnection != null) {
@@ -126,10 +126,10 @@ class RemoteConnectionController {
 	void processUpdateSegment(RcvSegment pSegment) {
 		RemoteConnection tRemoteConnection = null;
 
-		tRemoteConnection = mRemoteConnections.get(pSegment);
+		tRemoteConnection = mRemoteConnections.get(pSegment.getSourceId());
 
 		if (tRemoteConnection != null) {
-			tRemoteConnection.mHbIsActive = true;
+			tRemoteConnection.mIsActive = true;
 			tRemoteConnection.processUpdateSegment(pSegment);
 		}
 	}

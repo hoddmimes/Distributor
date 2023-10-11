@@ -1,15 +1,10 @@
 package com.hoddmimes.distributor.api;
 
 import com.hoddmimes.distributor.auxillaries.InetAddressConverter;
-import com.hoddmimes.distributor.generated.messages.DistExploreRetransmissonsRsp;
+import com.hoddmimes.distributor.generated.messages.MgmtConnectionRetransmissionInfo;
 
 import java.net.InetAddress;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-
-
+import java.util.*;
 
 
 class RetransmissionStatistics {
@@ -27,82 +22,15 @@ class RetransmissionStatistics {
 				.synchronizedMap(new HashMap<Long, NodeEntry>());
 	}
 
-	DistExploreRetransmissonsRsp getRetransmissonsInfo() {
-		DistExploreRetransmissonsRsp tRsp = new DistExploreRetransmissonsRsp();
-		tRsp.setTotalInRqst(mTotalIn);
-		tRsp.setTotalOutRqst(mTotalOut);
-		tRsp.setTotalSeenRqst(mTotalSeen);
 
-		NodeEntry[] tInNodes = mInStatistics.values().toArray(new NodeEntry[0]);
-		if (tInNodes != null) {
-			sortInNodes(tInNodes);
-			String[] tInNodeArray = new String[tInNodes.length];
-			for (int i = 0; i < tInNodes.length; i++) {
-				tInNodeArray[i] = tInNodes[i].toInString();
-			}
-			tRsp.setInHosts(tInNodeArray);
-
-		} else {
-			tRsp.setInHosts(null);
-		}
-
-		NodeEntry[] tOutNodes = mOutStatistics.values().toArray(
-				new NodeEntry[0]);
-		if (tOutNodes != null) {
-			sortOutNodes(tOutNodes);
-			String[] tOutNodeArray = new String[tInNodes.length];
-			for (int i = 0; i < tOutNodes.length; i++) {
-				tOutNodeArray[i] = tOutNodes[i].toOutString();
-			}
-			tRsp.setOutHosts(tOutNodeArray);
-		} else {
-			tRsp.setOutHosts(null);
-		}
-
-		return tRsp;
-	}
-
-	private void sortInNodes(NodeEntry[] pInNodes) {
-		if (pInNodes == null) {
-			return;
-		}
-		for (int j = 0; j < pInNodes.length; j++) {
-			for (int i = 1; i < pInNodes.length; i++) {
-				if (pInNodes[i].mToThisNodeCount > pInNodes[i - 1].mToThisNodeCount) {
-					NodeEntry tTmp = pInNodes[i - 1];
-					pInNodes[i - 1] = pInNodes[i];
-					pInNodes[i] = tTmp;
-				}
-			}
-		}
-	}
-
-	private void sortOutNodes(NodeEntry[] pOutNodes) {
-		if (pOutNodes == null) {
-			return;
-		}
-		for (int j = 0; j < pOutNodes.length; j++) {
-			for (int i = 1; i < pOutNodes.length; i++) {
-				if (pOutNodes[i].mOutCount > pOutNodes[i - 1].mOutCount) {
-					NodeEntry tTmp = pOutNodes[i - 1];
-					pOutNodes[i - 1] = pOutNodes[i];
-					pOutNodes[i] = tTmp;
-				}
-			}
-		}
-	}
-
-
-	private Long getKey(InetAddress pMcaAddress, int pMcaPort,
-			InetAddress pAddress) {
+	private Long getKey(InetAddress pMcaAddress, int pMcaPort, InetAddress pAddress) {
 		long tValue = ((InetAddressConverter.inetAddrToInt(pMcaAddress) & 0x00ffffff) << 40)
 				+ ((InetAddressConverter.inetAddrToInt(pAddress) & 0x00ffffff) << 16)
 				+ (pMcaPort & 0xffff);
 		return tValue;
 	}
 
-	void updateInStatistics(InetAddress pMcaAddress, int pMcaPort,
-			InetAddress pAddress, boolean pToThisApplication) {
+	void updateInStatistics(InetAddress pMcaAddress, int pMcaPort, InetAddress pAddress, boolean pToThisApplication) {
 		Long tKey = getKey(pMcaAddress, pMcaPort, pAddress);
 		NodeEntry tEntry = mInStatistics.get(tKey);
 		if (tEntry == null) {
@@ -119,8 +47,7 @@ class RetransmissionStatistics {
 		}
 	}
 
-	void updateOutStatistics(InetAddress pMcaAddress, int pMcaPort,
-			InetAddress pAddress) {
+	void updateOutStatistics(InetAddress pMcaAddress, int pMcaPort, InetAddress pAddress) {
 		Long tKey = getKey(pMcaAddress, pMcaPort, pAddress);
 		NodeEntry tEntry = mOutStatistics.get(tKey);
 		if (tEntry == null) {
@@ -128,7 +55,29 @@ class RetransmissionStatistics {
 			mOutStatistics.put(tKey, tEntry);
 		}
 		tEntry.mOutCount++;
-		mTotalIn++;
+		mTotalOut++;
+	}
+
+	public MgmtConnectionRetransmissionInfo geRetransmissionStatistics() {
+		MgmtConnectionRetransmissionInfo tInfo = new MgmtConnectionRetransmissionInfo();
+		tInfo.setTotalInRqst(this.mTotalIn);
+		tInfo.setTotalOutRqst(this.mTotalOut);
+		tInfo.setTotalSeenRqst(this.mTotalSeen);
+
+
+		List<NodeEntry> tOutNodes = new ArrayList<>(this.mOutStatistics.values());
+		tOutNodes.sort( new NodeEntryComparator(false));
+		for( NodeEntry ne: tOutNodes) {
+			tInfo.addOutHostsToArray( ne.toOutString());
+		}
+
+		List<NodeEntry> tInNodes = new ArrayList<>(this.mInStatistics.values());
+		tInNodes.sort( new NodeEntryComparator(true));
+		for( NodeEntry ne: tInNodes) {
+			tInfo.addInHostsToArray( ne.toInString());
+		}
+		return tInfo;
+
 	}
 
 	class NodeEntry {
@@ -140,7 +89,7 @@ class RetransmissionStatistics {
 		int mToThisNodeCount;
 		int mToRemoteNodeCount;
 
-		NodeEntry(InetAddress pMcaAddress, int pMcaPort, InetAddress pAddress) {
+		NodeEntry(InetAddress pMcaAddress, int pMcaPort, InetAddress pAddress)  {
 			mMcaAddress = pMcaAddress;
 			mMcaPort = pMcaPort;
 			mAddress = pAddress;
@@ -152,15 +101,31 @@ class RetransmissionStatistics {
 
 		public String toOutString() {
 			return "Host: " + mAddress.getHostAddress()
-					+ " number of outgoing retransmissions "
-					+ String.valueOf(mOutCount);
+					+ " number of outgoing retransmissions served: "
+					+ String.valueOf(this.mOutCount);
 		}
 
 		public String toInString() {
 			return "Host: " + mAddress.getHostAddress()
-					+ " seen retransmissions " + String.valueOf(mTotalInCount)
-					+ " for this hosts " + String.valueOf(mToThisNodeCount);
+					+ " retransmissions seen: " + String.valueOf(this.mTotalInCount)
+					+ " retransmissions for this distributor: " + String.valueOf(this.mToThisNodeCount);
 		}
 	}
 
+	static class NodeEntryComparator implements Comparator<NodeEntry>
+	{
+		private boolean mSortInNodes;
+
+		NodeEntryComparator( boolean pSortInNodes) {
+			mSortInNodes = pSortInNodes;
+		}
+		@Override
+		public int compare(NodeEntry N1, NodeEntry N2) {
+			if (mSortInNodes) {
+				return (N2.mToRemoteNodeCount - N1.mToRemoteNodeCount);
+			} else {
+				return (N2.mOutCount - N1.mOutCount);
+			}
+		}
+	}
 }

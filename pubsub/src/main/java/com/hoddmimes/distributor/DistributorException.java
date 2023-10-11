@@ -21,4 +21,14 @@ public class DistributorException extends Exception {
 		super(pMessage);
 		this.fillInStackTrace();
 	}
+
+	public DistributorException(String pMessage, Exception e) {
+		super(pMessage, e);
+		this.fillInStackTrace();
+	}
+
+	public DistributorException( Exception e) {
+		super(e);
+		this.fillInStackTrace();
+	}
 }

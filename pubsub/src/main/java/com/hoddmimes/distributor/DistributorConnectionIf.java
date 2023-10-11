@@ -52,11 +52,5 @@ public interface DistributorConnectionIf
 	 */
 	public long getConnectionId();
 
-	/**
-	 * Returns the connection is string which is the multicast (UDP) address &lt;&lt; 32 + multicast (UDP) port
-	 * 
-	 * @return connection id string
-	 */
-	public long getMcaConnectionId();
 
 }

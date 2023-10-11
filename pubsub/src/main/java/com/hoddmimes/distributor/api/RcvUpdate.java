@@ -8,10 +8,9 @@ public class RcvUpdate
 	private int mAppId;
 	private long   mDistributorConnectionId;
 	
-	RcvUpdate( long pDistributorConnectionId, String pSubjectName, byte[] pUpdateData, int pAppId, boolean pCommesFromBdxGwy)
+	RcvUpdate( long pDistributorConnectionId, String pSubjectName, byte[] pUpdateData, int pAppId)
 	{
 		mUpdateData = pUpdateData;
-		mCommesFromBdxGwy = pCommesFromBdxGwy;
 		mSubjectName = pSubjectName;
 		mAppId = pAppId;
 		mDistributorConnectionId = pDistributorConnectionId;
@@ -20,10 +19,6 @@ public class RcvUpdate
 	
 	long getDistributorConnectionId() {
 		return mDistributorConnectionId;
-	}
-	
-	boolean isBdxGwyUpdate() {
-		return mCommesFromBdxGwy;
 	}
 
 	int getSize() {

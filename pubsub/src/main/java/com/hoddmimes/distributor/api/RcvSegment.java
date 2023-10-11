@@ -7,6 +7,7 @@ class RcvSegment extends Segment
 {
 	private InetAddress mFromAddress;
 	private int mFromPort;
+
 	
 	RcvSegment(ByteBuffer pByteBuffer) {
 		super(pByteBuffer);
@@ -43,11 +44,6 @@ class RcvSegment extends Segment
 	
 	int getFromPort() {
 		return mFromPort;
-	}
-	
-	@Override
-	public int hashCode() {
-		return super.hashCode();
 	}
 
 	@Override

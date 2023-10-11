@@ -46,6 +46,9 @@ public class TcpIpServer extends Thread {
 		catch( IOException e ) {};
 	}
 	
+	public int getServerPort() {
+		return this.mServerSocket.getLocalPort();
+	}
 
 	@Override
 	public void run() {

@@ -212,8 +212,7 @@ public class DistributorSubscriptionFilter {
 		void getActiveSubscriptionsStrings(Vector<String> pVector,
 				String pPrefix) {
 			if ((mSubscriptions != null) && (mSubscriptions.size() > 0)) {
-				pVector.add("References: " + mSubscriptions.size() + " Topic: "
-						+ pPrefix + "/" + mKey + "\n");
+				pVector.add("Topic: " + String.format("%-30s", (pPrefix + "/" + mKey)) + " References: " + mSubscriptions.size());
 			}
 
 			Iterator<KeyNode> tItr = null;

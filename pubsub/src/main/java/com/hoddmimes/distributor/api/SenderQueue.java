@@ -1,12 +1,10 @@
 package com.hoddmimes.distributor.api;
 
-import com.hoddmimes.distributor.generated.messages.QueueSizeItem;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-
+import com.hoddmimes.distributor.generated.messages.QueueSizeItem;
 
 class SenderQueue<E> {
 	static final SimpleDateFormat cSDF = new SimpleDateFormat("HH:mm:ss.SSS");
@@ -70,13 +68,11 @@ class SenderQueue<E> {
 		return mQueue.isEmpty();
 	}
 
-	int getQueueLength() {
-		return mQueue.size();
-	}
+
 
 	QueueSizeItem getSizeInfo() {
 		QueueSizeItem tQI = new QueueSizeItem();
-		tQI.setSize(mQueue.size());
+		tQI.setSize((long) mQueue.size());
 		tQI.setPeakSize(mPeakLength);
 		tQI.setPeakTime(mPeakTime);
 		return tQI;

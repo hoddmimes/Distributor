@@ -37,12 +37,12 @@ public class DistributorConnectionConfiguration {
 	public static final long DEFUALT_HEARTBEAT_INTERVAL = 3000;
 	public static final int DEFUALT_HEARTBEAT_MAX_LOST = 10;
 	public static final long DEFUALT_FLOW_RECALCULATE_INTERVAL = 100;
-	public static final double DEFAULT_MAX_BANDWIDTH = 0; // Mbit /sec
+	public static final int DEFAULT_MAX_BANDWIDTH = 0; // Kbit /sec
 	public static final int DEFAULT_FAKE_XTA_ERROR_RATE = 0;
 	public static final int DEFAULT_FAKE_RCV_ERROR_RATE = 0;
 
 	public static final long DEFAULT_SEND_HOLDBACK = 0;
-	public static final int DEFAULT_SEND_HOLDBACK_THRESHOLD = 100;
+	public static final int DEFAULT_SEND_HOLDBACK_THRESHOLD = 200;
 	public static final int DEFAULT_SENDER_ID_PORT_OFFSET = 61234;
 	public static final int DEFAULT_SENDER_ID = 0;
 	public static final int DEFAULT_RETRANS_SERVER_HOLDBACK = 20;
@@ -59,8 +59,6 @@ public class DistributorConnectionConfiguration {
 	/**
 	 * Member variables
 	 */
-
-	protected boolean mIsCmaConnection; // Is this connection used as CMA connections
 
 
 	protected InetAddress mMca; // Multicast group
@@ -88,7 +86,7 @@ public class DistributorConnectionConfiguration {
 	protected int mSenderIdPort; // Multicast group sender id port
 	protected long mSendHoldbackDelay; // Publisher holdback delay
 	protected int mSendHoldbackThreshold; // Publisher holdback thresholdvalue
-	protected double mMaxBandwidth; // Max publisher bandwidth
+	protected int mMaxBandwidthKbit; // Max publisher bandwidth
 	protected long mFlowRateRecalculateInterval;	 // How often the flow rate will be recalculated
 
 	protected long mRetransmissionServerHoldback; // Retransmission holdback on publisher side
@@ -120,8 +118,6 @@ public class DistributorConnectionConfiguration {
 	 */
 	public DistributorConnectionConfiguration(String pMcaAddress, int pMcaSourcePort) {
 
-		mIsCmaConnection = false;
-
 		mMca = getInetAddress(pMcaAddress);
 		mMcaNetworkInterface = DEFAULT_MCA_NETWORK_INTERFACE;
 		mSenderIdPort = DEFAULT_SENDER_ID;
@@ -145,7 +141,7 @@ public class DistributorConnectionConfiguration {
 		mSenderIdPortOffset = DEFAULT_SENDER_ID_PORT_OFFSET;
 		mHeartbeatInterval = DEFUALT_HEARTBEAT_INTERVAL;
 		mHeartbeatMaxLost = DEFUALT_HEARTBEAT_MAX_LOST;
-		mMaxBandwidth = DEFAULT_MAX_BANDWIDTH;
+		mMaxBandwidthKbit = DEFAULT_MAX_BANDWIDTH;
 		mRetransmissionServerHoldback = DEFAULT_RETRANS_SERVER_HOLDBACK;
 
 		mSendHoldbackDelay = DEFAULT_SEND_HOLDBACK;
@@ -161,25 +157,6 @@ public class DistributorConnectionConfiguration {
 		mStatisticInterval = DEFAULT_STATISTICS_INTERVAL;
 	}
 
-	
-	
-	/**
-	 * Check whatever the connection should be a Configuration Multicast Connection. 
-	 * @return true if being a CMA otherwise false.
-	 */
-	public boolean isCmaConnection() {
-		return mIsCmaConnection;
-	}
-	
-	/**
-	 * Set that connection should be a Configuration Multicast Connection. By default it is false,
-	 * let it be that way, trust me!. 
-	 * @param pFlag
-	 */
-	public void setCmaConnection( boolean pFlag) {
-		mIsCmaConnection = pFlag;
-	}
-	
 	/**
 	 * Get the interval with which the outbound flow rate should be calculated.
 	 * @return flow rate recalculation interval in milliseconds.
@@ -403,8 +380,8 @@ public class DistributorConnectionConfiguration {
 	 * 
 	 * @return int, max bandwidth bytes/sec (Mbit/sec)
 	 */
-	public double getMaxBandwidth() {
-		return mMaxBandwidth;
+	public int getMaxBandwidthKbit() {
+		return mMaxBandwidthKbit;
 	}
 	
 
@@ -412,12 +389,12 @@ public class DistributorConnectionConfiguration {
 	 * Sets the maximum number of bytes that the connection can push out per
 	 * second. By the default the bandwidth is set to zero implicating that the
 	 * bandwidth allowed is infinite. The minimum bandwith will never be less than
-	 * 0.25 Mbit/sec
+	 * 250 Kbit/sec
 	 * 
-	 * @param pMbitPerSec max bandwidth (bytes/sec). Expressed as Mbit/sec
+	 * @param pKbitPerSec max bandwidth (bytes/sec). Expressed as Kbit/sec
 	 */
-	public void setMaxBandwidth(double pMbitPerSec) {
-		mMaxBandwidth = pMbitPerSec;
+	public void setMaxBandwidth(int pKbitPerSec) {
+		mMaxBandwidthKbit = pKbitPerSec;
 	}
 
 	/**
@@ -901,7 +878,7 @@ public class DistributorConnectionConfiguration {
 				+ "mSendHoldbackThreshold:                 			"
 				+ mSendHoldbackThreshold + "\n"
 				+ "mMaxBandwidth:                            			"
-				+ mMaxBandwidth + "\n"
+				+ mMaxBandwidthKbit + "\n"
 				+ "mRetransmissionServerHoldback:     			"
 				+ mRetransmissionServerHoldback + "\n"
 				+ "mRetransmissionTimeout:                			"

@@ -2,11 +2,10 @@ package com.hoddmimes.distributor.api;
 
 import com.hoddmimes.distributor.DistributorPublisherStatisticsIf;
 import com.hoddmimes.distributor.DistributorSubscriberStatisticsIf;
-import com.hoddmimes.distributor.generated.messages.DataRateItem;
 
 import java.text.SimpleDateFormat;
 import java.util.concurrent.atomic.AtomicLong;
-
+import com.hoddmimes.distributor.generated.messages.*;
 
 
 
@@ -53,11 +52,13 @@ class TrafficStatisticTimerTask extends DistributorTimerTask implements Distribu
 
 
 	AtomicLong mRcvTotalBytes;
-	AtomicLong mRcvTotalUpdates;
+	AtomicLong mRcvTotalUserDataUpdates;
 	AtomicLong mRcvTotalSegments;
+
 
 	private DataRateItem transform(CounterElement pCE) {
 		DataRateItem tDR = new DataRateItem();
+		tDR.setAttribute( pCE.getAttributeName() );
 		tDR.setCurrValue(pCE.getValueSec());
 		tDR.setPeakValue(pCE.getPeakPerSec());
 		tDR.setPeakTime(pCE.getPeakTime());
@@ -137,6 +138,8 @@ class TrafficStatisticTimerTask extends DistributorTimerTask implements Distribu
 		return transform(mRcvUpdates5min);
 	}
 
+
+
 	long getTotalXtaBytes() {
 		return mXtaTotalBytes.get();
 	}
@@ -158,7 +161,7 @@ class TrafficStatisticTimerTask extends DistributorTimerTask implements Distribu
 	}
 
 	long getTotalRcvUpdates() {
-		return mRcvTotalUpdates.get();
+		return mRcvTotalUserDataUpdates.get();
 	}
 
 
@@ -209,7 +212,7 @@ class TrafficStatisticTimerTask extends DistributorTimerTask implements Distribu
 		mXtaTotalUserDataUpdates = new AtomicLong(0);
 		mXtaTotalSegments = new AtomicLong(0);
 		mRcvTotalBytes = new AtomicLong(0);
-		mRcvTotalUpdates = new AtomicLong(0);
+		mRcvTotalUserDataUpdates = new AtomicLong(0);
 		mRcvTotalSegments = new AtomicLong(0);
 		mXtaUpdSendTimeUsec = new AtomicLong(0);
 		mXtaUpdFillTotalBufferAllocateSize = new AtomicLong(0);
@@ -266,7 +269,7 @@ class TrafficStatisticTimerTask extends DistributorTimerTask implements Distribu
 			mRcvUpdates.update(tUpdateCount);
 			mRcvUpdates1min.update(tUpdateCount);
 			mRcvUpdates5min.update(tUpdateCount);
-			mRcvTotalUpdates.getAndAdd(tUpdateCount);
+			mRcvTotalUserDataUpdates.getAndAdd(tUpdateCount);
 		}
 	}
 
@@ -311,6 +314,54 @@ class TrafficStatisticTimerTask extends DistributorTimerTask implements Distribu
 		}
 
 	}
+
+	public MgmtConnectionTrafficInfo getMgmtTrafficInfo() {
+		MgmtConnectionTrafficInfo tMsg = new MgmtConnectionTrafficInfo();
+
+		tMsg.setRcvBytes( this.getRcvBytesInfo());
+		tMsg.setRcvSegments( this.getRcvMsgsInfo());
+		tMsg.setRcvUpdates( this.getRcvUpdatesInfo());
+
+		tMsg.setRcvBytes1min( this.getRcvBytes1MinInfo());
+		tMsg.setRcvBytes5min( this.getRcvBytes5MinInfo());
+
+		tMsg.setRcvSegments1min( this.getRcvMsgs1MinInfo());
+		tMsg.setRcvSegments5min( this.getRcvMsgs5MinInfo());
+
+		tMsg.setRcvUpdates1min( this.getRcvUpdates1MinInfo());
+		tMsg.setRcvUpdates5min( this.getRcvUpdates5MinInfo());
+
+		tMsg.setRcvTotalBytes( this.mRcvTotalBytes.get());
+		tMsg.setRcvTotalSegments( this.mRcvTotalSegments.get());
+		tMsg.setRcvTotalUpdates( this.mRcvTotalUserDataUpdates.get());
+
+		// Xta Info
+		tMsg.setXtaBytes( this.getXtaBytesInfo());
+		tMsg.setXtaSegments( this.getXtaMsgsInfo());
+		tMsg.setXtaUpdates( this.getXtaUpdatesInfo());
+
+		tMsg.setXtaBytes1min( this.getXtaBytes1MinInfo());
+		tMsg.setXtaBytes5min( this.getXtaBytes5MinInfo());
+
+		tMsg.setXtaSegments1min( this.getXtaMsgs1MinInfo());
+		tMsg.setXtaSegments5min( this.getXtaMsgs5MinInfo());
+
+		tMsg.setXtaUpdates1min( this.getXtaUpdates1MinInfo());
+		tMsg.setXtaUpdates5min( this.getXtaUpdates5MinInfo());
+
+		tMsg.setRcvTotalBytes(this.mRcvTotalBytes.get());
+		tMsg.setXtaTotalBytes( this.mXtaTotalBytes.get());
+
+		tMsg.setXtaTotalSegments( this.mXtaTotalSegments.get());
+		tMsg.setRcvTotalSegments( this.mRcvTotalSegments.get());
+
+		tMsg.setXtaTotalUpdates( this.mXtaTotalUserDataUpdates.get());
+		tMsg.setRcvTotalUpdates( this.mRcvTotalUserDataUpdates.get());
+
+		return tMsg;
+	}
+
+
 
 	/**
 	 *===================================================================================
@@ -372,6 +423,10 @@ class TrafficStatisticTimerTask extends DistributorTimerTask implements Distribu
 		return mXtaBytes1min;
 	}
 
+
+
+
+
 	/**
 	 *===================================================================================
 	 * DistributorSubscriberStatisticsIf
@@ -380,7 +435,7 @@ class TrafficStatisticTimerTask extends DistributorTimerTask implements Distribu
 
 	@Override
 	public long getRcvTotalNumberOfUpdates() {
-		return this.mRcvTotalUpdates.get();
+		return this.mRcvTotalUserDataUpdates.get();
 	}
 
 	@Override

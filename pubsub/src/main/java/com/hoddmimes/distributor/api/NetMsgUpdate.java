@@ -98,7 +98,6 @@ class NetMsgUpdate extends NetMsg {
 		RcvUpdate[] tRcvUpdates = null;
 		String tSubjectName = null;
 		byte[] tData = null;
-		
 		super.decode();
 		MessageBinDecoder tDecoder = super.getDecoder();
 		
@@ -109,7 +108,7 @@ class NetMsgUpdate extends NetMsg {
 		for( int i = 0; i < mUpdateCount; i++) {
 		  tSubjectName = tDecoder.readString();
 		  tData = tDecoder.readBytes();
-		  tRcvUpdates[i] = new RcvUpdate(pDistributorConnectionId, tSubjectName, tData, super.getHeaderAppId(), super.isMsgFromBdxGwy());
+		  tRcvUpdates[i] = new RcvUpdate(pDistributorConnectionId, tSubjectName, tData, super.getHeaderAppId() );
 		}
 		return tRcvUpdates;
 	}
@@ -117,7 +116,6 @@ class NetMsgUpdate extends NetMsg {
 	void addLargeUpdateHeader(String pSubjectName, int pAppId, int pDataSize) {
 		MessageBinEncoder tEncoder = super.getEncoder();
 		tEncoder.add( pSubjectName );
-		tEncoder.add( pAppId );
 		tEncoder.add( true );
 		tEncoder.add( pDataSize );
 

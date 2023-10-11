@@ -8,9 +8,6 @@ import java.net.InetAddress;
 
 
 
-
-
-
 class NetMsg {
 	
 	enum SequenceNumberActions {
@@ -65,14 +62,6 @@ class NetMsg {
 
 	int getHeaderAppId() { return mSegment.getHeaderAppId(); }
 
-	
-
-	public boolean isMsgFromBdxGwy() {
-		if ((mSegment.getHeaderSegmentFlags() & Segment.FLAG_M_SEGMENT_BDXGWY) != 0) {
-			return true;
-		}
-		return false;
-	}
 
 	public String toString() {
 		return mSegment.toString();

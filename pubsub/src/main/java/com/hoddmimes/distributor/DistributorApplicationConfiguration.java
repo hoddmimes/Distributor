@@ -24,17 +24,31 @@ public class DistributorApplicationConfiguration {
 	public static int LOG_DATA_PROTOCOL_XTA = 256;
 	public static int LOG_RETRANSMISSION_CACHE = 512;
 
-	public static final String DEFAULT_CMA_ADDRESS = "224.42.42.100";
-	public static final int DEAFULT_CMA_PORT = 4242;
-	public static final String DEFAULT_CMA_INTERFACE = null;
-	public static final String DEFAULT_ETH_DEVICE = "eth0";
+
+
+
 	public static final boolean DEFAULT_MANAGEMENT_CONTROL_ENABLED = true;
+	public static final boolean DEFAULT_MANAGEMENT_HTTP_ENABLED = true;
+
+	public static final String DEFAULT_MANAGEMENT_ADDRESS = "224.42.42.100";
+	public static final int DEFAULT_MANAGEMENT_PORT = 4242;
+	public static final int DEFAULT_MANAGEMENT_HTTP_PORT = 8888;
+	public static final String DEFAULT_MANAGEMENT_INTERFACE = null;
+
+
+	public static final String DEFAULT_ETH_DEVICE = "eth0";
+
 	public static final int DEFAULT_TIMER_THREADS = 2;
 
 	private String mApplicationName;
-	private String mCMA;
-	private String mCMAInterface;
-	private int mCMAPort;
+	private String mMgmtAddress;
+	private String mMgmtInterface;
+	private int mMgmtPort;
+	private int mMgmtHttpPort;
+	private boolean mMgmtHttpEnabled;
+
+
+
 	private int mTimerThreads;
 	private int mLogFlags;
 	private boolean mLogToConsole;
@@ -42,10 +56,6 @@ public class DistributorApplicationConfiguration {
 	
 	private String mEthDevice;
 	private String mLocalHostAddress;
-
-	private  boolean mIsBdxGwy; // True if executing in a BdxGwy context
-	private  String mBdxGwyAddress; // Ip address to broadcast gateway
-	private  int mBdxGwyPort; // Ip accept port on which the broadcast gatewa will accept inbound connecton
 
 	private boolean mMgmtControlEnabled; // Start Distributor management port
 
@@ -66,7 +76,7 @@ public class DistributorApplicationConfiguration {
 	 * <li>LOG_RMTDB_EVENTS creation and deletion of remote distributor connections
 	 * </ul>
 	 * <br>
-	 * @param pApplicationName name of the application. Used used for identification and tracing purpose, must not be null.
+	 * @param pApplicationName name of the application. Used for identification and tracing purpose, must not be null.
 	 * @throws DistributorException exception thrown if failed to create an instance
 	 *         
 	 */
@@ -81,17 +91,16 @@ public class DistributorApplicationConfiguration {
 		mTimerThreads = DEFAULT_TIMER_THREADS;
 		mEthDevice = DEFAULT_ETH_DEVICE;
 
-		mBdxGwyAddress = null;
-		mBdxGwyPort = -1;
-		mIsBdxGwy = false;
 		mLogToConsole = true;
 		mLogToFile = true;
 		mLocalHostAddress = null;
 
 		mMgmtControlEnabled = DEFAULT_MANAGEMENT_CONTROL_ENABLED;
-		mCMA = DEFAULT_CMA_ADDRESS;
-		mCMAInterface = DEFAULT_CMA_INTERFACE;
-		mCMAPort = DEAFULT_CMA_PORT;
+		mMgmtHttpEnabled = DEFAULT_MANAGEMENT_HTTP_ENABLED;
+		mMgmtAddress = DEFAULT_MANAGEMENT_ADDRESS;
+		mMgmtPort = DEFAULT_MANAGEMENT_PORT;
+		mMgmtInterface = DEFAULT_MANAGEMENT_INTERFACE;
+		mMgmtHttpPort = DEFAULT_MANAGEMENT_HTTP_PORT;
 	}
 
 	/**
@@ -141,6 +150,23 @@ public class DistributorApplicationConfiguration {
 	 */
 	public boolean isLogToConsoleEnabled() {
 		return mLogToConsole;
+	}
+
+	/**
+	 * Check whatever the Management controller should start
+	 * a HTTP service or not
+	 * @return
+	 */
+	public boolean isMgmtHttpEnabled() {
+		return mMgmtHttpEnabled;
+	}
+
+	/**
+	 * Enable or disable the start of HTTP service as part of the Mgmt controller
+	 * @param pValue
+	 */
+	public void mMgmtHttpEnabled( boolean pValue ) {
+		mMgmtHttpEnabled = pValue;
 	}
 
 	/**
@@ -236,12 +262,12 @@ public class DistributorApplicationConfiguration {
 
 	/**
 	 * Setting the network interface on which the management control transport
-	 * is to be enabled. By default the transport is enabled on all interfaces.
+	 * is to be enabled. By default, the transport is enabled on all interfaces.
 	 * 
-	 * @param pCMAInterfaceAddress, configuration multicast address interface address
+	 * @param pManagementInterfaceAddress, configuration multicast address interface address
 	 */
-	public void setCMAInterface(String pCMAInterfaceAddress) {
-		mCMAInterface = pCMAInterfaceAddress;
+	public void setMgmtInterface(String pManagementInterfaceAddress) {
+		mMgmtInterface = pManagementInterfaceAddress;
 	}
 
 	/**
@@ -250,17 +276,17 @@ public class DistributorApplicationConfiguration {
 	 * 
 	 * @return String network interface address.
 	 */
-	public String getCMAInterface() {
-		return mCMAInterface;
+	public String getMgmtInterface() {
+		return mMgmtInterface;
 	}
 
 	/**
 	 * Specifies the multicast UDP address being used for management control
 	 * 
-	 * @param pCMAAddress  UDP multicast address
+	 * @param pMulticastGroupAddress  UDP multicast address
 	 */
-	public void setCMA(String pCMAAddress) {
-		mCMA = pCMAAddress;
+	public void setMgmtAddress(String pMulticastGroupAddress) {
+		mMgmtAddress = pMulticastGroupAddress;
 	}
 
 	/**
@@ -268,17 +294,17 @@ public class DistributorApplicationConfiguration {
 	 * 
 	 * @return String, UDP multicast address
 	 */
-	public String getCMA() {
-		return mCMA;
+	public String getMgmtAddress() {
+		return mMgmtAddress;
 	}
 
 	/**
 	 * Sets the UDP multicast port being used for management control
 	 * 
-	 * @param pCMASourcePort UDP port
+	 * @param pMulticastGroupPort UDP port
 	 */
-	public void setCMAPort(int pCMASourcePort) {
-		mCMAPort = pCMASourcePort;
+	public void setMgmtPort(int pMulticastGroupPort) {
+		mMgmtHttpPort = pMulticastGroupPort;
 	}
 
 	/**
@@ -286,9 +312,31 @@ public class DistributorApplicationConfiguration {
 	 * 
 	 * @return int, UDP port
 	 */
-	public int getCMAPort() {
-		return mCMAPort;
+	public int getMgmtPort() {
+		return mMgmtPort;
 	}
+
+
+	/**
+	 * Sets the HTTP port to use when declaring the Distributor HTTP service
+	 *
+	 * @param pHttpPort Http port
+	 */
+	public void setMgmtHttpPort(int pHttpPort) {
+		mMgmtHttpPort = pHttpPort;
+	}
+
+	/**
+	 * Returns the HTTP port used for management http service
+	 *
+	 * @return int, HTTP port
+	 */
+	public int getMgmtHttpPort() {
+		return mMgmtHttpPort;
+	}
+
+
+
 
 	/**
 	 * Returns the number of timer threads that should be started. The
@@ -304,7 +352,7 @@ public class DistributorApplicationConfiguration {
 	/**
 	 * Sets the number of timer threads that will be started. The recommended
 	 * value is 2. In case of <i><b>many</b></i> connections being created it could be
-	 * applicable to started 1 or 2 more timer threads. By default two threads are started.
+	 * applicable to started 1 or 2 more timer threads. By default, two threads are started.
 	 * This should be sufficient.
 	 * 
 	 * @param pValue, number of timer threads to activate
@@ -322,74 +370,6 @@ public class DistributorApplicationConfiguration {
 		return this.mApplicationName;
 	}
 
-	/**
-	 * Check whatever the broadcast gateway should be used by this process.
-	 * If being used the application is interested in data published application on
-	 * remote sites and being forwarded by the broadcast gateway using a p-2-p transport i.e. tcp/ip
-	 * 
-	 * @return true broadcast gateway use is enabled
-	 */
-	public boolean isBroadcastGateayUseEnabled() {
-		if (this.mBdxGwyAddress == null) {
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * Method for retrieving the IP address where the broadcast gateway is running.
-	 * 
-	 * @return the IP address string of the host where the bdxgwy will run
-	 */
-	public String getBroadcastGatewayAddress() {
-		return this.mBdxGwyAddress;
-	}
-
-	
-	/**
-	 * Set the host address where the broadcast gateway is running
-	 * @param pAddress, IP4 address of the host where the broadcast gateway is running.
-	 */
-	public void setBroadcastGatewayAddress(String pAddress) {
-		this.mBdxGwyAddress = pAddress;
-	}
-
-	/**
-	 * Method for retrieving the IP port where the broadcast gateway is
-	 * accepting inbound connections.
-	 * 
-	 * @return the IP port on which the bdxgwy will accept inbound connections.
-	 */
-	public int getBroadcastGatewayPort() {
-		return this.mBdxGwyPort;
-	}
-
-	/**
-	 * Method for setting the port on which the bdxgwy will accept inbound connections.
-	 * @param pPort accept port
-	 */
-	public void setBroadcastGatewayPort(int pPort) {
-		this.mBdxGwyPort = pPort;
-	}
-
-	/**
-	 * Set whatever the application using the Distributor is a broadcast gateway or not.
-	 * <i>Note! By default the value is false and you should leave it that way, trust me.</i>
-	 * 
-	 * @param pFlag
-	 */
-	public void setIsBroadcastGateway(boolean pFlag) {
-		this.mIsBdxGwy = pFlag;
-	}
-	
-	/**
-	 * Check whatever the application is a broadcast gateway or not.
-	 * 
-	 * @return true if being a bdxgwy otherwise false.
-	 */
-	public boolean isBroadcastGateway() {
-		return mIsBdxGwy;
-	}
 
 
 	InetAddress getLocalInetAddress() throws DistributorException

@@ -172,7 +172,7 @@ public class GuiPublisher extends JFrame implements DistributorEventCallbackIf {
 	 * @return void
 	 */
 	private void initialize() {
-		this.setSize(525, 440);
+		this.setSize(558, 440);
 		this.setResizable(false);
 		this.setBackground(new Color(255, 255, 204));
 		this.setContentPane(getJContentPane());
@@ -377,7 +377,7 @@ public class GuiPublisher extends JFrame implements DistributorEventCallbackIf {
 			jStatisticsPanel = new JPanel();
 			jStatisticsPanel.setLayout(null);
 			jStatisticsPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED), "Statistics", TitledBorder.LEFT, TitledBorder.TOP, new Font("Arial", Font.ITALIC, 10), Color.blue));
-			jStatisticsPanel.setBounds(261, 0, 256, 315);
+			jStatisticsPanel.setBounds(301, 0, 256, 340);
 			jStatisticsPanel.add(jUpdatesSentLabel, null);
 			jStatisticsPanel.add(getJUpdatesSentTextField(), null);
 			jStatisticsPanel.add(jBytesSentLabel, null);
@@ -1167,10 +1167,6 @@ public class GuiPublisher extends JFrame implements DistributorEventCallbackIf {
 		DistributorConnectionIf tConnection;
 			
 		tApplConfig = new DistributorApplicationConfiguration("TestPublisher");
-		if ((mBdxGwyHost != null) && (mBdxGwyPort != 0)) {
-			tApplConfig.setBroadcastGatewayAddress( mBdxGwyHost);
-			tApplConfig.setBroadcastGatewayPort( mBdxGwyPort );
-		}
 		tApplConfig.setEthDevice(this.jEthDeviceTextField.getText());
 		tApplConfig.setLogFlags( mLogFlags );
 
@@ -1239,7 +1235,8 @@ public class GuiPublisher extends JFrame implements DistributorEventCallbackIf {
 					setLogLevel();
 				}
 			});
-			jLoggingButton.setBounds(new Rectangle(154, 260, 104, 18));
+			jLoggingButton.setBounds(new Rectangle(154, 260, 144, 18));
+			jLoggingButton.setFont( new Font("Arrial", Font.PLAIN,10));
 			jLoggingButton.setText("Set Log Level");
 			jLoggingButton.setEnabled(true);
 		}

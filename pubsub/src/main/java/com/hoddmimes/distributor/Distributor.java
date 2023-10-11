@@ -2,17 +2,24 @@ package com.hoddmimes.distributor;
 
 import com.hoddmimes.distributor.api.DistributorConnection;
 import com.hoddmimes.distributor.api.DistributorConnectionController;
-import com.hoddmimes.distributor.api.DistributorManagementController;
+import com.hoddmimes.distributor.generated.messages.MgmtConnection;
+import com.hoddmimes.distributor.generated.messages.MgmtConnectionView;
+import com.hoddmimes.distributor.generated.messages.MgmtDistributorView;
+import com.hoddmimes.distributor.management.DistributorManagementController;
+import com.hoddmimes.distributor.generated.messages.MgmtDistributorBdx;
 import com.hoddmimes.distributor.api.DistributorTimers;
 import com.hoddmimes.distributor.auxillaries.Application;
 import com.hoddmimes.distributor.auxillaries.UUIDFactory;
-import com.hoddmimes.distributor.bdxgwy.BdxGwyDistributorClient;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -34,9 +41,9 @@ public class Distributor {
 	final long 							      mDistributorId;
 	final String 						      mStartTimeString;
 	final int								  mAppId;
-	final BdxGwyDistributorClient             mBdxGwyConnection;
 	final DistributorManagementController 	  mMgmtController;
 	final InetAddress						  mLocalInetAddr;
+	 String							  mLocalHostName;
 
 
 	/**
@@ -60,6 +67,13 @@ public class Distributor {
 		mAppId = Application.getId( mLocalInetAddr );
 
 
+		try {mLocalHostName = InetAddress.getLocalHost().getHostName();}
+		catch( UnknownHostException e) {
+			mLocalHostName = mLocalInetAddr.getHostName();
+		}
+
+
+
 		mLogger.info("Initialized distributor application " + mApplicationConfiguration.getApplicationName() +
 					"\n    DistributorId: " + Long.toHexString(mDistributorId));
 		DistributorTimers.createTimers(mApplicationConfiguration.getTimerThreads());
@@ -70,24 +84,80 @@ public class Distributor {
 			mMgmtController = null;
 		}
 
-		if (mApplicationConfiguration.isBroadcastGateayUseEnabled()) {
-			mBdxGwyConnection = new BdxGwyDistributorClient(
-					mApplicationConfiguration.getBroadcastGatewayAddress(),
-					mApplicationConfiguration.getBroadcastGatewayPort());
-		} else {
-			mBdxGwyConnection = null;
-		}
-
-
 	}
 
+	/**
+	 * Collects and return an overview of the Distributor state and status as a POJO / Json message that will be
+	 * brroadcasted to Distributor management components.
+	 * @return MgmtDistributorBdx
+	 */
 
+	public MgmtDistributorBdx getMgmtDistributorBdx()
+	{
+		MgmtDistributorBdx bdxMsg = new MgmtDistributorBdx();
+
+		bdxMsg.setApplicationName( this.mApplicationConfiguration.getApplicationName());
+		bdxMsg.setHostName(this.mLocalHostName);
+		bdxMsg.setDistributorId( this.mDistributorId );
+		bdxMsg.setIpAddress( this.mLocalInetAddr.getHostAddress());
+		bdxMsg.setMgmtPort( this.mMgmtController.getMgmtPort());
+		bdxMsg.setStartTime( this.mStartTimeString );
+		List<DistributorConnection> tConnections = DistributorConnectionController.getDistributorConnections();
+		for( DistributorConnection tConn : tConnections ) {
+			synchronized( tConn ) {
+				tConn.updateMgmtDistributorBdx( bdxMsg );
+			}
+		}
+		bdxMsg.setConnections(tConnections.size());
+		return bdxMsg;
+	}
+
+	private List<MgmtConnection> getMgmtConnections() {
+		List<MgmtConnection> tConnList = new ArrayList<>();
+		List<DistributorConnection> tConnections = DistributorConnectionController.getDistributorConnections();
+		for( DistributorConnection tConn : tConnections ) {
+			synchronized ( tConn ) {
+				MgmtConnection mc = tConn.getMgmtConnection();
+				tConnList.add( mc );
+			}
+		}
+		return tConnList;
+	}
+
+	public MgmtDistributorView getMgmtDistributorDetails() {
+		MgmtDistributorView tMsg = new MgmtDistributorView();
+		tMsg.setDistributorId( this.mDistributorId );
+		tMsg.setApplicationName(mApplicationConfiguration.getApplicationName());
+		tMsg.setStartTime( this.mStartTimeString );
+		tMsg.setMgmtPort( this.mMgmtController.getMgmtPort());
+		tMsg.setHostName( this.mLocalHostName );
+		tMsg.setIpAddress(this.mLocalInetAddr.getHostAddress());
+		Runtime.getRuntime().gc();
+		tMsg.setMemMax(Runtime.getRuntime().maxMemory() / (1024 * 1024));
+		tMsg.setMemUsed((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024));
+		tMsg.setMemFree(Runtime.getRuntime().freeMemory() / (1024 * 1024));
+
+		tMsg.setConnections( getMgmtConnections());
+		return tMsg;
+	}
+
+	public MgmtConnectionView getMgmtConnectionDetails( long pConnectionId ) {
+		DistributorConnection tConn = DistributorConnectionController.getAndLockDistributor( pConnectionId );
+		if (tConn == null) {
+			mLogger.warn("Connect (" + pConnectionId + ") is not found when serving Mgmt connection details");
+			return null;
+		}
+
+		MgmtConnectionView tRspMsg = tConn.getMgmtConnectionDetails();
+		DistributorConnectionController.unlockDistributor( tConn );
+		return tRspMsg;
+	}
 
 
 	/**
 	 * Creates a transport connection i.e. multicast group. When having a connection
 	 * Subscribers and Publishers can associate with the connection for
-	 * subscribing and publishing data over the the connection. A connection is a UDP transport
+	 * subscribing and publishing data over the connection. A connection is a UDP transport
 	 * connection, a class D address and UDP port.
 	 * 
 	 * @param pConnectionConfiguration object defining the parameter settings used by the connection transport
@@ -165,7 +235,7 @@ public class Distributor {
 				throw new DistributorException("Distributor connects is closed or no longer valid");
 			}
 			tConnection.checkStatus();
-			return tConnection.createSubscriber(pEventCallback, pUpdateCallback, this.mBdxGwyConnection);
+			return tConnection.createSubscriber(pEventCallback, pUpdateCallback);
 		}
 		finally {
 			if (tConnection != null) {

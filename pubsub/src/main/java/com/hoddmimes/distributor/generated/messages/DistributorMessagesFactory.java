@@ -24,71 +24,63 @@ public class DistributorMessagesFactory implements MessageFactoryInterface
                return tWrappedMessage;
             }
 
-            case ((1 << 16) + 1): // DistNetMsg 
+            case ((1 << 16) + 1): // MgmtDistributorBdx 
             {
             	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
-            	DistNetMsg tMessage = new DistNetMsg();
+            	MgmtDistributorBdx tMessage = new MgmtDistributorBdx();
             	tMessage.decode( pDecoder );
             	return tMessage;
             }
 
-            case ((1 << 16) + 2): // DistDomainConnectionEntry 
+            case ((1 << 16) + 2): // MgmtDistributorRqst 
             {
             	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
-            	DistDomainConnectionEntry tMessage = new DistDomainConnectionEntry();
+            	MgmtDistributorRqst tMessage = new MgmtDistributorRqst();
             	tMessage.decode( pDecoder );
             	return tMessage;
             }
 
-            case ((1 << 16) + 3): // DistDomainDistributorEntry 
+            case ((1 << 16) + 3): // MgmtDistributorRsp 
             {
             	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
-            	DistDomainDistributorEntry tMessage = new DistDomainDistributorEntry();
+            	MgmtDistributorRsp tMessage = new MgmtDistributorRsp();
             	tMessage.decode( pDecoder );
             	return tMessage;
             }
 
-            case ((1 << 16) + 4): // DistExploreDomainRqst 
+            case ((1 << 16) + 4): // MgmtConnection 
             {
             	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
-            	DistExploreDomainRqst tMessage = new DistExploreDomainRqst();
+            	MgmtConnection tMessage = new MgmtConnection();
             	tMessage.decode( pDecoder );
             	return tMessage;
             }
 
-            case ((1 << 16) + 5): // DistExploreDomainRsp 
+            case ((1 << 16) + 5): // MgmtDistributorView 
             {
             	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
-            	DistExploreDomainRsp tMessage = new DistExploreDomainRsp();
+            	MgmtDistributorView tMessage = new MgmtDistributorView();
             	tMessage.decode( pDecoder );
             	return tMessage;
             }
 
-            case ((1 << 16) + 6): // DistributorEntry 
+            case ((1 << 16) + 6): // MgmtConnectionRqst 
             {
             	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
-            	DistributorEntry tMessage = new DistributorEntry();
+            	MgmtConnectionRqst tMessage = new MgmtConnectionRqst();
             	tMessage.decode( pDecoder );
             	return tMessage;
             }
 
-            case ((1 << 16) + 7): // DistExploreDistributorRqst 
+            case ((1 << 16) + 7): // MgmtConnectionRsp 
             {
             	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
-            	DistExploreDistributorRqst tMessage = new DistExploreDistributorRqst();
+            	MgmtConnectionRsp tMessage = new MgmtConnectionRsp();
             	tMessage.decode( pDecoder );
             	return tMessage;
             }
 
-            case ((1 << 16) + 8): // DistExploreDistributorRsp 
-            {
-            	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
-            	DistExploreDistributorRsp tMessage = new DistExploreDistributorRsp();
-            	tMessage.decode( pDecoder );
-            	return tMessage;
-            }
-
-            case ((1 << 16) + 9): // DataRateItem 
+            case ((1 << 16) + 8): // DataRateItem 
             {
             	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
             	DataRateItem tMessage = new DataRateItem();
@@ -96,7 +88,7 @@ public class DistributorMessagesFactory implements MessageFactoryInterface
             	return tMessage;
             }
 
-            case ((1 << 16) + 10): // QueueSizeItem 
+            case ((1 << 16) + 9): // QueueSizeItem 
             {
             	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
             	QueueSizeItem tMessage = new QueueSizeItem();
@@ -104,146 +96,26 @@ public class DistributorMessagesFactory implements MessageFactoryInterface
             	return tMessage;
             }
 
-            case ((1 << 16) + 11): // ConnectionEntry 
+            case ((1 << 16) + 10): // MgmtConnectionTrafficInfo 
             {
             	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
-            	ConnectionEntry tMessage = new ConnectionEntry();
+            	MgmtConnectionTrafficInfo tMessage = new MgmtConnectionTrafficInfo();
             	tMessage.decode( pDecoder );
             	return tMessage;
             }
 
-            case ((1 << 16) + 12): // DistExploreConnectionRqst 
+            case ((1 << 16) + 11): // MgmtConnectionRetransmissionInfo 
             {
             	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
-            	DistExploreConnectionRqst tMessage = new DistExploreConnectionRqst();
+            	MgmtConnectionRetransmissionInfo tMessage = new MgmtConnectionRetransmissionInfo();
             	tMessage.decode( pDecoder );
             	return tMessage;
             }
 
-            case ((1 << 16) + 13): // DistExploreConnectionRsp 
+            case ((1 << 16) + 12): // MgmtConnectionView 
             {
             	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
-            	DistExploreConnectionRsp tMessage = new DistExploreConnectionRsp();
-            	tMessage.decode( pDecoder );
-            	return tMessage;
-            }
-
-            case ((1 << 16) + 14): // DistExploreSubscriptionsRqst 
-            {
-            	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
-            	DistExploreSubscriptionsRqst tMessage = new DistExploreSubscriptionsRqst();
-            	tMessage.decode( pDecoder );
-            	return tMessage;
-            }
-
-            case ((1 << 16) + 15): // DistExploreSubscriptionsRsp 
-            {
-            	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
-            	DistExploreSubscriptionsRsp tMessage = new DistExploreSubscriptionsRsp();
-            	tMessage.decode( pDecoder );
-            	return tMessage;
-            }
-
-            case ((1 << 16) + 16): // DistExploreRetransmissionsRqst 
-            {
-            	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
-            	DistExploreRetransmissionsRqst tMessage = new DistExploreRetransmissionsRqst();
-            	tMessage.decode( pDecoder );
-            	return tMessage;
-            }
-
-            case ((1 << 16) + 17): // DistExploreRetransmissonsRsp 
-            {
-            	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
-            	DistExploreRetransmissonsRsp tMessage = new DistExploreRetransmissonsRsp();
-            	tMessage.decode( pDecoder );
-            	return tMessage;
-            }
-
-            case ((1 << 16) + 18): // NameValuePair 
-            {
-            	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
-            	NameValuePair tMessage = new NameValuePair();
-            	tMessage.decode( pDecoder );
-            	return tMessage;
-            }
-
-            case ((1 << 16) + 19): // DistTriggerCofigurationRqst 
-            {
-            	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
-            	DistTriggerCofigurationRqst tMessage = new DistTriggerCofigurationRqst();
-            	tMessage.decode( pDecoder );
-            	return tMessage;
-            }
-
-            case ((1 << 16) + 20): // ConfigurationXmlLoadRqst 
-            {
-            	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
-            	ConfigurationXmlLoadRqst tMessage = new ConfigurationXmlLoadRqst();
-            	tMessage.decode( pDecoder );
-            	return tMessage;
-            }
-
-            case ((1 << 16) + 21): // ConfigurationXmlLoadRsp 
-            {
-            	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
-            	ConfigurationXmlLoadRsp tMessage = new ConfigurationXmlLoadRsp();
-            	tMessage.decode( pDecoder );
-            	return tMessage;
-            }
-
-            case ((1 << 16) + 22): // DistBdxGwyHello 
-            {
-            	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
-            	DistBdxGwyHello tMessage = new DistBdxGwyHello();
-            	tMessage.decode( pDecoder );
-            	return tMessage;
-            }
-
-            case ((1 << 16) + 23): // DistBdxGwySubscrInterestItem 
-            {
-            	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
-            	DistBdxGwySubscrInterestItem tMessage = new DistBdxGwySubscrInterestItem();
-            	tMessage.decode( pDecoder );
-            	return tMessage;
-            }
-
-            case ((1 << 16) + 24): // DistBdxGwySubscrInterest 
-            {
-            	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
-            	DistBdxGwySubscrInterest tMessage = new DistBdxGwySubscrInterest();
-            	tMessage.decode( pDecoder );
-            	return tMessage;
-            }
-
-            case ((1 << 16) + 25): // DistBdxGwyPingRqst 
-            {
-            	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
-            	DistBdxGwyPingRqst tMessage = new DistBdxGwyPingRqst();
-            	tMessage.decode( pDecoder );
-            	return tMessage;
-            }
-
-            case ((1 << 16) + 26): // DistBdxGwyPingRsp 
-            {
-            	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
-            	DistBdxGwyPingRsp tMessage = new DistBdxGwyPingRsp();
-            	tMessage.decode( pDecoder );
-            	return tMessage;
-            }
-
-            case ((1 << 16) + 27): // DistBdxGwyUpdateItem 
-            {
-            	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
-            	DistBdxGwyUpdateItem tMessage = new DistBdxGwyUpdateItem();
-            	tMessage.decode( pDecoder );
-            	return tMessage;
-            }
-
-            case ((1 << 16) + 28): // DistBdxGwyUpdate 
-            {
-            	MessageBinDecoder pDecoder = new MessageBinDecoder( pBuffer );
-            	DistBdxGwyUpdate tMessage = new DistBdxGwyUpdate();
+            	MgmtConnectionView tMessage = new MgmtConnectionView();
             	tMessage.decode( pDecoder );
             	return tMessage;
             }

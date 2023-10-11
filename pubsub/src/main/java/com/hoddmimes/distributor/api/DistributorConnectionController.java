@@ -33,8 +33,9 @@ public class DistributorConnectionController {
 		}
 		return null;
 	}
-	
-	static List<DistributorConnection> getDistributorConnection() {
+
+
+	public static List<DistributorConnection> getDistributorConnections() {
 		ArrayList<DistributorConnection> tConnection = new ArrayList<DistributorConnection>();
 		if (cConnections.isEmpty()) {
 			return tConnection;
@@ -47,11 +48,11 @@ public class DistributorConnectionController {
 			cMutexAccess.unlock();
 		}
 		return tConnection;
-
 	}
 	
-	public static DistributorConnection createConnection( Distributor pDistributor, DistributorConnectionConfiguration pConfiguration, 
-												   DistributorApplicationConfiguration pApplicationConfiguration) throws DistributorException {
+	public static DistributorConnection createConnection( Distributor pDistributor,
+														  DistributorConnectionConfiguration pConfiguration,
+														  DistributorApplicationConfiguration pApplicationConfiguration) throws DistributorException {
 		DistributorConnection tConnection = null;
 		
 		cMutexRemove.lock();
@@ -70,7 +71,7 @@ public class DistributorConnectionController {
 					throw tException;
 				}
 			}
-		
+
 			tConnection = new DistributorConnection(pDistributor, pConfiguration, pApplicationConfiguration);
 			cConnections.add(tConnection);
 		} 
