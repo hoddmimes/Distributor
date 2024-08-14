@@ -1,6 +1,7 @@
 package com.hoddmimes.distributor.samples;
 
 import com.hoddmimes.distributor.*;
+import com.hoddmimes.distributor.auxillaries.AuxLog4J;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -78,6 +79,7 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 	private JTextField jUpdatesReceivedTextField = null;
 
 	private JLabel jReceivedByteRateLabel = null;
+	private JLabel jMgmtHttpPortLabel = null;
 
 	private JTextField jReceivedBytesRateTextField = null;
 
@@ -97,7 +99,7 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 
 	private JButton jLoggingButton = null;
 
-	private JLabel jStateLabel = null;
+
 
 
 	List<String> 									mSubjects = null;
@@ -133,6 +135,7 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 	private JLabel jEthDeviceLabel;
 	private JLabel jLoggingLabel;
 	private JTextField jEthDeviceTextField;
+	private JTextField jMgmtHttpPortTextField;
 
 	private int mBdxGwyPort = 0;
 	private String mBdxGwyHost = null;
@@ -252,6 +255,8 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 			jParameterPanel.add(getJIpBufferSizeField(), null);
 			jParameterPanel.add(jErrorRateLabel, null);
 			jParameterPanel.add(getJErrorRateTextField(), null);
+			jParameterPanel.add(getJMgmtHttPortLabel(), null);
+			jParameterPanel.add(getJMgmtHttTextField(), null);
 			jParameterPanel.add(getJEthDeviceLabel());
 			jParameterPanel.add(getJEthDeviceTextField());
 			jParameterPanel.add(getBrowseDeviceButtonButton());
@@ -536,7 +541,7 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 					listEthDevices();
 				}
 			});
-			jBrowseDeviceButton.setBounds(new Rectangle(192, 80, 37, 16));
+			jBrowseDeviceButton.setBounds(new Rectangle(192, 100, 37, 16));
 			jBrowseDeviceButton.setEnabled(true);
 			jBrowseDeviceButton.setText("...");
 		}
@@ -552,7 +557,7 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 					setLogLevel();
 				}
 			});
-			jLoggingButton.setBounds(new Rectangle(125, 101, 105, 18));
+			jLoggingButton.setBounds(new Rectangle(125, 121, 105, 18));
 			jLoggingButton.setEnabled(true);
 			jLoggingButton.setFont( new Font("Arrial", Font.PLAIN,10));
 			jLoggingButton.setText("Set Log Level");
@@ -659,6 +664,7 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 //	    							 DistributorApplicationConfiguration.LOG_SEGMENTS_EVENTS );
 
 
+			tApplConfig.setMgmtHttpPort( Integer.parseInt(jMgmtHttpPortTextField.getText()));
 	    	mDistributor = new Distributor( tApplConfig );
 	    	DistributorConnectionConfiguration tConfig = new DistributorConnectionConfiguration( mAddressString, Integer.parseInt( mPortString ));
 	    	if (tErrorRate > 0)
@@ -974,12 +980,17 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 		return tValue;
 	}
 
+
+	private static void setupLog4J() {
+		AuxLog4J.initialize("guisubscriber.log", true);
+	}
 	/**
 	 * Programs arguments
 	 * @param args, program arguments
 	 */
 	@SuppressWarnings("static-access")
 	public static void main(String[] args) {
+		setupLog4J();
 		try {
 			javax.swing.UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 		} catch (Exception ex) {
@@ -1029,13 +1040,25 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 		}
 		return jLastSeqnoSeenTextField;
 	}
+
+	private JLabel getJMgmtHttPortLabel()  {
+		if (jMgmtHttpPortLabel == null) {
+			jMgmtHttpPortLabel = new JLabel();
+			jMgmtHttpPortLabel.setText("Mgmt Http Port");
+			jMgmtHttpPortLabel.setFont(new Font("Dialog", Font.PLAIN, 12));
+			jMgmtHttpPortLabel.setBounds(new Rectangle(10, 60, 89, 16));
+			jMgmtHttpPortLabel.setBounds(10, 81, 107, 16);
+		}
+		return jMgmtHttpPortLabel;
+	}
+
 	private JLabel getJEthDeviceLabel() {
 		if (jEthDeviceLabel == null) {
 			jEthDeviceLabel = new JLabel();
 			jEthDeviceLabel.setText("Ethernet device");
 			jEthDeviceLabel.setFont(new Font("Dialog", Font.PLAIN, 12));
 			jEthDeviceLabel.setBounds(new Rectangle(10, 60, 89, 16));
-			jEthDeviceLabel.setBounds(10, 81, 107, 16);
+			jEthDeviceLabel.setBounds(10, 100, 107, 16);
 		}
 		return jEthDeviceLabel;
 	}
@@ -1046,9 +1069,21 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 			jLoggingLabel.setText("Log Flags");
 			jLoggingLabel.setFont(new Font("Dialog", Font.PLAIN, 12));
 			jLoggingLabel.setBounds(new Rectangle(10, 60, 89, 16));
-			jLoggingLabel.setBounds(10, 101, 107, 16);
+			jLoggingLabel.setBounds(10, 121, 107, 16);
 		}
 		return jLoggingLabel;
+	}
+
+	private JTextField getJMgmtHttTextField() {
+			if (jMgmtHttpPortTextField == null) {
+				jMgmtHttpPortTextField = new JTextField();
+				jMgmtHttpPortTextField.setText("888");
+				jMgmtHttpPortTextField.setHorizontalAlignment(SwingConstants.RIGHT);
+				jMgmtHttpPortTextField.setFont(new Font("Dialog", Font.PLAIN, 10));
+				jMgmtHttpPortTextField.setBounds(new Rectangle(125, 60, 60, 16));
+				jMgmtHttpPortTextField.setBounds(125, 80, 60, 16);
+			}
+			return jMgmtHttpPortTextField;
 	}
 
 	private JTextField getJEthDeviceTextField() {
@@ -1058,7 +1093,7 @@ public class GuiSubscriber extends JFrame implements DistributorEventCallbackIf,
 			jEthDeviceTextField.setHorizontalAlignment(SwingConstants.CENTER);
 			jEthDeviceTextField.setFont(new Font("Dialog", Font.PLAIN, 10));
 			jEthDeviceTextField.setBounds(new Rectangle(125, 60, 60, 16));
-			jEthDeviceTextField.setBounds(125, 80, 60, 16);
+			jEthDeviceTextField.setBounds(125, 100, 60, 16);
 		}
 		return jEthDeviceTextField;
 	}

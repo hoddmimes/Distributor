@@ -153,7 +153,7 @@ public class DistributorManagementController extends Thread implements MgmtServi
 	@Override
 	public void ipmgReadComplete(byte[] data, SocketAddress pSourceAddress)
 	{
-		System.out.println("ipmgReadComplete length: " + data.length);
+		//System.out.println("ipmgReadComplete length: " + data.length);
 		MgmtDistributorBdx bdx = new MgmtDistributorBdx( data );
 		synchronized( mMgmtDistributorMap ) {
 			mMgmtDistributorMap.put( bdx.getDistributorId(), bdx);

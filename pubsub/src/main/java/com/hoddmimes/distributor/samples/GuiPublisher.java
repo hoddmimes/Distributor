@@ -1,6 +1,7 @@
 package com.hoddmimes.distributor.samples;
 
 import com.hoddmimes.distributor.*;
+import com.hoddmimes.distributor.auxillaries.AuxLog4J;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -52,6 +53,9 @@ public class GuiPublisher extends JFrame implements DistributorEventCallbackIf {
 	private JLabel jAdressLabel = null;
 
 	private JTextField jAddressTextField = null;
+
+	private JLabel jMgmtHttpPortLabel = null;
+	private JTextField jMgmtHttpPortTextField = null;
 
 	private JLabel jPortLabel = null;
 
@@ -300,10 +304,16 @@ public class GuiPublisher extends JFrame implements DistributorEventCallbackIf {
 			jLoggingLabel = new JLabel();
 			jLoggingLabel.setText("Log Level");
 			jLoggingLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-			jLoggingLabel.setBounds(new Rectangle(10, 260, 97, 16));
+			jLoggingLabel.setBounds(new Rectangle(10, 280, 97, 16));
+
+
+			jMgmtHttpPortLabel = new JLabel();
+			jMgmtHttpPortLabel.setBounds(new Rectangle(10, 240, 102, 15));
+			jMgmtHttpPortLabel.setText("Mgmt Http Port");
+			jMgmtHttpPortLabel.setFont(new Font("Arial", Font.PLAIN, 12));
 
 			jEthDeviceLabel = new JLabel();
-			jEthDeviceLabel.setBounds(new Rectangle(10, 240, 102, 15));
+			jEthDeviceLabel.setBounds(new Rectangle(10, 260, 102, 15));
 			jEthDeviceLabel.setText("Eth Device");
 			jEthDeviceLabel.setFont(new Font("Arial", Font.PLAIN, 12));
 
@@ -333,6 +343,10 @@ public class GuiPublisher extends JFrame implements DistributorEventCallbackIf {
 			jParameterPanel.add(getJStatisticsPanel(), null);
 			jParameterPanel.add(jWarmupLabel, null);
 			jParameterPanel.add(getJWarmupTextField(), null);
+
+			jParameterPanel.add(jMgmtHttpPortLabel, null);
+			jParameterPanel.add(getMgmtHttpPortTextField(), null);
+
 			jParameterPanel.add(jEthDeviceLabel, null);
 			jParameterPanel.add(getEthDeviceTextField(), null);
 			jParameterPanel.add(getJEthDeviceBtn());
@@ -706,7 +720,7 @@ public class GuiPublisher extends JFrame implements DistributorEventCallbackIf {
 
 			jEthDeviceButton = new JButton("");
 			jEthDeviceButton.setBackground(Color.LIGHT_GRAY);
-			jEthDeviceButton.setBounds(226, 240, 32, 16);
+			jEthDeviceButton.setBounds(226, 260, 32, 16);
 
 			jEthDeviceButton.setAction(new AbstractAction(){
 
@@ -1169,6 +1183,7 @@ public class GuiPublisher extends JFrame implements DistributorEventCallbackIf {
 		tApplConfig = new DistributorApplicationConfiguration("TestPublisher");
 		tApplConfig.setEthDevice(this.jEthDeviceTextField.getText());
 		tApplConfig.setLogFlags( mLogFlags );
+		tApplConfig.setMgmtHttpPort( Integer.parseInt(jMgmtHttpPortTextField.getText()));
 
 		
 		try {
@@ -1235,12 +1250,24 @@ public class GuiPublisher extends JFrame implements DistributorEventCallbackIf {
 					setLogLevel();
 				}
 			});
-			jLoggingButton.setBounds(new Rectangle(154, 260, 144, 18));
+			jLoggingButton.setBounds(new Rectangle(154, 280, 144, 18));
 			jLoggingButton.setFont( new Font("Arrial", Font.PLAIN,10));
 			jLoggingButton.setText("Set Log Level");
 			jLoggingButton.setEnabled(true);
 		}
 		return jLoggingButton;
+	}
+
+
+	private JTextField getMgmtHttpPortTextField() {
+		if (jMgmtHttpPortTextField == null) {
+			jMgmtHttpPortTextField = new JTextField();
+			jMgmtHttpPortTextField.setHorizontalAlignment(SwingConstants.RIGHT);
+			jMgmtHttpPortTextField.setText("8888");
+			jMgmtHttpPortTextField.setFont(new Font("Dialog", Font.PLAIN, 10));
+			jMgmtHttpPortTextField.setBounds(new Rectangle(154, 240, 66, 16));
+		}
+		return jMgmtHttpPortTextField;
 	}
 
 	private JTextField getEthDeviceTextField() {
@@ -1249,7 +1276,7 @@ public class GuiPublisher extends JFrame implements DistributorEventCallbackIf {
 			jEthDeviceTextField.setHorizontalAlignment(SwingConstants.CENTER);
 			jEthDeviceTextField.setText("eth0");
 			jEthDeviceTextField.setFont(new Font("Dialog", Font.PLAIN, 10));
-			jEthDeviceTextField.setBounds(new Rectangle(154, 240, 66, 16));
+			jEthDeviceTextField.setBounds(new Rectangle(154, 260, 66, 16));
 		}
 		return jEthDeviceTextField;
 	}
@@ -1295,13 +1322,16 @@ public class GuiPublisher extends JFrame implements DistributorEventCallbackIf {
 		return tValue;
 	}
 
-
+private static void setupLog4J() {
+	AuxLog4J.initialize("guipublisher.log", true);
+}
 
 	/**
 	 * @param args, program arguments
 	 */
 	@SuppressWarnings("static-access")
 	public static void main(String[] args) {
+		setupLog4J();
 		try {
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 		} catch (Exception ex) {

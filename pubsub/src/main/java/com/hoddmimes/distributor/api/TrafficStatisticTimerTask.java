@@ -301,7 +301,7 @@ class TrafficStatisticTimerTask extends DistributorTimerTask implements Distribu
 		}
 
 		if (System.currentTimeMillis() <= (mLastTimeStamp_5_min + 300000)) {
-			tDiff = System.currentTimeMillis() - mLastTimeStamp_1_min;
+			tDiff = System.currentTimeMillis() - mLastTimeStamp_5_min;
 			mLastTimeStamp_5_min = System.currentTimeMillis();
 
 			mXtaMsgs5min.calculate(tDiff);
