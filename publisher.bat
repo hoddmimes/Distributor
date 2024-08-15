@@ -33,7 +33,16 @@ echo location of your Java installation.
 goto fail
 
 :runApp
-"%JAVA_EXE%" -cp %HOME%/libs/* -Dlog4j.configurationFile=%HOME%\log4j.xml com.hoddmimes.distributor.samples.Publisher %*
+"%JAVA_EXE%" -cp %HOME%/libs/* -Dlog4j.configurationFile=%HOME%\log4j.xml com.hoddmimes.distributor.samples.Publisher ^
+  -rate 10  ^
+  -displayFactor 10 ^
+  -minSize 64  ^
+  -maxSize 256  ^
+  -fakeErrors 0  ^
+  -device eth0 ^
+  -segmentSize 8192  ^
+  -holdback 10  ^
+  -holdbackThreshold 300
 
 :end
 @rem End local scope for the variables with windows NT shell

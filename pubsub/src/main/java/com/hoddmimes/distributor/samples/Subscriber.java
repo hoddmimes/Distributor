@@ -85,7 +85,7 @@ public class Subscriber {
 		System.out.println("-port                " + mIpPort );
 		System.out.println("-device              " + mEthDevice );
 		System.out.println("-ipBuffer            " + mIpBufferSize );
-		System.out.println("-segment             " + mSegmentSize );
+		System.out.println("-segmentSize      " + mSegmentSize );
 		System.out.println("-logFlags            " + "0x0" + Integer.toHexString(mLogFlags) );
 		System.out.println("-fakeErrors          " + mFakeErrorRate);
 		System.out.println("-displayFactor       " + mUpdateDisplayFactor);

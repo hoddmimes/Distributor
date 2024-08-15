@@ -104,7 +104,7 @@ public class Publisher {
 				mHoldback = Integer.parseInt(pArgs[i+1]);
 				i++;
 			}
-			if (pArgs[i].equals("-holdbackTreshold")) {
+			if (pArgs[i].equals("-holdbackThreshold")) {
 				mHoldbackThreshold = Integer.parseInt(pArgs[i+1]);
 				i++;
 			}
@@ -120,7 +120,7 @@ public class Publisher {
 				mIpBufferSize = Integer.parseInt(pArgs[i+1]);
 				i++;
 			}
-			if (pArgs[i].equals("-segment")) {
+			if (pArgs[i].equals("-segmentSize")) {
 				mSegmentSize = Integer.parseInt(pArgs[i+1]);
 				i++;
 			}
@@ -148,10 +148,10 @@ public class Publisher {
 		System.out.println("-port                " + mIpPort );
 		System.out.println("-device              " + mEthDevice );
 		System.out.println("-holdback            " + mHoldback );
-		System.out.println("-holdbackTreshold    " + mHoldbackThreshold );
+		System.out.println("-holdbackThreshold   " + mHoldbackThreshold );
 		System.out.println("-maximize		     " + mMaximize );
 		System.out.println("-ipBuffer            " + mIpBufferSize );
-		System.out.println("-segment             " + mSegmentSize );
+		System.out.println("-segmentSize      " + mSegmentSize );
 		System.out.println("-logFlags            " + "0x0" + Integer.toHexString(mLogFlags) );
 		System.out.println("-fakeErrors          " + mFakeErrorRate);
 		System.out.println("-displayFactor       " + mUpdateDisplayFactor);

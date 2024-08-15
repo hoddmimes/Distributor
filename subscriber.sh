@@ -1,3 +1,7 @@
 #!/bin/bash
 #
-java -cp "./libs/*" test.distributor.Subscriber $1 $2 $3 $4 $5 $6 $7 $8 $9 $10
+java -cp "./libs/*" com.hoddmimes.distributor.samples.Subscriber \
+  -device en0 \
+  -displayFactor 10 \
+  -segmentSize 8192 \
+  -fakeErrors 0
