@@ -1,6 +1,7 @@
 package com.hoddmimes.distributor.samples;
 
 import com.hoddmimes.distributor.*;
+import com.hoddmimes.distributor.auxillaries.AuxLog4J;
 import com.hoddmimes.distributor.auxillaries.InetAddressConverter;
 
 import java.text.SimpleDateFormat;
@@ -59,7 +60,7 @@ public class Publisher {
 	
 	
 	public static void main(String[] pArgs) {
-		
+		AuxLog4J.initialize("publisher.log", true);
 		Publisher publisher = new Publisher();
 		publisher.parseArguments( pArgs );
 		publisher.setup();
@@ -157,8 +158,8 @@ public class Publisher {
 		System.out.println("-------------------------------------------------------\n\n");
 		
 	}
-	
-	
+
+
 	
 	private void setup() 
 	{
@@ -176,6 +177,7 @@ public class Publisher {
 			DistributorApplicationConfiguration tApplConfig = new DistributorApplicationConfiguration(mApplicationName);
 			tApplConfig.setEthDevice(mEthDevice);
 			tApplConfig.setLogFlags(mLogFlags);
+
 
 			mDistributor = new Distributor(tApplConfig);
 
@@ -211,7 +213,7 @@ public class Publisher {
 	}
 	private void runPublisher() 
 	{
-		Statistics tStat = (mPublisherInstances > 1) ? new Statistics() : null;
+		Statistics tStat = (mPublisherInstances >= 1) ? new Statistics() : null;
 
 		byte[] tBuffer;
 		Random mRandom = new Random();
@@ -220,7 +222,7 @@ public class Publisher {
 		long tStartTime = System.currentTimeMillis();
 		parseSenderRate();
 
-		if (mPublisherInstances > 1)
+		if (mPublisherInstances >= 1)
 		try {
 			while( true ) {
 				for( int i = 0; i < mSendBatchFactor; i++) {
