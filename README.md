@@ -13,6 +13,22 @@ For performance characteristics see [Publisher Performance Characteristics](#pub
 
 Snipplets for minimalist [_Publisher_](#A-minimalist-Publisher-App) and [_Subscriber_](#A-minimalist-Subscriber-App) are found below.
 
+## Quick Start
+The _Distributor_ component is developed with IntelliJ and built with _gradle_.
+Before you can try _Distributor_ out you have to built it.
+
+From command line execute the command
+```
+$ gradle build
+```
+
+Within IntelliJ execute the command *__Build Project__* from the *__Build__* menu item.
+
+To try out the gui sample execute scripts _guiPublisher.sh_ and _guiSubscriber.sh_
+alternatively _guiPublisher.bat_ and _guiSubscriber.bat_
+
+
+
 ## Background
 The Distributor utility history derives from the financial industry and dissemination of market data. Some of the earlies ideas goes back as far as
 to the mid -80 and the Digital Equipment NWAY protocol.  [Digital Equipment](https://en.wikipedia.org/wiki/Digital_Equipment_Corporation) at that time
