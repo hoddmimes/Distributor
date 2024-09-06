@@ -22,6 +22,16 @@ task deleteGeneratedFiles(type: Delete) {
     }
 }
 
+
+task generateJavadoc( type: Javadoc )
+{
+    setFailOnError(false)
+    destinationDir = reporting.file("../../../javadoc")
+    source = sourceSets.main.allJava
+    classpath = sourceSets.main.runtimeClasspath
+    options.addStringOption('Xdoclint:none', '-quiet')
+}
+
 task buildDistributorJar( type: Jar ) {
     Date date = new Date()
     String dateTime = date.format("yy-MM-dd");
@@ -55,6 +65,7 @@ generateMessageClasses.dependsOn(deleteGeneratedFiles)
 compileJava.dependsOn(generateMessageClasses)
 
 classes.finalizedBy(buildDistributorJar)
+build.finalizedBy( generateJavadoc );
 
 dependencies {
     implementation project (':msggen')
