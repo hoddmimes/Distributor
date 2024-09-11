@@ -4,8 +4,8 @@ The *Distributor* utility is a **publish/subscribe** messaging component. The ut
 The utility is a true _one-to-many_ transport using IP multicast as transport.
 
 ## Area of Usage
-The distributor framework is primarily designed for application having a need for distributing high volumes of volatile real time information to
-many receivers in a _reliable_ and _consistent_ way with low latecy. 
+The distributor framework is primarily designed for applications that need to distribute high volumes of volatile real time information to
+many receivers in a _reliable_ and _consistent_ way with low latency. 
  
 It is possible to push over a million updates / sec  with a size of 50-60 bytes on a Gigabit LAN from a single publisher.
 For performance characteristics see [Publisher Performance Characteristics](#publisher-performance-characteristics) below.
@@ -24,7 +24,7 @@ $ gradle build
 
 Within IntelliJ execute the command *__Build Project__* from the *__Build__* menu item.
 
-To try out the gui sample execute scripts _guiPublisher.sh_ and _guiSubscriber.sh_
+To try out the gui sample execute scripts [_guiPublisher.sh_](https://github.com/hoddmimes/Distributor/blob/master/guiPublisher.sh) and [_guiSubscriber.sh_](https://github.com/hoddmimes/Distributor/blob/master/guiSubscriber.sh)
 alternatively _guiPublisher.bat_ and _guiSubscriber.bat_
 
 
@@ -68,7 +68,7 @@ In case a receiver discovers a loss of messages a retransmission request is publ
 Retransmission and recover takes place over the IP multicast channel used for publishing. All recovery logic is internal to the distributor package and hidden for the applications using the distributor utility.
 
 - Publishers keep sent messages in a retransmission cache and could serve retransmission requests from receivers as long messages are in the retransmission cache. 
-  The retransmission cache is a FIFO cache with a limited size (configurable). 
+  The retransmission cache is a FIFO cache with a limited size (configurable). For _Publishers_, there is one retransmission cache per _Distributor connection_ i.e. IP mulicast channel. 
 
 - One of the more challaging scenarios are _broadcast storms_. These could occur when there are high volumes, many subscribers losing several messages is a short time frame, due to a network glitch. 
 This will trigger multiple retransmissions to be sent. Which could trigger spikes and additional messages being lost and causing even more retransmission to be sent and 
@@ -88,17 +88,17 @@ there is the _broadcast storm_. In order to mitigate these scenarios the _Distri
 
 
 ## Distributor Application Configuration 
-When creating a [Distributor](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/Distributor.html) instance a 
-[DistributorApplicationConfiguration](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/DistributorApplicationConfiguration.html) instance is passed as parameter.
+When creating a [Distributor](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/blob/master/javadoc/com/hoddmimes/distributor/Distributor.html) instance a 
+[DistributorApplicationConfiguration](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/blob/master/javadoc/com/hoddmimes/distributor/DistributorApplicationConfiguration.html) instance is passed as parameter.
 
 Normally the _DistributorApplicationConfiguration_ object are instasiated with default parameters suitable for most application you can however modify the default parameters 
 after you have created the _DistributorApplicationConfiguration_ object and before creating the _Distributor_ instance.
 
 ## Distributor Connection Configuration
 When application exchange information using the _Distributor_ utility it is done over IP multicast. A single [IP class D](https://www.tutorialspoint.com/ipv4/ipv4_address_classes.htm) address translates to an physical 
-Ethernet multicast group. There is a one-to-one mapping between a [DistributorConnection](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/DistributorConnectionIf.html) and a IP Multicast address.
+Ethernet multicast group. There is a one-to-one mapping between a [DistributorConnection](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/blob/master/javadoc/com/hoddmimes/distributor/DistributorConnectionIf.html) and a IP Multicast address.
 
-When instantiating a _DistributorConnection_ a [DistributorConnectionConfiguration](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/DistributorConnectionConfiguration.html)
+When instantiating a _DistributorConnection_ a [DistributorConnectionConfiguration](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/blob/master/javadoc/com/hoddmimes/distributor/DistributorConnectionConfiguration.html)
 is passed as parameter. The _DistributorConnectionConfiguration_ defines the behaviour for how the distributor disseminates and receives data over that _channel_
 To a large extent it defines settings for how the _Distributor_ application protocol will behave/work.
   
@@ -107,7 +107,7 @@ To a large extent it defines settings for how the _Distributor_ application prot
 ## Subject Names
 
 All information published by publisher application have an associated subject name. 
-And in order for subscriber application to receive data they must setup subscriptions on subjects that they have and interest in.
+And in order for subscriber application to receive data they must setup a subscriptions on the subjects that they have and interest in.
 
 Subject names are hieratical string like _“/foo/bar/fie”_. The “/” characters is used to separate levels. 
 A subject name could have an arbitrary number of levels. 
@@ -132,7 +132,7 @@ Some typical matching rules.
 
 The transport protocol when disseminating information with the Distributor utility is IP Multicast.  IP multicasting cater for layer 1 and 2 in the ISO/OSI model.
 This implicates that there is *_no flow control or error detection_* if messages are lost or duplicated, The Distributor application _protocol_, hidden for publisher and subscriber 
-application implement error detection, retransmissions and and a sort of flow control. Since the mechanism is a true one-to-many there is not a one-to-one relation betweeen a 
+application implement error detection, retransmissions and a sort of flow control. Since the mechanism is a true one-to-many there is not a one-to-one relation between a 
 publisher and subscriber.   
 
 Each distributor connection having subscribers monitors itself to examine that it does not generate too many retransmissions, constantly. This could typically happen 
@@ -175,15 +175,15 @@ totRetransmissions = 0;
 ## Retransmission 
 
 The _Distributor_ transmission protocol has virtually guaranteed delivery. The protocoll has mechanisms for detect duplicates and lost messages and take proper action to recover.
-However if messages can not be delivered in order the receiver application is notified about the exception via a callback.
+However, if messages can not be delivered in order the receiver application is notified about the exception via a callback.
 Since the _Distributor_ application does not have a sophisticated flow control the most likely cause for losing messages is data overrun. This typically is caused by the receiver application 
 not processing data fast enough and internal kernal buffers are filled up and eventually overwritten. Could happen due insufficient process capacity i.e. lack CPU cycles. 
-The only solution for these scenarios are; process data faster. Could be done by using a more powerfull machine or optimizing the subscriber app. And / or possibly subscribe to less data. 
+The only solution for these scenarios are; process data faster. Could be done by using a more powerful machine or optimizing the subscriber app. And / or possibly subscribe to a reduced dataflow (i.e. less _subjects_). 
 
 But it can also happen due to broadcast spikes i.e. the publisher sending a large amount of data in a short time.
-That will cause the kernel receiver buffer to be filled up an over written. To make receiver applications more ressilient 
+That will cause the kernel receiver buffer to be filled up and overwritten. To make receiver applications more resillent 
 kernal bufferes used for receiving multicast can be enlarged. By the default they may be on the lower side since normally there is not a large demand for 
-handling larger volumes of multicast traffic
+handling larger volumes of multicast traffic.
 
 
 
@@ -218,7 +218,7 @@ eth1      Link encap:Ethernet  HWaddr 00:50:04:2F:1E:4
                Interrupt:18 Base address:0xef80
 ```  
 
-Better and more comprehensive documentation on the subject UDP buffering could be found on the _Informatica_ web site.
+Better and more comprehensive documentation on the subject UDP buffering could be found on the _Informatica_ website.
 - [UDP Buffering Background](https://www.informatica.com/downloads/1568_high_perf_messaging_wp/Topics-in-High-Performance-Messaging.htm#UDP-BUFFERING-BACKGROUND)
 - [UDP Buffer Sizing](https://www.informatica.com/downloads/1568_high_perf_messaging_wp/Topics-in-High-Performance-Messaging.htm#UDP-BUFFER-SIZING) 
 
@@ -230,14 +230,14 @@ the network, during spikes. Especially at startup when an application might want
 
 The _Distributor_ API has a primitive mechanism for controlling  how much data that could be published on a connection (i.e multicastgroup) per second. This is configured when a distributor connection is created.
 
-When declaring a distributor connection [createConnection](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/Distributor.html#createConnection(com.hoddmimes.distributor.DistributorConnectionConfiguration))
-a [connection configuration object](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/DistributorConnectionConfiguration.html) is passed as argument.
+When declaring a distributor connection [createConnection](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/blob/master/javadoc/com/hoddmimes/distributor/Distributor.html#createConnection(com.hoddmimes.distributor.DistributorConnectionConfiguration))
+a [connection configuration object](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/blob/master/javadoc/com/hoddmimes/distributor/DistributorConnectionConfiguration.html) is passed as argument.
 
-The max bandwith can be configured via the method [setMaxBandwith( int pMaxBandwidth )](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/DistributorConnectionConfiguration.html#setMaxBandwidth(double))
+The max bandwith can be configured via the method [setMaxBandwith( int pMaxBandwidth )](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/blob/master/javadoc/com/hoddmimes/distributor/DistributorConnectionConfiguration.html#setMaxBandwidth(double))
 The value express is Mbit per second. _Note_ that the lowest value will always be 0.25 Mbit /sec.
 
 It also possible to configure how frequently the bandwith utilization should be monitored using the method 
-[setFlowRateRecalculateInterval​(long pInterval)](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/DistributorConnectionConfiguration.html#setFlowRateRecalculateInterval(long))
+[setFlowRateRecalculateInterval​(long pInterval)](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/blob/master/javadoc/com/hoddmimes/distributor/DistributorConnectionConfiguration.html#setFlowRateRecalculateInterval(long))
 The default interval for checking the publishing  rate is 250 ms.
 
 
@@ -250,7 +250,7 @@ There is then a good chance that someone has sent MAC pause messages. Normally t
 You can however configure Ethernet controllers to ignore MAC pause request i.e. disable flow control. On windows you can do this by going into the Contral Panel, Networking, Adapters and change adapter properties. 
 On linux the NIC properties are configure with the [ethtool](https://www.thegeekstuff.com/2010/10/ethtool-command/)
 
-However disabling the flow control increases the risk for data overrun quitesignificantly. The problem is not on the sender side to push out data.
+However, disabling the flow control increases the risk for data overrun quitesignificantly. The problem is not on the sender side to push out data.
 The challange is to receive and process data, this normally requires a much bigger effort.  
 
 
@@ -260,7 +260,7 @@ The challange is to receive and process data, this normally requires a much bigg
 The _Distributor_ keep sent messages in a memory cache. In case a subscriber has missed a message and request a 
 retransmission, the publisher will lookup the the missed message in the cache and retransmit the message.
 The size of the retransmission cache are configured on a multicast group level 
-[setRetransmissionMaxCacheSize​(int pValue)](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/tree/master/javadoc/com/hoddmimes/distributor/DistributorConnectionConfiguration.html#setRetransmissionMaxCacheSize(int))
+[setRetransmissionMaxCacheSize​(int pValue)](https://htmlpreview.github.io/?https://github.com/hoddmimes/Distributor/blob/master/javadoc/com/hoddmimes/distributor/DistributorConnectionConfiguration.html#setRetransmissionMaxCacheSize(int))
                                                                             
 ## Distributor Console
 The _Distributor Console_ is a management gui application. The app communicates with other Distrbutor applications using _Distributor broadcasts_
@@ -319,7 +319,7 @@ The challenge is for receiver applications to receive and processes data and not
 
 ## A minimalist Publisher App
 
-A bit more comprehensive publisher sample is found [here](https://github.com/hoddmimes/Distributor/blob/master/pubsub/java/main/com/hoddmimes/distributor/samples/Publisher.java)
+A bit more comprehensive publisher sample is found [here](https://github.com/hoddmimes/Distributor/blob/master/pubsub/src/main/java/com/hoddmimes/distributor/samples/Publisher.java)
 
 <sup>
 
@@ -382,7 +382,7 @@ public class Publisher {
 
 ## A minimalist Subscriber App
 
-A bit more comprehensive subscriber sample is found [here](https://github.com/hoddmimes/Distributor/blob/master/pubsub/java/main/com/hoddmimes/distributor/samples/Subscriber.java)
+A bit more comprehensive subscriber sample is found [here](https://github.com/hoddmimes/Distributor/blob/master/pubsub/src/main/java/com/hoddmimes/distributor/samples/Subscriber.java)
 
 <sup>
 
