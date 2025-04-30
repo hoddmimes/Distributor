@@ -1,7 +1,12 @@
 # Java Multicast Distributor
 
-The *Distributor* utility is a **publish/subscribe** messaging component. The utility provides an API allowing application to publish real time data received by one or many applications on a [LAN](https://www.cisco.com/c/en/us/products/switches/what-is-a-lan-local-area-network.html#~types).
-The utility is a true _one-to-many_ transport using IP multicast as transport.
+The **Distributor** utility is a lightweight **publish/subscribe** messaging component designed for real-time data distribution over a local area network (LAN). 
+It provides a simple API that allows one or more applications to publish and share live data efficiently.
+
+This utility implements a true _one-to-many_ communication model using **IP multicast** as the underlying transport mechanism. 
+It is optimized for scenarios where multiple consumers need access to the same stream of volatile data with minimal latency.
+
+Learn more about [Local Area Networks (LANs)](https://www.cisco.com/c/en/us/products/switches/what-is-a-lan-local-area-network.html#~types).
 
 ## Area of Usage
 The distributor framework is primarily designed for applications that need to distribute high volumes of volatile real time information to
@@ -128,6 +133,21 @@ Some typical matching rules.
 “/foo/bar/…” with match anything with three or more levels, starting with “/foo” and “/bar” at level one and two. 
 
 
+## Data Filtering
+
+Subscribers **add** subscriptions to the _subjects_ they are interested in. With subjects organized hierarchically, 
+subscribers can filter data with fine granularity, reducing the need for custom filtering logic within the application itself.
+
+However, when a subscriber enables an **information class** (i.e., a multicast group), the _Distributor_ layer receives **all** data published to that information class. 
+The subject filter within the _Distributor_ then ensures that **only messages matching the subscriber’s subjects of interest** are delivered to the application.
+
+Using **more information classes** allows for better physical filtering, as only traffic for the enabled multicast groups is received. 
+This hardware-level filtering occurs directly on the **Ethernet controller**, offloading work from the CPU.
+
+That said, increasing the number of information classes can lead to a more complex configuration. 
+Additionally, many Ethernet controllers can filter only a limited number of multicast groups. If this limit is exceeded, the network card may enter [promiscuous mode](https://en.wikipedia.org/wiki/Promiscuous_mode), receiving **all** multicast packets. Filtering then falls back to the controller driver in software, increasing **CPU load** and potentially degrading performance.
+
+
 ## Nagging Distributor Connections
 
 The transport protocol when disseminating information with the Distributor utility is IP Multicast.  IP multicasting cater for layer 1 and 2 in the ISO/OSI model.
@@ -173,17 +193,41 @@ totRetransmissions = 0;
 
 
 ## Retransmission 
+The _Distributor_ transmission protocol offers virtually guaranteed delivery. 
+It includes mechanisms to detect both duplicate and lost messages, and automatically takes corrective actions when possible.
 
-The _Distributor_ transmission protocol has virtually guaranteed delivery. The protocoll has mechanisms for detect duplicates and lost messages and take proper action to recover.
-However, if messages can not be delivered in order the receiver application is notified about the exception via a callback.
-Since the _Distributor_ application does not have a sophisticated flow control the most likely cause for losing messages is data overrun. This typically is caused by the receiver application 
-not processing data fast enough and internal kernal buffers are filled up and eventually overwritten. Could happen due insufficient process capacity i.e. lack CPU cycles. 
-The only solution for these scenarios are; process data faster. Could be done by using a more powerful machine or optimizing the subscriber app. And / or possibly subscribe to a reduced dataflow (i.e. less _subjects_). 
+However, if messages cannot be delivered in order, the receiver application is notified of the exception through a callback.
 
-But it can also happen due to broadcast spikes i.e. the publisher sending a large amount of data in a short time.
-That will cause the kernel receiver buffer to be filled up and overwritten. To make receiver applications more resillent 
-kernal bufferes used for receiving multicast can be enlarged. By the default they may be on the lower side since normally there is not a large demand for 
-handling larger volumes of multicast traffic.
+The _Distributor_ does not implement advanced flow control. As a result, the most common cause of message loss is data overrun
+when the receiver cannot process incoming data quickly enough, leading to kernel buffer overflow. In such cases, data is overwritten 
+before it can be consumed. This typically occurs due to insufficient processing capacity, such as a lack of available CPU cycles on the receiving machine.
+
+To mitigate this, the subscriber can be optimized to process data more efficiently, or deployed on more capable hardware. 
+Alternatively, subscribing to a reduced data stream (i.e., fewer _subjects_) can lower the message volume and reduce pressure on system resources.
+
+Message loss can also occur due to broadcast spikes, where the publisher sends a large volume of data in a short period. 
+hese bursts may exceed the kernel’s receive buffer capacity, causing packets to be dropped.
+
+To improve resilience, the kernel buffers used for multicast reception can be increased. By default, 
+these buffers may be conservatively sized, as most systems are not tuned for high-volume multicast traffic. 
+Proper buffer tuning can significantly enhance stability under heavy load conditions.
+
+### Retransmission Caches
+
+A _Distributor_ instance publishing data maintains recently sent messages in **retransmission caches**. 
+If a subscriber detects a gap in the message stream, it issues a **retransmission request**, prompting the publisher to resend the missing message or messages.
+
+Both retransmission requests and the retransmissions themselves are sent using **IP multicast**. 
+his design has an important advantage: other subscribers that have missed the same messages can detect that a retransmission is 
+already in progress and suppress their own requests, reducing overall multicast traffic.
+
+The _Distributor_ supports a large number of _subjects_. 
+Each published message is associated with a _subject_, which in turn is tied to an **information class** i.e. represented by a multicast group.
+
+Retransmission caches are maintained **per information class** (i.e., per multicast group), **not per subject**. This means that even if the number of _subjects_ is high, 
+it does not increase the number of retransmission caches, and it may not necessarily impact their size.
+
+
 
 
 
