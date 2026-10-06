@@ -31,3 +31,8 @@ hs_err_pid*
 gradle/
 /pubsub/build/
 /msggen/build/
+/build/
+
+# Self-extracting installer build output
+/installer-build/
+*.run

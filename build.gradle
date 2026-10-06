@@ -1,7 +1,12 @@
 import groovy.json.JsonSlurper
 
 buildscript {
-    repositories { flatDir name: 'libs', dirs: "./libs" }
+    repositories {
+        flatDir {
+            name = 'libs'
+            dirs = ["./libs"]
+        }
+    }
     dependencies { classpath 'com.hoddmimes.versionplugin:versionplugin:1.0' }
 }
 
@@ -12,7 +17,7 @@ allprojects {
 }
 
 subprojects {
-    group 'com.hoddmimes'
+    group = 'com.hoddmimes'
 
     apply plugin: 'java'
     apply plugin: 'com.hoddmimes.versionplugin'
